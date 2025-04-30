@@ -14,12 +14,13 @@ import ProfilePage from './pages/auth/Profile';
 import MemorySpaceList from './pages/memorySpaces/MemorySpaceList';
 import MemorySpaceView from './pages/memorySpaces/MemorySpaceView';
 import TimelineView from './pages/timeline/TimelineView';
-import FamilyTree from './pages/familyTree/FamilyTree';
 import NotFound from './pages/NotFound';
+import Gallery from './pages/gallery/Gallery.tsx';
 
 // Contexts
 import { AuthContext } from './contexts/AuthContext';
 import { MemorySpaceProvider } from './contexts/MemorySpaceContext';
+
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -152,9 +153,9 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
-                <Route path="/family-tree" element={
+                <Route path="/gallery" element={
                   <ProtectedRoute>
-                    <FamilyTree />
+                    <Gallery />
                   </ProtectedRoute>
                 } />
                 

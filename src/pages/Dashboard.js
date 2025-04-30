@@ -255,20 +255,19 @@ const Dashboard = () => {
         </TabList>
         
         <TabPanels>
-          <TabPanel>
-            <Card>
-              <Title>Aktivitäten über Zeit</Title>
-              <Text>Anzahl der Uploads, Ansichten und Kommentare</Text>
-              <AreaChart
-                className="mt-4 h-72"
-                data={activityData}
-                index="date"
-                categories={["uploads", "views", "comments"]}
-                colors={["emerald", "blue", "amber"]}
-                valueFormatter={(number) => `${number} Aktionen`}
-              />
-            </Card>
-          </TabPanel>
+        <TabPanel>
+        <Card>
+          <Title>Aktivitäten über Zeit</Title>
+          <Text>Anzahl der Uploads, Ansichten und Kommentare</Text>
+          <AreaChart
+            data={activityData}
+            index="date"
+            categories={["uploads", "views", "comments"]}
+            colors={["emerald", "blue", "amber"]}
+            yAxisWidth={60}
+          />
+        </Card>
+      </TabPanel>
           
           <TabPanel>
             <Card>
