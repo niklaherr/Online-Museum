@@ -1,13 +1,19 @@
+import User from 'interfaces/User';
 import { useState } from 'react';
+import { Credentials, userService } from 'services/UserService';
 
-const LoginPage = ({ onLogin, onNavigate }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+type LoginPageProps = {
+  onNavigate: (route: string) => void;
+};
+
+const LoginPage = ({ onNavigate }: LoginPageProps) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setError('');
     
@@ -17,13 +23,15 @@ const LoginPage = ({ onLogin, onNavigate }) => {
     }
     
     setIsLoading(true);
+    const credentials: Credentials = {
+      username: email,
+      password: password,
+    };
+    const user = await userService.login(credentials);
+
+    setIsLoading(false);
     
-    // In einer echten App würde hier ein API-Aufruf stattfinden
-    // Für dieses Beispiel simulieren wir einen erfolgreichen Login
-    setTimeout(() => {
-      onLogin({ email, password, rememberMe });
-      setIsLoading(false);
-    }, 1000);
+    onNavigate('/');
   };
 
   return (

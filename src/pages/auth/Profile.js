@@ -121,12 +121,12 @@ const ProfilePage = () => {
                     {user.avatar ? (
                       <img 
                         src={user.avatar} 
-                        alt={user.name} 
+                        alt={user.username} 
                         className="w-full h-full rounded-full object-cover"
                       />
                     ) : (
                       <span className="text-2xl font-semibold text-gray-500">
-                        {user.name.charAt(0).toUpperCase()}
+                        {user.username.charAt(0).toUpperCase()}
                       </span>
                     )}
                   </div>

@@ -15,11 +15,13 @@ import MemorySpaceList from './pages/memorySpaces/MemorySpaceList';
 import MemorySpaceView from './pages/memorySpaces/MemorySpaceView';
 import TimelineView from './pages/timeline/TimelineView';
 import NotFound from './pages/NotFound';
-import Gallery from './pages/gallery/Gallery.tsx';
+import Gallery from './pages/gallery/Gallery';
 
 // Contexts
 import { AuthContext } from './contexts/AuthContext';
 import { MemorySpaceProvider } from './contexts/MemorySpaceContext';
+
+import { userService } from './services/UserService';
 
 
 function App() {
@@ -34,35 +36,31 @@ function App() {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setCurrentUser(JSON.parse(storedUser));
+      userService.setCurrentUser(JSON.parse(storedUser))
     }
     setLoading(false);
   }, []);
 
-  // Authentifizierungsfunktionen
-  const login = (userData) => {
-    // Simulierte Anmeldung
-    const user = {
-      id: 'user123',
-      email: userData.email,
-      name: 'Demo User',
-      role: 'user',
-      storage: {
-        used: 1250000000, // 1.25 GB
-        total: 5000000000, // 5 GB
+  useEffect(() => {
+    const handleUserChange = (user) => {
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+        setCurrentUser(user)
+      } else {
+        setCurrentUser(null);
+        localStorage.removeItem('user');
+        navigate('/login');
       }
+      
     };
-    
-    setCurrentUser(user);
-    localStorage.setItem('user', JSON.stringify(user));
-    navigate('/');
-    return user;
-  };
 
-  const logout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
+    userService.subscribe(handleUserChange);
+
+    // Cleanup on unmount
+    return () => {
+      userService.unsubscribe(handleUserChange);
+    };
+  }, []);
 
   const register = (userData) => {
     // Simulierte Registrierung
@@ -96,9 +94,7 @@ function App() {
 
   return (
     <AuthContext.Provider value={{ 
-      user: currentUser, 
-      login, 
-      logout, 
+      user: currentUser,
       register,
       isAuthenticated: !!currentUser
     }}>
@@ -113,14 +109,14 @@ function App() {
           
           <div className="flex flex-col flex-1 overflow-hidden">
             <Header 
-              toggleSidebar={() => setSidebarOpen(!sidebarOpen)} 
+              toggleSidebar={setSidebarOpen} 
               user={currentUser}
-              onLogout={logout}
+              sidebarOpen={sidebarOpen}
             />
             
             <main className="flex-1 overflow-y-auto p-4 md:p-6">
               <Routes>
-                <Route path="/login" element={<LoginPage onLogin={login} onNavigate={() => navigate('/register')} />} />
+                <Route path="/login" element={<LoginPage onNavigate={() => navigate('/')} />} />
                 <Route path="/register" element={<RegisterPage onRegister={register} onNavigate={() => navigate('/login')} />} />
                 
                 <Route path="/" element={

@@ -1,16 +1,27 @@
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
+import { userService } from 'services/UserService';
 
-const Header = ({ toggleSidebar }) => {
-  const { user, logout } = useContext(AuthContext);
+type HeaderProps = {
+  onNavigate: (route: string) => void;
+  toggleSidebar: (sidebarOpen: boolean) => void;
+  sidebarOpen: boolean;
+};
+const Header = ({onNavigate, toggleSidebar, sidebarOpen } : HeaderProps) => {
+  const { user } = useContext(AuthContext);
+
+  const logout = async () => {
+    await userService.logout();
+    onNavigate('/login');
+  };
 
   return (
     <header className="bg-white shadow px-4 py-2 flex items-center justify-between">
       <div className="flex items-center">
         {user && (
           <button
-            onClick={toggleSidebar}
+            onClick={() => toggleSidebar(!sidebarOpen)}
             className="mr-2 text-gray-600 hover:text-gray-900"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,13 +39,9 @@ const Header = ({ toggleSidebar }) => {
         {user ? (
           <div className="relative group">
             <button className="flex items-center space-x-2">
-              <span className="hidden md:block">{user.name}</span>
+              <span className="hidden md:block">{userService.getUserName()}</span>
               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                {user.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
-                ) : (
-                  user.name.charAt(0)
-                )}
+                {userService.getUserName() ? userService.getUserName()!.charAt(0) : ""}
               </div>
             </button>
             

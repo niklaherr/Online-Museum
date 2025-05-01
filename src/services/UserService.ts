@@ -62,6 +62,15 @@ class UserService {
         return this.currentUser != null;
     }
 
+    getUserName(): string | undefined {
+        return this.currentUser?.username;
+    }
+
+    setCurrentUser(user: User) {
+        this.currentUser = user;
+    }
+
+
     /**
      * Subscribes a listener to user changes.
      */
