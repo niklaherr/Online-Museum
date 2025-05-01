@@ -11,16 +11,6 @@ const ProfilePage = () => {
     bio: user?.bio || '',
   });
 
-  // Speichernutzung berechnen
-  const storagePercentage = user?.storage 
-    ? Math.round((user.storage.used / user.storage.total) * 100) 
-    : 0;
-  
-  // Formatierung der Speichergröße in GB
-  const formatStorage = (bytes) => {
-    return (bytes / 1000000000).toFixed(1) + ' GB';
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -170,47 +160,6 @@ const ProfilePage = () => {
         </Col>
         
         <Col>
-          <Card>
-            <Title>Speichernutzung</Title>
-            <Metric className="mt-2">
-              {user.storage && formatStorage(user.storage.used)} von {user.storage && formatStorage(user.storage.total)}
-            </Metric>
-            
-            <ProgressBar value={storagePercentage} color="blue" className="mt-3" />
-            
-            <Text className="mt-3">
-              {storagePercentage}% Ihres Speichers sind belegt
-            </Text>
-            
-            <div className="mt-6 space-y-4">
-              <div className="flex justify-between">
-                <Text>Bilder</Text>
-                <Text className="font-medium">0.8 GB</Text>
-              </div>
-              <div className="flex justify-between">
-                <Text>Videos</Text>
-                <Text className="font-medium">0.4 GB</Text>
-              </div>
-              <div className="flex justify-between">
-                <Text>Dokumente</Text>
-                <Text className="font-medium">0.2 GB</Text>
-              </div>
-            </div>
-            
-            <div className="mt-6">
-              <Button 
-                variant="secondary" 
-                color="blue"
-                icon={() => (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                )}
-              >
-                Speicherplatz erweitern
-              </Button>
-            </div>
-          </Card>
           
           <Card className="mt-6">
             <Title>Kontoeinstellungen</Title>

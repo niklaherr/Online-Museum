@@ -229,28 +229,12 @@ const Dashboard = () => {
             </div>
           </Flex>
         </Card>
-        
-        <Card decoration="top" decorationColor="purple">
-          <Flex alignItems="start">
-            <div>
-              <Text>Speichernutzung</Text>
-              <Metric>5.0 GB</Metric>
-              <Text className="mt-2">1.4 GB von 5 GB genutzt</Text>
-            </div>
-            <div className="bg-purple-100 p-3 rounded-full">
-              <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-              </svg>
-            </div>
-          </Flex>
-        </Card>
       </Grid>
       
       {/* Abschnitt für detaillierte Analysen und Diagramme */}
       <TabGroup>
         <TabList>
           <Tab>Aktivitätsübersicht</Tab>
-          <Tab>Speichernutzung</Tab>
           <Tab>Kategorien</Tab>
         </TabList>
         
@@ -268,21 +252,6 @@ const Dashboard = () => {
           />
         </Card>
       </TabPanel>
-          
-          <TabPanel>
-            <Card>
-              <Title>Speichernutzung nach Medientyp</Title>
-              <Text>Verteilung des belegten Speicherplatzes (in GB)</Text>
-              <DonutChart
-                className="mt-6 h-60"
-                data={storageUsageData}
-                category="value"
-                index="category"
-                colors={["blue", "cyan", "indigo", "violet"]}
-                valueFormatter={(value) => `${value} GB`}
-              />
-            </Card>
-          </TabPanel>
           
           <TabPanel>
             <Card>

@@ -49,9 +49,6 @@ const Header = ({onNavigate, toggleSidebar, sidebarOpen } : HeaderProps) => {
               <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 Profil
               </Link>
-              <Link to="/storage" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                Speicher
-              </Link>
               <button 
                 onClick={logout}
                 className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
