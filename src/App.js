@@ -62,25 +62,6 @@ function App() {
     };
   }, []);
 
-  const register = (userData) => {
-    // Simulierte Registrierung
-    const user = {
-      id: 'user' + Date.now(),
-      email: userData.email,
-      name: userData.name,
-      role: 'user',
-      storage: {
-        used: 0,
-        total: 2000000000, // 2 GB für neue Nutzer
-      }
-    };
-    
-    setCurrentUser(user);
-    localStorage.setItem('user', JSON.stringify(user));
-    navigate('/');
-    return user;
-  };
-
   // Geschützte Route - leitet zu Login weiter, wenn nicht angemeldet
   const ProtectedRoute = ({ children }) => {
     if (loading) return <div>Lädt...</div>;
@@ -95,7 +76,6 @@ function App() {
   return (
     <AuthContext.Provider value={{ 
       user: currentUser,
-      register,
       isAuthenticated: !!currentUser
     }}>
       <MemorySpaceProvider>
@@ -109,6 +89,7 @@ function App() {
           
           <div className="flex flex-col flex-1 overflow-hidden">
             <Header 
+              onNavigate={(route) => navigate(route)} 
               toggleSidebar={setSidebarOpen} 
               user={currentUser}
               sidebarOpen={sidebarOpen}
@@ -116,8 +97,8 @@ function App() {
             
             <main className="flex-1 overflow-y-auto p-4 md:p-6">
               <Routes>
-                <Route path="/login" element={<LoginPage onNavigate={() => navigate('/')} />} />
-                <Route path="/register" element={<RegisterPage onRegister={register} onNavigate={() => navigate('/login')} />} />
+                <Route path="/login" element={<LoginPage onNavigate={(route) => navigate(route)} />} />
+                <Route path="/register" element={<RegisterPage onNavigate={(route) => navigate(route)} />} />
                 
                 <Route path="/" element={
                   <ProtectedRoute>

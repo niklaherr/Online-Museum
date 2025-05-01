@@ -142,7 +142,7 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
           <p className="text-sm text-gray-600">
             Noch kein Konto?{' '}
             <button
-              onClick={() => onNavigate('register')}
+              onClick={() => onNavigate('/register')}
               className="font-medium text-blue-600 hover:text-blue-500"
             >
               Jetzt registrieren

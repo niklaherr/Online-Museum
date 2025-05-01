@@ -1,6 +1,11 @@
 import { useState } from 'react';
+import { Credentials, userService } from 'services/UserService';
 
-const RegisterPage = ({ onRegister, onNavigate }) => {
+type RegisterPageProps = {
+  onNavigate: (route: string) => void;
+};
+
+const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -8,7 +13,7 @@ const RegisterPage = ({ onRegister, onNavigate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setError('');
     
@@ -21,15 +26,16 @@ const RegisterPage = ({ onRegister, onNavigate }) => {
       setError('Die Passwörter stimmen nicht überein');
       return;
     }
-    
     setIsLoading(true);
+    const credentials: Credentials = {
+      username: email,
+      password: password,
+    };
+    const user = await userService.signup(credentials);
+
+    setIsLoading(false);
     
-    // In einer echten App würde hier ein API-Aufruf stattfinden
-    // Hier nur eine Simulation
-    setTimeout(() => {
-      onRegister({ name, email, password });
-      setIsLoading(false);
-    }, 1000);
+    onNavigate('/');
   };
 
   return (
