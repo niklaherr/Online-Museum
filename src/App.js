@@ -120,7 +120,7 @@ function App() {
                 
                 <Route path="/memory-spaces/:id" element={
                   <ProtectedRoute>
-                    <MemorySpaceView />
+                    <MemorySpaceView onNavigate={(route) => navigate(route)} />
                   </ProtectedRoute>
                 } />
                 

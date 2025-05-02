@@ -162,6 +162,59 @@ app.get("/item-lists", authenticateJWT, async (req, res) => {
     }
 });
 
+// Get a single item list by ID
+app.get("/item-lists/:id", authenticateJWT, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query("SELECT * FROM item_list WHERE id = $1", [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).send("Item list not found");
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching item list");
+    }
+});
+
+// Get items by item_list_id
+app.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) => {
+    const { item_list_id } = req.params; // Extract the item_list_id from the URL
+
+    try {
+        // Query to get the items related to a specific item_list_id
+        const result = await pool.query(
+            `SELECT item.id, item.title, item.category, item.entered_on, item.description, item.user_id, item.image
+             FROM item
+             JOIN item_itemlist ON item.id = item_itemlist.item_id
+             WHERE item_itemlist.item_list_id = $1
+             ORDER BY item.entered_on DESC`,
+            [item_list_id] // Pass the item_list_id as a parameter
+        );
+
+        // Map each item and convert the image to a base64 string if it exists
+        const items = result.rows.map((item) => ({
+            id: item.id,
+            title: item.title,
+            category: item.category,
+            entered_on: item.entered_on,
+            description: item.description,
+            user_id: item.user_id,
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '' // Convert image to base64 here
+        }));
+
+        // Send the items (including base64 images) to the frontend
+        res.json(items);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching items for the specified item list");
+    }
+});
+
+
 // Start server
 app.listen(port, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${port}`);

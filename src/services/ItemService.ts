@@ -1,7 +1,7 @@
 import NotyfService from "./NotyfService";
 import { userService } from "./UserService";
 import User from "../interfaces/User";
-import Item from "../interfaces/Item";
+import Item, { GalleryItem } from "../interfaces/Item";
 import ItemList from "interfaces/ItemList";
 
 class ItemService {
@@ -49,6 +49,56 @@ class ItemService {
 
     const headers = { Authorization: `Bearer ${token}` };
     return await this.getWithRetry<ItemList[]>("/item-lists", headers);
+  }
+
+  async fetchItemListById(id: string): Promise<ItemList> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+  
+    const headers = { Authorization: `Bearer ${token}` };
+    return await this.getWithRetry<ItemList>(`/item-lists/${id}`, headers);
+  }
+
+  // New function to fetch items by item_list_id
+  async fetchItemsByItemListId(itemListId: number): Promise<GalleryItem[]> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    // Fetch items for the specific item list
+    try {
+      const res = await fetch(`${this.baseUrl}/item-lists/${itemListId}/items`, {
+        method: "GET",
+        headers,
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Laden der Items: ${errorMessage}`);
+      }
+
+      const items = await res.json();
+
+      const users: User[] = await this.getWithRetry("/users", headers);
+
+      const mapped: GalleryItem[] = items.map((item: Item) => {
+        const user = users.find(u => u.id === item.user_id); // Find the user for each item based on user_id
+
+        return {
+          category: item.category,
+          title: item.title,
+          entered_on: item.entered_on,
+          username: user ? user.username : 'Unknown', // Handle case where user is not found
+          image: item.image,
+        };
+      });
+
+      return mapped
+    } catch (err: any) {
+      console.error("Fehler beim Abrufen der Items:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Items.");
+    }
   }
 
   async createItem(data: {

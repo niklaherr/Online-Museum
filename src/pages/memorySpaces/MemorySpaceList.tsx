@@ -11,6 +11,7 @@ type SpaceCardProps = {
 
 // Komponente für eine einzelne Erinnerungsraum-Karte
 const SpaceCard = ({ list, onView }: SpaceCardProps) => {
+  
   return (
     <div 
       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
