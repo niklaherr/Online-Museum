@@ -33,10 +33,8 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({ item, onClose }) => 
         </div>
 
         {/* Close Button */}
-        <div className="mt-6 flex justify-center">
-          <Button onClick={onClose} color="red">
-            Close
-          </Button>
+        <div className="flex justify-end space-x-2 mt-6">
+          <Button onClick={onClose}>Close</Button>
         </div>
       </div>
     </div>

@@ -6,8 +6,7 @@ type RegisterPageProps = {
 };
 
 const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +16,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
     e.preventDefault();
     setError('');
     
-    if (!name || !email || !password) {
+    if (!username || !password) {
       setError('Bitte füllen Sie alle Pflichtfelder aus');
       return;
     }
@@ -28,7 +27,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
     }
     setIsLoading(true);
     const credentials: Credentials = {
-      username: email,
+      username: username,
       password: password,
     };
     const user = await userService.signup(credentials);
@@ -61,24 +60,10 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
             </label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Ihr Name"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              E-Mail-Adresse
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="ihre@email.de"
               required
             />
           </div>

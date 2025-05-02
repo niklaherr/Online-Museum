@@ -7,3 +7,7 @@ export default interface Item {
     description: string;
     category: string;
   };  
+
+export interface GalleryItem extends Item {
+  username: string
+}
