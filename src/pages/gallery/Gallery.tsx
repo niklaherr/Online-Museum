@@ -5,17 +5,27 @@ import { GalleryModal } from "../../components/gallery/GalleryModal";
 import { userService } from "../../services/UserService";
 import Item from "../../interfaces/Item";
 import { itemService } from "../../services/ItemService";
+import NotyfService from "services/NotyfService";
 
-const Gallery: React.FC = () => {
+type GalleryProps = {
+  onNavigate: (route: string) => void;
+};
+
+const Gallery = ({ onNavigate }: GalleryProps) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [museumItems, setMuseumItems] = useState<any[]>([]);
 
   useEffect(() => {
     const loadItems = async () => {
-      const items = await itemService.fetchAllItemsWithUsers();
-      setMuseumItems(items);
-      console.log(items)
+      try {
+        const items = await itemService.fetchAllItemsWithUsers();
+        setMuseumItems(items);
+      } catch (err) {
+        NotyfService.showError("Fehler beim Laden der Items.");
+        userService.logout()
+        onNavigate('/login')
+      }
     };
 
     loadItems();

@@ -19,7 +19,7 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({ item, onClose }) => 
         <div className="mt-4">
           <div className="flex space-x-4 overflow-x-auto">
             <img
-              src={item.images[0]}
+              src={item.image}
               alt={item.name}
               className="w-48 h-48 object-cover rounded-lg border border-gray-300"
             />

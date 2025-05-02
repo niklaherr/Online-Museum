@@ -151,6 +151,17 @@ app.post("/items", authenticateJWT, async (req, res) => {
     }
 });
 
+// Get all item lists
+app.get("/item-lists", authenticateJWT, async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM item_list ORDER BY id ASC");
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching item lists");
+    }
+});
+
 // Start server
 app.listen(port, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${port}`);

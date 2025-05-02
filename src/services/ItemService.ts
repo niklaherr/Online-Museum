@@ -3,6 +3,7 @@ import NotyfService from "./NotyfService";
 import { userService } from "./UserService";
 import  User  from "../interfaces/User";
 import  Item  from "../interfaces/Item";
+import ItemList from "interfaces/ItemList";
 
 class ItemService {
   private maxRetries: number;
@@ -14,8 +15,7 @@ class ItemService {
   }
 
   async fetchAllItemsWithUsers(): Promise<any[]> {
-    try {
-      const token = userService.getToken();
+    const token = userService.getToken();
       if (!token) throw new Error("Nicht eingeloggt.");
 
       const headers = { Authorization: `Bearer ${token}` };
@@ -42,11 +42,14 @@ class ItemService {
       allItems.push(...mapped);
 
       return allItems;
-    } catch (err) {
-      console.error(err);
-      NotyfService.showError("Fehler beim Laden der Items.");
-      return [];
-    }
+  }
+
+  async fetchItemLists(): Promise<ItemList[]> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+  
+    const headers = { Authorization: `Bearer ${token}` };
+    return await this.getWithRetry<ItemList[]>("/item-lists", headers);
   }
 
   private async getWithRetry<T>(endpoint: string, headers: Record<string, string>): Promise<T> {

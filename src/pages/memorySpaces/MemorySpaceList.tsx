@@ -1,122 +1,81 @@
+import ItemList from 'interfaces/ItemList';
 import { useState, useEffect } from 'react';
+import { itemService } from 'services/ItemService';
+import NotyfService from 'services/NotyfService';
+import { userService } from 'services/UserService';
+
+type SpaceCardProps = {
+  list: ItemList
+  onView: (id: number) => void;
+};
 
 // Komponente für eine einzelne Erinnerungsraum-Karte
-const SpaceCard = ({ space, onView }) => {
+const SpaceCard = ({ list, onView }: SpaceCardProps) => {
   return (
     <div 
       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-      onClick={() => onView(space.id)}
+      onClick={() => onView(list.id)}
     >
       <div className="h-40 bg-gray-200 relative">
-        {space.coverImage ? (
-          <img
-            src={space.coverImage}
-            alt={space.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-500">
+        <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-500">
             <svg className="w-16 h-16 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-        )}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-3">
-          <h3 className="text-white font-medium truncate">{space.title}</h3>
+          <h3 className="text-white font-medium truncate">{list.title}</h3>
         </div>
         <div className="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full px-2 py-1 text-xs font-medium">
-          {space.isPrivate ? 'Privat' : 'Öffentlich'}
+          {false ? 'Privat' : 'Öffentlich'}
         </div>
       </div>
       <div className="p-4">
         <p className="text-gray-500 text-sm mb-2">
-          {space.itemCount} Einträge • Erstellt am {new Date(space.createdAt).toLocaleDateString('de-DE')}
+          {34} Einträge • Erstellt am {new Date().toLocaleDateString('de-DE')}
         </p>
-        <p className="text-gray-700 line-clamp-2 text-sm">{space.description}</p>
+        <p className="text-gray-700 line-clamp-2 text-sm">{list.description}</p>
       </div>
     </div>
   );
 };
 
-// Hauptkomponente für die Liste der Erinnerungsräume
-const MemorySpaceList = ({ onViewSpace }) => {
-  const [spaces, setSpaces] = useState([]);
+type MemorySpaceListProps = {
+  onViewSpace: (id: number) => void;
+  onNavigate: (route: string) => void;
+};
+
+const MemorySpaceList = ({ onViewSpace, onNavigate }: MemorySpaceListProps) => {
+  const [itemLists, setItemLists] = useState<ItemList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'private', 'public'
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Simulierte Daten laden
   useEffect(() => {
-    // In einer echten App würde hier eine API-Anfrage erfolgen
-    const loadSpaces = async () => {
-      // Simulierte Verzögerung
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Beispieldaten
-      const mockSpaces = [
-        {
-          id: '1',
-          title: 'Familienurlaub Italien 2022',
-          description: 'Unsere Reise durch die Toskana und entlang der Amalfiküste - ein unvergessliches Abenteuer.',
-          coverImage: '/api/placeholder/800/400',
-          isPrivate: false,
-          itemCount: 42,
-          createdAt: '2022-06-15T12:00:00Z',
-          category: 'Reisen'
-        },
-        {
-          id: '2',
-          title: 'Omas Kriegserinnerungen',
-          description: 'Gesammelte Geschichten, Briefe und Fotos aus der Kriegszeit 1939-1945.',
-          coverImage: '/api/placeholder/800/400',
-          isPrivate: true,
-          itemCount: 18,
-          createdAt: '2023-01-10T09:30:00Z',
-          category: 'Kriegserinnerungen'
-        },
-        {
-          id: '3',
-          title: 'Hochzeit von Marie & Thomas',
-          description: 'Der schönste Tag im Leben von Marie und Thomas - alle Erinnerungen an diesen besonderen Tag.',
-          coverImage: '/api/placeholder/800/400',
-          isPrivate: false,
-          itemCount: 87,
-          createdAt: '2023-09-05T16:45:00Z',
-          category: 'Familienfeiern'
-        },
-        {
-          id: '4',
-          title: 'Großvaters Werkstatt',
-          description: 'Alles rund um die Schreinerei meines Großvaters, die von 1950 bis 1985 bestand.',
-          coverImage: null,
-          isPrivate: true,
-          itemCount: 24,
-          createdAt: '2023-11-20T11:15:00Z',
-          category: 'Berufsleben'
-        }
-      ];
-      
-      setSpaces(mockSpaces);
-      setIsLoading(false);
+    const loadItemLists = async () => {
+      try {
+        const itemLists = await itemService.fetchItemLists();
+        setItemLists(itemLists);
+        setIsLoading(false);
+      } catch (err) {
+        NotyfService.showError("Fehler beim Laden der Items.");
+        userService.logout()
+        onNavigate('/login')
+      }
     };
-    
-    loadSpaces();
+
+    loadItemLists();
   }, []);
 
   // Filtern und Suchen der Erinnerungsräume
-  const filteredSpaces = spaces.filter(space => {
-    // Nach Sichtbarkeit filtern
-    if (filter === 'private' && !space.isPrivate) return false;
-    if (filter === 'public' && space.isPrivate) return false;
+  const filteredLists = itemLists.filter(list => {
     
     // Nach Suchbegriff filtern
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       return (
-        space.title.toLowerCase().includes(term) || 
-        space.description.toLowerCase().includes(term) ||
-        space.category.toLowerCase().includes(term)
+        list.title.toLowerCase().includes(term) || 
+        list.description.toLowerCase().includes(term)
       );
     }
     
@@ -198,7 +157,7 @@ const MemorySpaceList = ({ onViewSpace }) => {
         </div>
       </div>
       
-      {filteredSpaces.length === 0 ? (
+      {filteredLists.length === 0 ? (
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -223,8 +182,8 @@ const MemorySpaceList = ({ onViewSpace }) => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSpaces.map(space => (
-            <SpaceCard key={space.id} space={space} onView={onViewSpace} />
+          {filteredLists.map(list => (
+            <SpaceCard key={list.id} list={list} onView={onViewSpace} />
           ))}
         </div>
       )}

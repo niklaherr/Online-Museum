@@ -114,7 +114,7 @@ function App() {
                 
                 <Route path="/memory-spaces" element={
                   <ProtectedRoute>
-                    <MemorySpaceList onViewSpace={(id) => navigate(`/memory-spaces/${id}`)} />
+                    <MemorySpaceList onNavigate={(route) => navigate(route)} onViewSpace={(id) => navigate(`/memory-spaces/${id}`)} />
                   </ProtectedRoute>
                 } />
                 
@@ -132,7 +132,7 @@ function App() {
                 
                 <Route path="/gallery" element={
                   <ProtectedRoute>
-                    <Gallery />
+                    <Gallery onNavigate={(route) => navigate(route)}  />
                   </ProtectedRoute>
                 } />
                 
