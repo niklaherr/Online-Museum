@@ -155,6 +155,40 @@ class ItemService {
     }
   }
 
+  async createItemList(data: {
+    title: string;
+    description?: string;
+    item_ids: number[];
+  }): Promise<any> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+
+    try {
+      // Sending the POST request to create a new item list
+      const res = await fetch(`${this.baseUrl}/item-lists`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      // Handling errors if the response is not ok
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Erstellen der Liste: ${errorMessage}`);
+      }
+
+      // Return the response data (the created item list)
+      const createdItemList = await res.json();
+      return createdItemList;
+    } catch (err: any) {
+      console.error("Item list creation failed:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Erstellen der Item-Liste.");
+    }
+  }
+
   private async getWithRetry<T>(endpoint: string, headers: Record<string, string>): Promise<T> {
     let attempts = 0;
     while (attempts < this.maxRetries) {

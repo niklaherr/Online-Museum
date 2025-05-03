@@ -4,7 +4,11 @@ import Item from "interfaces/Item";
 import { itemService } from "services/ItemService";
 import NotyfService from "services/NotyfService";
 
-export default function CreateItemList() {
+type CreateItemListProps = {
+    onNavigate: (route: string) => void;
+  };
+
+export default function CreateItemList({ onNavigate} : CreateItemListProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [userItems, setUserItems] = useState<Item[]>([]);
@@ -35,14 +39,9 @@ export default function CreateItemList() {
     }
 
     try {
-      /*
-        const newList = await itemService.createItemList({ title, description });
-
-        for (const itemId of selectedItemIds) {
-          await itemService.addItemToItemList(newList.id, itemId);
-        }
-      */
+      await itemService.createItemList({ title: title, description: description, item_ids: selectedItemIds });
       NotyfService.showSuccess("Liste erfolgreich erstellt.");
+      onNavigate('/item-list')
       setTitle("");
       setDescription("");
       setSelectedItemIds([]);

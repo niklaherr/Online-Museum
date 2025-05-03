@@ -210,6 +210,50 @@ app.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) => 
     }
 });
 
+app.post("/item-lists", authenticateJWT, async (req, res) => {
+    const { title, description, item_ids } = req.body;
+
+    try {
+        // Get the user_id from the JWT token (req.user is set by authenticateJWT middleware)
+        const userId = req.user.id;
+
+        // Check if title and item_ids are provided
+        if (!title || !item_ids || item_ids.length === 0) {
+            return res.status(400).send("Title and at least one item ID are required.");
+        }
+
+        // Insert the new item list into the database
+        const result = await pool.query(
+            "INSERT INTO item_list (title, description, user_id) VALUES ($1, $2, $3) RETURNING id",
+            [title, description || "", userId] // Use userId from JWT
+        );
+
+        const newItemListId = result.rows[0].id;
+
+        // Now insert the selected items into the item_itemlist table to associate them with the new item list
+        for (const itemId of item_ids) {
+            await pool.query(
+                "INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)",
+                [newItemListId, itemId]
+            );
+        }
+
+        // Send the created item list response
+        res.status(201).json({
+            id: newItemListId,
+            title,
+            description,
+            user_id: userId,
+            item_ids,
+        });
+    } catch (err) {
+        console.error("Error creating item list:", err);
+        res.status(500).send("Error creating item list.");
+    }
+});
+
+  
+
 
 // Start server
 app.listen(port, "0.0.0.0", () => {

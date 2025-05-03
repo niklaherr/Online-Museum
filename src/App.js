@@ -133,7 +133,7 @@ function App() {
 
                 <Route path="/item-list/create" element={
                   <ProtectedRoute>
-                    <CreateItemList />
+                    <CreateItemList onNavigate={(route) => navigate(route)} />
                   </ProtectedRoute>
                 } />
                 
