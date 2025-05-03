@@ -1,15 +1,18 @@
+import { UserIcon } from '@heroicons/react/24/outline';
+import { Card, Text } from '@tremor/react';
 import { GalleryItem } from 'interfaces/Item';
 import ItemList from 'interfaces/ItemList';
+import NoResults from 'pages/NoResults';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { itemService } from 'services/ItemService';
 import NotyfService from 'services/NotyfService';
 import { userService } from 'services/UserService';
 
-type MemorySpaceViewProps = {
+type ItemListDetailViewProps = {
   onNavigate: (route: string) => void;
 };
-const MemorySpaceView = ({onNavigate } : MemorySpaceViewProps) => {
+const ItemListDetailView = ({onNavigate } : ItemListDetailViewProps) => {
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'image', 'video', 'audio', 'document'
@@ -94,68 +97,47 @@ const MemorySpaceView = ({onNavigate } : MemorySpaceViewProps) => {
         <p className="text-gray-700">{list?.description}</p>
       </div>
       
-      {/* Tabs für Medientypen */}
+      {/* Items */}
       <div className="bg-white rounded-lg shadow-sm mb-6">
-        <div className="border-b border-gray-200">
-          <div className="flex overflow-x-auto">
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${
-                activeTab === 'all'
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
+
+        {items.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-4 gap-6 w-full max-w-screen-xl mx-auto mt-6 px-4">
+          {items.map((item) => (
+            <Card
+              key={item.id}  // Use a unique identifier
+              className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
+              //onClick={() => handleItemClick(item)}
             >
-              Alle Medien
-            </button>
-            <button
-              onClick={() => setActiveTab('image')}
-              className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${
-                activeTab === 'image'
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Bilder
-            </button>
-            <button
-              onClick={() => setActiveTab('video')}
-              className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${
-                activeTab === 'video'
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Videos
-            </button>
-            <button
-              onClick={() => setActiveTab('audio')}
-              className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${
-                activeTab === 'audio'
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Audio
-            </button>
-            <button
-              onClick={() => setActiveTab('document')}
-              className={`px-4 py-3 text-sm font-medium whitespace-nowrap ${
-                activeTab === 'document'
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Dokumente
-            </button>
-          </div>
+              <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">{item.category}</Text>
+              <Text className="mt-2 text-lg font-semibold">{item.title}</Text>
+              <Text className="text-sm text-gray-500 mt-1">Entered on: {item.entered_on}</Text>
+
+              <div className="mt-2">
+                <div className="flex space-x-4 overflow-x-auto">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-48 h-48 object-cover rounded-lg border border-gray-300"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center space-x-2">
+                <UserIcon className="w-5 h-5 text-gray-500" />
+                <Text className="text-sm text-gray-700">{item.username}</Text>
+              </div>
+            </Card>
+          ))}
         </div>
+        ) : (
+          <NoResults />
+        )}
         
         
       </div>
       
       {/* Aktionsleiste am unteren Rand */}
-      <div className="sticky bottom-4 bg-white rounded-lg shadow-md p-3 flex justify-between items-center">
+      <div className="bottom-4 bg-white rounded-lg shadow-md p-3 flex justify-between items-center">
         <div className="flex space-x-4">
           <button className="flex items-center text-gray-700 hover:text-blue-600">
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,4 +164,4 @@ const MemorySpaceView = ({onNavigate } : MemorySpaceViewProps) => {
   );
 };
 
-export default MemorySpaceView;
+export default ItemListDetailView;

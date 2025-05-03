@@ -11,8 +11,8 @@ import Dashboard from './pages/Dashboard';
 import LoginPage from './pages/auth/Login';
 import RegisterPage from './pages/auth/Register';
 import ProfilePage from './pages/auth/Profile';
-import MemorySpaceList from './pages/memorySpaces/MemorySpaceList';
-import MemorySpaceView from './pages/memorySpaces/MemorySpaceView';
+import ItemListView from './pages/memorySpaces/ItemListView';
+import ItemListDetailView from './pages/memorySpaces/ItemListDetailView';
 import TimelineView from './pages/timeline/TimelineView';
 import NotFound from './pages/NotFound';
 import Gallery from './pages/gallery/Gallery';
@@ -22,6 +22,7 @@ import { AuthContext } from './contexts/AuthContext';
 import { MemorySpaceProvider } from './contexts/MemorySpaceContext';
 
 import { userService } from './services/UserService';
+import CreateItemList from 'components/itemList/CreateItemList';
 
 
 function App() {
@@ -112,21 +113,27 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
-                <Route path="/memory-spaces" element={
+                <Route path="/item-list" element={
                   <ProtectedRoute>
-                    <MemorySpaceList onNavigate={(route) => navigate(route)} onViewSpace={(id) => navigate(`/memory-spaces/${id}`)} />
+                    <ItemListView onNavigate={(route) => navigate(route)} onViewSpace={(id) => navigate(`/item-list/${id}`)} />
                   </ProtectedRoute>
                 } />
                 
-                <Route path="/memory-spaces/:id" element={
+                <Route path="/item-list/:id" element={
                   <ProtectedRoute>
-                    <MemorySpaceView onNavigate={(route) => navigate(route)} />
+                    <ItemListDetailView onNavigate={(route) => navigate(route)} />
                   </ProtectedRoute>
                 } />
                 
-                <Route path="/memory-spaces/:id/timeline" element={
+                <Route path="/item-list/:id/timeline" element={
                   <ProtectedRoute>
                     <TimelineView />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="/item-list/create" element={
+                  <ProtectedRoute>
+                    <CreateItemList />
                   </ProtectedRoute>
                 } />
                 

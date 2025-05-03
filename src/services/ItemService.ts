@@ -43,6 +43,27 @@ class ItemService {
     return allItems;
   }
 
+  async fetchOwnItems(): Promise<Item[]> {
+    const token = userService.getToken();
+    const userID = userService.getUserID(); // Assumes this returns the logged-in user
+    if (!token || !userID) throw new Error("Nicht eingeloggt.");
+  
+    const headers = { Authorization: `Bearer ${token}` };
+  
+    const res = await fetch(`${this.baseUrl}/items?user_id=${userID}`, {
+      method: "GET",
+      headers,
+    });
+  
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Fehler beim Laden der eigenen Items: ${errorText}`);
+    }
+  
+    return await res.json();
+  }
+  
+
   async fetchItemLists(): Promise<ItemList[]> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");

@@ -6,7 +6,7 @@ import { userService } from "../../services/UserService";
 import Item, { GalleryItem } from "../../interfaces/Item";
 import { itemService } from "../../services/ItemService";
 import NotyfService from "services/NotyfService";
-import { CreateItemModal } from "../../components/gallery/CreateItemModal"; // Import the CreateItemModal
+import { CreateItemModal } from "../../components/gallery/CreateItemModal";
 import NoResults from "pages/NoResults";
 
 type GalleryProps = {
@@ -14,14 +14,12 @@ type GalleryProps = {
 };
 
 const Gallery = ({ onNavigate }: GalleryProps) => {
-  // State Hooks
-  const [showModal, setShowModal] = useState(false);  // For viewing item details
-  const [showCreateModal, setShowCreateModal] = useState(false); // For creating new item
+  const [showModal, setShowModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
-  const [museumItems, setMuseumItems] = useState<GalleryItem[]>([]);  // Improved typing
-  const [searchQuery, setSearchQuery] = useState("");  // Search query state
+  const [museumItems, setMuseumItems] = useState<GalleryItem[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Function to load items
   const loadItems = async () => {
     try {
       const items = await itemService.fetchAllItemsWithUsers();
@@ -33,12 +31,10 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     }
   };
 
-  // Fetch items on initial load
   useEffect(() => {
     loadItems();
   }, []);
 
-  // Filter items based on search query
   const filteredItems = museumItems.filter((item) => {
     const query = searchQuery.toLowerCase();
     return (
@@ -48,60 +44,64 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     );
   });
 
-  // Handle item click to open the modal
   const handleItemClick = (item: GalleryItem) => {
     setSelectedItem(item);
     setShowModal(true);
   };
 
-  // Handle closing the Create Item Modal and re-fetching items
   const handleItemCreated = () => {
-    setShowCreateModal(false);  // Close the modal
-    loadItems();  // Re-fetch the items after a new item has been created
+    setShowCreateModal(false);
+    loadItems();
   };
 
   return (
-    <div>
-      {/* Top Section: Search Bar and Add Item Button */}
-      <div className="flex items-center justify-between mb-6">
-        {/* Search Bar */}
+    <div className="max-w-screen-xl mx-auto px-4">
+      {/* Header: Title and Button */}
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold text-gray-900">Meine Galerie</h1>
+        <Button
+          onClick={() => setShowCreateModal(true)}
+          color="blue"
+          className="text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          + Neues Item
+        </Button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-6">
         <input
           type="text"
           placeholder="Search by title, user, or date"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="px-4 py-2 border rounded-lg w-1/3" // Adjust width as necessary
+          className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-
-        {/* Add New Item Button */}
-        <Button
-          onClick={() => setShowCreateModal(true)}
-          variant="primary"
-        >
-          Add New Item
-        </Button>
       </div>
 
+      {/* Item Grid */}
       {filteredItems.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-4 gap-6 w-full max-w-screen-xl mx-auto mt-6 px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {filteredItems.map((item) => (
             <Card
-              key={item.id}  // Use a unique identifier
+              key={item.id}
               className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
               onClick={() => handleItemClick(item)}
             >
-              <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">{item.category}</Text>
+              <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
+                {item.category}
+              </Text>
               <Text className="mt-2 text-lg font-semibold">{item.title}</Text>
-              <Text className="text-sm text-gray-500 mt-1">Entered on: {item.entered_on}</Text>
+              <Text className="text-sm text-gray-500 mt-1">
+                Entered on: {item.entered_on}
+              </Text>
 
               <div className="mt-2">
-                <div className="flex space-x-4 overflow-x-auto">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-48 h-48 object-cover rounded-lg border border-gray-300"
-                  />
-                </div>
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-48 object-cover rounded-lg border border-gray-300"
+                />
               </div>
 
               <div className="mt-4 flex items-center space-x-2">
@@ -111,21 +111,19 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
             </Card>
           ))}
         </div>
-        ) : (
-          <NoResults />
-        )}
+      ) : (
+        <NoResults />
+      )}
 
-      {/* Museum Items Gallery */}
-      
-
-      {/* Gallery Modal for item details */}
+      {/* Modals */}
       {showModal && selectedItem && (
         <GalleryModal item={selectedItem} onClose={() => setShowModal(false)} />
       )}
-
-      {/* Create Item Modal */}
       {showCreateModal && (
-        <CreateItemModal onClose={() => setShowCreateModal(false)} onItemCreated={handleItemCreated} />
+        <CreateItemModal
+          onClose={() => setShowCreateModal(false)}
+          onItemCreated={handleItemCreated}
+        />
       )}
     </div>
   );

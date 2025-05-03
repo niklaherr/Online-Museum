@@ -100,10 +100,6 @@ app.get("/items", authenticateJWT, async (req, res) => {
         if (req.query.user_id) {
             query = "SELECT * FROM item WHERE user_id = $1 ORDER BY entered_on DESC";
             queryParams = [req.query.user_id]; // Use user_id from query
-        } else if (req.user && req.user.id) {
-            // If the user is authenticated, use the user_id from JWT
-            query = "SELECT * FROM item WHERE user_id = $1 ORDER BY entered_on DESC";
-            queryParams = [req.user.id]; // Use user_id from JWT
         }
 
         // Execute query

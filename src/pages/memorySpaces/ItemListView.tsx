@@ -4,13 +4,12 @@ import { itemService } from 'services/ItemService';
 import NotyfService from 'services/NotyfService';
 import { userService } from 'services/UserService';
 
-type SpaceCardProps = {
+type ItemListCardProps = {
   list: ItemList
   onView: (id: number) => void;
 };
 
-// Komponente für eine einzelne Erinnerungsraum-Karte
-const SpaceCard = ({ list, onView }: SpaceCardProps) => {
+const ItemListCard = ({ list, onView }: ItemListCardProps) => {
   
   return (
     <div 
@@ -40,17 +39,16 @@ const SpaceCard = ({ list, onView }: SpaceCardProps) => {
   );
 };
 
-type MemorySpaceListProps = {
+type ItemListViewProps = {
   onViewSpace: (id: number) => void;
   onNavigate: (route: string) => void;
 };
 
-const MemorySpaceList = ({ onViewSpace, onNavigate }: MemorySpaceListProps) => {
+const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
   const [itemLists, setItemLists] = useState<ItemList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'private', 'public'
   const [searchTerm, setSearchTerm] = useState('');
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     const loadItemLists = async () => {
@@ -101,7 +99,7 @@ const MemorySpaceList = ({ onViewSpace, onNavigate }: MemorySpaceListProps) => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Meine Erinnerungsräume</h1>
         <button 
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => onNavigate('/item-list/create')}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           + Neuer Raum
@@ -171,7 +169,7 @@ const MemorySpaceList = ({ onViewSpace, onNavigate }: MemorySpaceListProps) => {
           </p>
           <div className="mt-6">
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => onNavigate('item-list/create')}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,7 +182,7 @@ const MemorySpaceList = ({ onViewSpace, onNavigate }: MemorySpaceListProps) => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredLists.map(list => (
-            <SpaceCard key={list.id} list={list} onView={onViewSpace} />
+            <ItemListCard key={list.id} list={list} onView={onViewSpace} />
           ))}
         </div>
       )}
@@ -194,4 +192,4 @@ const MemorySpaceList = ({ onViewSpace, onNavigate }: MemorySpaceListProps) => {
   );
 };
 
-export default MemorySpaceList;
+export default ItemListView;
