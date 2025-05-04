@@ -4,6 +4,7 @@ const cors = require("cors");
 const { Pool } = require("pg");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const multer = require("multer"); // Import multer for file handling
 
 const app = express();
 const port = 3001;
@@ -37,6 +38,9 @@ const authenticateJWT = (req, res, next) => {
         return res.status(401).json({ error: "Invalid or expired token." });
     }
 };
+
+// Setup multer to handle file uploads (store in memory)
+const upload = multer(); // This will store files in memory as buffers
 
 // ========== ROUTES ========== //
 
@@ -90,7 +94,7 @@ app.get("/users", authenticateJWT, async (req, res) => {
     }
 });
 
-
+// Get all items
 app.get("/items", authenticateJWT, async (req, res) => {
     try {
         let query = "SELECT * FROM item ORDER BY entered_on DESC"; // Default query for all items
@@ -113,7 +117,7 @@ app.get("/items", authenticateJWT, async (req, res) => {
             entered_on: item.entered_on,
             description: item.description,
             user_id: item.user_id,
-            image: item.image
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '' // Convert image to base64 here
         }));
 
         // Send the items (including base64 images) to the frontend
@@ -124,11 +128,12 @@ app.get("/items", authenticateJWT, async (req, res) => {
     }
 });
 
+// Add a new item with image upload
+app.post("/items", authenticateJWT, upload.single("image"), async (req, res) => {
+    const { title, entered_on, description, category } = req.body;
+    const image = req.file ? req.file.buffer : null; // Store the image as a buffer (BYTEA in PostgreSQL)
 
-// Add a new item
-app.post("/items", authenticateJWT, async (req, res) => {
-    const { title, entered_on, image, description, category } = req.body;
-
+    // Validate required fields
     if (!title || !entered_on) {
         return res.status(400).send("Missing required fields: title, entered_on");
     }
@@ -138,7 +143,14 @@ app.post("/items", authenticateJWT, async (req, res) => {
             `INSERT INTO item (user_id, title, entered_on, image, description, category)
              VALUES ($1, $2, $3, $4, $5, $6)
              RETURNING *`,
-            [req.user.id, title, entered_on, image || null, description || null, category || null]
+            [
+                req.user.id, 
+                title, 
+                entered_on, 
+                image, // image will be a buffer (BYTEA type in PostgreSQL)
+                description || null, 
+                category || null
+            ]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -251,9 +263,6 @@ app.post("/item-lists", authenticateJWT, async (req, res) => {
         res.status(500).send("Error creating item list.");
     }
 });
-
-  
-
 
 // Start server
 app.listen(port, "0.0.0.0", () => {

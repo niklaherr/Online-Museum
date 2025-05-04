@@ -13,30 +13,26 @@ export const CreateItemModal = ({ onClose, onItemCreated }: CreateItemModalProps
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
-  const [imageBase64, setImageBase64] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [enteredOn, setEnteredOn] = useState("");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageBase64(reader.result as string);
-      };
-      reader.readAsDataURL(file); // Converts to base64 string
+      setImageFile(file);
     }
   };
 
   const handleCreate = async () => {
     try {
-      await itemService.createItem({
-        title,
-        category,
-        description,
-        image: imageBase64, // base64-encoded string
-        entered_on: enteredOn,
-      });
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("category", category);
+      formData.append("description", description);
+      formData.append("entered_on", enteredOn);
+      if (imageFile) formData.append("image", imageFile);
 
+      await itemService.createItem(formData);
       NotyfService.showSuccess("Item created successfully.");
       onItemCreated();
       onClose();
@@ -55,13 +51,7 @@ export const CreateItemModal = ({ onClose, onItemCreated }: CreateItemModalProps
             <TextInput placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
             <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
 
-            {/* File input for image (base64 conversion) */}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="w-full text-sm"
-            />
+            <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm" />
 
             <input
               type="date"
@@ -71,9 +61,7 @@ export const CreateItemModal = ({ onClose, onItemCreated }: CreateItemModalProps
             />
           </div>
           <div className="flex justify-end space-x-2 mt-6">
-            <Button onClick={onClose} variant="light">
-              Cancel
-            </Button>
+            <Button onClick={onClose} variant="light">Cancel</Button>
             <Button onClick={handleCreate}>Create</Button>
           </div>
         </Dialog.Panel>

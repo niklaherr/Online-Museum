@@ -122,38 +122,32 @@ class ItemService {
     }
   }
 
-  async createItem(data: {
-    title: string;
-    entered_on: string;
-    image?: string;
-    description?: string;
-    category?: string;
-  }): Promise<any> {
+  async createItem(formData: FormData): Promise<any> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
-
+  
     try {
       const res = await fetch(`${this.baseUrl}/items`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          // DO NOT set "Content-Type"; browser will set it with boundary for multipart/form-data
         },
-        body: JSON.stringify(data),
+        body: formData,
       });
-
+  
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Erstellen: ${errorMessage}`);
       }
-
-      const createdItem = await res.json();
-      return createdItem;
+  
+      return await res.json();
     } catch (err: any) {
       console.error("Item creation failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Erstellen des Items.");
     }
   }
+  
 
   async createItemList(data: {
     title: string;
