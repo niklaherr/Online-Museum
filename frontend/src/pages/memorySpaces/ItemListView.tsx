@@ -186,8 +186,6 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
           ))}
         </div>
       )}
-      
-      {/* Hier könnte ein Modal zur Erstellung neuer Räume implementiert werden */}
     </div>
   );
 };

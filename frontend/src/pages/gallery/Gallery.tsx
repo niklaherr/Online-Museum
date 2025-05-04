@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, Text } from "@tremor/react";
 import { UserIcon } from "@heroicons/react/24/outline";
-import { GalleryModal } from "../../components/gallery/GalleryModal";
 import { userService } from "../../services/UserService";
 import Item, { GalleryItem } from "../../interfaces/Item";
 import { itemService } from "../../services/ItemService";
 import NotyfService from "services/NotyfService";
-import { CreateItemModal } from "../../components/gallery/CreateItemModal";
 import NoResults from "pages/NoResults";
 
 type GalleryProps = {
@@ -14,17 +12,15 @@ type GalleryProps = {
 };
 
 const Gallery = ({ onNavigate }: GalleryProps) => {
-  const [showModal, setShowModal] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
   const [museumItems, setMuseumItems] = useState<GalleryItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadItems = async () => {
     try {
       const items = await itemService.fetchAllItemsWithUsers();
       setMuseumItems(items);
-      console.log(items);
+      setIsLoading(false);
     } catch (err) {
       NotyfService.showError("Fehler beim Laden der Items.");
       userService.logout();
@@ -45,41 +41,48 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     );
   });
 
-  const handleItemClick = (item: GalleryItem) => {
-    setSelectedItem(item);
-    setShowModal(true);
-  };
-
-  const handleItemCreated = () => {
-    setShowCreateModal(false);
-    loadItems();
-  };
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center p-12">
+        <div className="text-blue-500">
+          <svg className="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-screen-xl mx-auto px-4">
-      {/* Header: Title and Button */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold text-gray-900">Meine Galerie</h1>
-        <Button
-          onClick={() => setShowCreateModal(true)}
-          color="blue"
-          className="text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Meine Gallerie</h1>
+        <button 
+          onClick={() => onNavigate('/items/create')}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           + Neues Item
-        </Button>
+        </button>
       </div>
-
-      {/* Search Bar */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search by title, user, or date"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+      
+      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Suchen..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full md:w-64"
+          />
+          <div className="absolute left-3 top-2.5 text-gray-400">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
       </div>
-
+      
       {/* Item Grid */}
       {filteredItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -87,10 +90,10 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
             <Card
               key={item.id}
               className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
-              onClick={() => handleItemClick(item)}
+              onClick={() => onNavigate('/items/' + item.id)}
             >
               <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
-                {item.category}
+                {item.id}
               </Text>
               <Text className="mt-2 text-lg font-semibold">{item.title}</Text>
               <Text className="text-sm text-gray-500 mt-1">
@@ -114,17 +117,6 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
         </div>
       ) : (
         <NoResults />
-      )}
-
-      {/* Modals */}
-      {showModal && selectedItem && (
-        <GalleryModal item={selectedItem} onClose={() => setShowModal(false)} />
-      )}
-      {showCreateModal && (
-        <CreateItemModal
-          onClose={() => setShowCreateModal(false)}
-          onItemCreated={handleItemCreated}
-        />
       )}
     </div>
   );

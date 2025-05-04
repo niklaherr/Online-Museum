@@ -128,6 +128,48 @@ app.get("/items", authenticateJWT, async (req, res) => {
     }
 });
 
+// Get a single item by ID along with the user's data in a single query
+app.get("/items/:id", authenticateJWT, async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      // Use a JOIN to fetch both the item and the user's username
+      const query = `
+        SELECT item.*, users.username 
+        FROM item 
+        JOIN users ON item.user_id = users.id
+        WHERE item.id = $1
+      `;
+  
+      const result = await pool.query(query, [id]);
+  
+      // Check if the item was found
+      if (result.rows.length === 0) {
+        return res.status(404).send("Item not found");
+      }
+  
+      const item = result.rows[0];
+  
+      // Return the item data along with the username
+      const galleryItem = {
+        id: item.id,
+        user_id: item.user_id,
+        title: item.title,
+        entered_on: item.entered_on,
+        image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '', // Convert image to base64 if it exists
+        description: item.description,
+        category: item.category,
+        username: item.username, // The username is fetched directly from the JOIN
+      };
+  
+      res.json(galleryItem);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error fetching item or user data");
+    }
+  });
+  
+
 // Add a new item with image upload
 app.post("/items", authenticateJWT, upload.single("image"), async (req, res) => {
     const { title, entered_on, description, category } = req.body;

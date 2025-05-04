@@ -23,6 +23,8 @@ import { MemorySpaceProvider } from './contexts/MemorySpaceContext';
 
 import { userService } from './services/UserService';
 import CreateItemList from 'components/itemList/CreateItemList';
+import { CreateItem } from 'components/gallery/CreateItem';
+import ItemDetailView from 'components/gallery/ItemDetailView';
 
 
 function App() {
@@ -137,9 +139,21 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
-                <Route path="/gallery" element={
+                <Route path="/items" element={
                   <ProtectedRoute>
                     <Gallery onNavigate={(route) => navigate(route)}  />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="/items/:id" element={
+                  <ProtectedRoute>
+                    <ItemDetailView onNavigate={(route) => navigate(route)} />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="/items/create" element={
+                  <ProtectedRoute>
+                    <CreateItem onNavigate={(route) => navigate(route)}  />
                   </ProtectedRoute>
                 } />
                 

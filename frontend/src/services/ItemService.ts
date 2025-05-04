@@ -19,7 +19,6 @@ class ItemService {
 
     const headers = { Authorization: `Bearer ${token}` };
 
-    // Lade alle Nutzer
     const users: User[] = await this.getWithRetry("/users", headers);
 
     const allItems: any[] = [];
@@ -30,6 +29,7 @@ class ItemService {
       const user = users.find(u => u.id === item.user_id); // Find the user for each item based on user_id
 
       return {
+        id: item.id,
         category: item.category,
         title: item.title,
         entered_on: item.entered_on,
@@ -61,6 +61,37 @@ class ItemService {
     }
   
     return await res.json();
+  }
+
+  async fetchItemById(itemId: number): Promise<GalleryItem> {
+    const token = userService.getToken();
+    const userID = userService.getUserID();
+
+    if (!token || !userID) {
+      throw new Error("Nicht eingeloggt.");
+    }
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    try {
+      // Fetch the item with the user data using the item ID
+      const res = await fetch(`${this.baseUrl}/items/${itemId}`, {
+        method: "GET",
+        headers,
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Fehler beim Laden des Items: ${errorText}`);
+      }
+
+      // Parse the response JSON into a GalleryItem type
+      const item: GalleryItem = await res.json();
+      return item;
+    } catch (error) {
+      console.error(error);
+      throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
+    }
   }
   
 
