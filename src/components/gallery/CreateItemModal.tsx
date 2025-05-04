@@ -13,8 +13,19 @@ export const CreateItemModal = ({ onClose, onItemCreated }: CreateItemModalProps
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
+  const [imageBase64, setImageBase64] = useState("");
   const [enteredOn, setEnteredOn] = useState("");
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageBase64(reader.result as string);
+      };
+      reader.readAsDataURL(file); // Converts to base64 string
+    }
+  };
 
   const handleCreate = async () => {
     try {
@@ -22,9 +33,10 @@ export const CreateItemModal = ({ onClose, onItemCreated }: CreateItemModalProps
         title,
         category,
         description,
-        image,
+        image: imageBase64, // base64-encoded string
         entered_on: enteredOn,
       });
+
       NotyfService.showSuccess("Item created successfully.");
       onItemCreated();
       onClose();
@@ -42,8 +54,15 @@ export const CreateItemModal = ({ onClose, onItemCreated }: CreateItemModalProps
             <TextInput placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
             <TextInput placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
             <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-            <TextInput placeholder="Image URL" value={image} onChange={(e) => setImage(e.target.value)} />
-            {/* Use standard HTML input for date */}
+
+            {/* File input for image (base64 conversion) */}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full text-sm"
+            />
+
             <input
               type="date"
               value={enteredOn}

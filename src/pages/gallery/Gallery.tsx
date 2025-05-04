@@ -24,6 +24,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     try {
       const items = await itemService.fetchAllItemsWithUsers();
       setMuseumItems(items);
+      console.log(items);
     } catch (err) {
       NotyfService.showError("Fehler beim Laden der Items.");
       userService.logout();
