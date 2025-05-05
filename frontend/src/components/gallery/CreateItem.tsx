@@ -12,7 +12,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [enteredOn, setEnteredOn] = useState("");
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,7 +26,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
       formData.append("title", title);
       formData.append("category", category);
       formData.append("description", description);
-      formData.append("entered_on", enteredOn);
       if (imageFile) formData.append("image", imageFile);
 
       await itemService.createItem(formData);
@@ -47,13 +45,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
         <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
 
         <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm" />
-
-        <input
-          type="date"
-          value={enteredOn}
-          onChange={(e) => setEnteredOn(e.target.value)}
-          className="border border-gray-300 rounded-lg p-2 w-full"
-        />
       </div>
 
       <Button color="blue" onClick={handleCreate}>

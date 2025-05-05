@@ -97,16 +97,13 @@ const ItemListDetailView = ({onNavigate } : ItemListDetailViewProps) => {
         <p className="text-gray-700">{list?.description}</p>
       </div>
       
-      {/* Items */}
-      <div className="bg-white rounded-lg shadow-sm mb-6">
-
-        {items.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-4 gap-6 w-full max-w-screen-xl mx-auto mt-6 px-4">
+      {items.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-4 gap-6 w-full max-w-screen-xl mt-6">
           {items.map((item) => (
             <Card
               key={item.id}  // Use a unique identifier
               className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
-              //onClick={() => handleItemClick(item)}
+              onClick={() => onNavigate('/items/' + item.id)}
             >
               <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">{item.category}</Text>
               <Text className="mt-2 text-lg font-semibold">{item.title}</Text>
@@ -129,37 +126,10 @@ const ItemListDetailView = ({onNavigate } : ItemListDetailViewProps) => {
             </Card>
           ))}
         </div>
-        ) : (
-          <NoResults />
-        )}
-        
-        
-      </div>
-      
-      {/* Aktionsleiste am unteren Rand */}
-      <div className="bottom-4 bg-white rounded-lg shadow-md p-3 flex justify-between items-center">
-        <div className="flex space-x-4">
-          <button className="flex items-center text-gray-700 hover:text-blue-600">
-            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span className="text-sm">Zeitstrahl</span>
-          </button>
-          <button className="flex items-center text-gray-700 hover:text-blue-600">
-            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span className="text-sm">Karte</span>
-          </button>
-        </div>
-        
-        <div>
-          <button className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-700">
-            Teilen
-          </button>
-        </div>
-      </div>
+      ) : (
+        <NoResults />
+      )}
+
     </div>
   );
 };

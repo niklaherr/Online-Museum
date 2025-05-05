@@ -15,32 +15,33 @@ class ItemService {
 
   async fetchAllItemsWithUsers(): Promise<any[]> {
     const token = userService.getToken();
-    if (!token) throw new Error("Nicht eingeloggt.");
+    const userID = userService.getUserID();
+
+    if (!token || !userID) {
+      throw new Error("Nicht eingeloggt.");
+    }
 
     const headers = { Authorization: `Bearer ${token}` };
 
-    const users: User[] = await this.getWithRetry("/users", headers);
+    try {
+      // Fetch the item with the user data using the item ID
+      const res = await fetch(`${this.baseUrl}/items`, {
+        method: "GET",
+        headers,
+      });
 
-    const allItems: any[] = [];
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Fehler beim Laden des Items: ${errorText}`);
+      }
 
-    const items: Item[] = await this.getWithRetry(`/items`, headers);
-
-    const mapped = items.map((item: Item) => {
-      const user = users.find(u => u.id === item.user_id); // Find the user for each item based on user_id
-
-      return {
-        id: item.id,
-        category: item.category,
-        title: item.title,
-        entered_on: item.entered_on,
-        username: user ? user.username : 'Unknown', // Handle case where user is not found
-        image: item.image,
-      };
-    });
-
-    allItems.push(...mapped);
-
-    return allItems;
+      // Parse the response JSON into a GalleryItem type
+      const item: GalleryItem[] = await res.json();
+      return item;
+    } catch (error) {
+      console.error(error);
+      throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
+    }
   }
 
   async fetchOwnItems(): Promise<Item[]> {
@@ -130,23 +131,10 @@ class ItemService {
         throw new Error(`Fehler beim Laden der Items: ${errorMessage}`);
       }
 
-      const items = await res.json();
+      const items: GalleryItem[] = await res.json();
 
-      const users: User[] = await this.getWithRetry("/users", headers);
-
-      const mapped: GalleryItem[] = items.map((item: Item) => {
-        const user = users.find(u => u.id === item.user_id); // Find the user for each item based on user_id
-
-        return {
-          category: item.category,
-          title: item.title,
-          entered_on: item.entered_on,
-          username: user ? user.username : 'Unknown', // Handle case where user is not found
-          image: item.image,
-        };
-      });
-
-      return mapped
+      return items
+      
     } catch (err: any) {
       console.error("Fehler beim Abrufen der Items:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Items.");

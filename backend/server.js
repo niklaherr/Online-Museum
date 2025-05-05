@@ -97,17 +97,14 @@ app.get("/users", authenticateJWT, async (req, res) => {
 // Get all items
 app.get("/items", authenticateJWT, async (req, res) => {
     try {
-        let query = "SELECT * FROM item ORDER BY entered_on DESC"; // Default query for all items
-        let queryParams = [];
-
-        // Check if user_id is provided in the request
-        if (req.query.user_id) {
-            query = "SELECT * FROM item WHERE user_id = $1 ORDER BY entered_on DESC";
-            queryParams = [req.query.user_id]; // Use user_id from query
-        }
+        const query = `
+        SELECT item.*, users.username 
+        FROM item 
+        JOIN users ON item.user_id = users.id
+      `;
 
         // Execute query
-        const result = await pool.query(query, queryParams);
+        const result = await pool.query(query);
 
         // Map each item and convert the image to a base64 string if it exists
         const items = result.rows.map((item) => ({
@@ -172,23 +169,22 @@ app.get("/items/:id", authenticateJWT, async (req, res) => {
 
 // Add a new item with image upload
 app.post("/items", authenticateJWT, upload.single("image"), async (req, res) => {
-    const { title, entered_on, description, category } = req.body;
+    const { title, description, category } = req.body;
     const image = req.file ? req.file.buffer : null; // Store the image as a buffer (BYTEA in PostgreSQL)
 
     // Validate required fields
-    if (!title || !entered_on) {
+    if (!title) {
         return res.status(400).send("Missing required fields: title, entered_on");
     }
 
     try {
         const result = await pool.query(
-            `INSERT INTO item (user_id, title, entered_on, image, description, category)
-             VALUES ($1, $2, $3, $4, $5, $6)
+            `INSERT INTO item (user_id, title, image, description, category)
+             VALUES ($1, $2, $3, $4, $5)
              RETURNING *`,
             [
                 req.user.id, 
-                title, 
-                entered_on, 
+                title,
                 image, // image will be a buffer (BYTEA type in PostgreSQL)
                 description || null, 
                 category || null
@@ -233,13 +229,12 @@ app.get("/item-lists/:id", authenticateJWT, async (req, res) => {
 // Get items by item_list_id
 app.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) => {
     const { item_list_id } = req.params; // Extract the item_list_id from the URL
-
     try {
-        // Query to get the items related to a specific item_list_id
         const result = await pool.query(
-            `SELECT item.id, item.title, item.category, item.entered_on, item.description, item.user_id, item.image
+            `SELECT item.id, item.title, item.category, item.entered_on, item.description, item.user_id, item.image, users.username
              FROM item
              JOIN item_itemlist ON item.id = item_itemlist.item_id
+             JOIN users ON item.user_id = users.id
              WHERE item_itemlist.item_list_id = $1
              ORDER BY item.entered_on DESC`,
             [item_list_id] // Pass the item_list_id as a parameter
@@ -248,19 +243,20 @@ app.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) => 
         // Map each item and convert the image to a base64 string if it exists
         const items = result.rows.map((item) => ({
             id: item.id,
-            title: item.title,
-            category: item.category,
-            entered_on: item.entered_on,
-            description: item.description,
             user_id: item.user_id,
-            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '' // Convert image to base64 here
-        }));
+            title: item.title,
+            entered_on: item.entered_on,
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '', // Convert image to base64 if it exists
+            description: item.description,
+            category: item.category,
+            username: item.username, // The username is fetched directly from the JOIN
+          }));
 
         // Send the items (including base64 images) to the frontend
         res.json(items);
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching items for the specified item list");
+        res.status(500).send("Error fetching items");
     }
 });
 

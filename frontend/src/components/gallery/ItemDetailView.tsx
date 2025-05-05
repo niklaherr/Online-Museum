@@ -65,26 +65,32 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
   if (!item) return <NoResults />;
 
   return (
-    <div className="p-8 max-w-4xl mx-auto bg-white rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-4">{item.title}</h2>
-      <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">{item.category}</Text>
-      <Text className="text-sm text-gray-500 mt-1">Entered on: {item.entered_on}</Text>
-
+    <div>
+      <h2 className="text-2xl font-bold">{item.title}</h2>
+      <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
+        {item.category}
+      </Text>
+      <Text className="text-sm text-gray-500">Entered on: {item.entered_on}</Text>
+      <Text className="text-sm tracking-wide text-blue-500 font-medium">
+        Description
+      </Text>
+      <Text className="text-sm text-gray-500">{item.description}</Text>
       {/* Image Gallery */}
-      <div className="mt-4">
+      <div>
         <img
           src={item.image}
           alt={item.title}
-          className="w-48 h-48 object-cover rounded-lg border border-gray-300"
+          className="max-w-[50vw] w-full h-auto"
         />
       </div>
 
       {/* User Info */}
-      <div className="mt-4 flex items-center space-x-2">
+      <div className="flex items-center">
         <UserIcon className="w-5 h-5 text-gray-500" />
         <Text className="text-sm text-gray-700">{item.username}</Text>
       </div>
     </div>
+
   );
 };
 
