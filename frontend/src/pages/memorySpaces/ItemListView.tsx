@@ -1,4 +1,5 @@
 import ItemList from 'interfaces/ItemList';
+import NoResults from 'pages/NoResults';
 import { useState, useEffect } from 'react';
 import { itemService } from 'services/ItemService';
 import NotyfService from 'services/NotyfService';
@@ -31,7 +32,7 @@ const ItemListCard = ({ list, onView }: ItemListCardProps) => {
       </div>
       <div className="p-4">
         <p className="text-gray-500 text-sm mb-2">
-          {34} Einträge • Erstellt am {new Date().toLocaleDateString('de-DE')}
+          Erstellt am {list.entered_on}
         </p>
         <p className="text-gray-700 line-clamp-2 text-sm">{list.description}</p>
       </div>
@@ -157,28 +158,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
       </div>
       
       {filteredLists.length === 0 ? (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
-          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h3 className="mt-2 text-lg font-medium text-gray-900">Keine Erinnerungsräume gefunden</h3>
-          <p className="mt-1 text-gray-500">
-            {searchTerm 
-              ? `Keine Ergebnisse für "${searchTerm}". Versuche einen anderen Suchbegriff.` 
-              : 'Erstelle deinen ersten Erinnerungsraum, um Erinnerungen zu sammeln.'}
-          </p>
-          <div className="mt-6">
-            <button
-              onClick={() => onNavigate('item-list/create')}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Erinnerungsraum erstellen
-            </button>
-          </div>
-        </div>
+        <NoResults />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredLists.map(list => (

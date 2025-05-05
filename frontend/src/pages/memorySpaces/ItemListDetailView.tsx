@@ -71,7 +71,7 @@ const ItemListDetailView = ({onNavigate } : ItemListDetailViewProps) => {
               <div className="mt-1 flex items-center text-white text-opacity-90 text-sm">
                 <span>{list?.title}</span>
                 <span className="mx-2">•</span>
-                <span>Erstellt am {new Date().toLocaleDateString('de-DE')}</span>
+                <span>Erstellt am {list?.entered_on}</span>
                 <span className="mx-2">•</span>
                 <span className="bg-white bg-opacity-20 px-2 py-1 rounded-full">
                   {true ? 'Privat' : 'Öffentlich'}

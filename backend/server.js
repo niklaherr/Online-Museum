@@ -302,6 +302,79 @@ app.post("/item-lists", authenticateJWT, async (req, res) => {
     }
 });
 
+async function fetchLatestActivities() {
+    try {
+      // Query to fetch last 5 items
+      const itemsQuery = `
+        SELECT 
+          id,
+          'item' AS type,
+          entered_on,
+          'created item' AS action,
+          title AS target
+        FROM 
+          item
+        ORDER BY 
+          entered_on DESC
+        LIMIT 5;
+      `;
+      const itemsResult = await pool.query(itemsQuery);
+  
+      // Query to fetch last 5 item lists
+      const itemListsQuery = `
+        SELECT 
+          id,
+          'item_list' AS type,
+          entered_on,
+          'created list' AS action,
+          title AS target
+        FROM 
+          item_list
+        ORDER BY 
+          entered_on DESC
+        LIMIT 5;
+      `;
+      // Map the results to the Activity format
+        const mapToActivity = (rows) => {
+            return rows.map(row => ({
+            id: row.id,
+            type: row.type,
+            username: row.username,
+            entered_on: row.entered_on,
+            action: row.action,
+            target: row.target
+            }));
+        };
+        const itemListsResult = await pool.query(itemListsQuery)
+  
+      // Map each result set to the Activity interface
+      const itemsActivities = mapToActivity(itemsResult.rows);
+      const itemListsActivities = mapToActivity(itemListsResult.rows);
+  
+      // Combine the activities from both tables
+      const allActivities = [...itemsActivities, ...itemListsActivities];
+  
+      // Sort the combined results by entered_on (most recent first)
+      allActivities.sort((a, b) => new Date(b.entered_on) - new Date(a.entered_on));
+  
+      // Return the top 5 activities
+      return allActivities.slice(0, 5);
+    } catch (err) {
+      console.error('Error fetching activities:', err);
+      throw err;
+    }
+  }
+  
+// Express route to fetch all activities
+app.get('/activities', authenticateJWT, async (req, res) => {
+try {
+    const activities = await fetchLatestActivities();
+    res.json(activities);
+} catch (err) {
+    res.status(500).send('Error fetching activities');
+}
+});
+
 // Start server
 app.listen(port, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${port}`);

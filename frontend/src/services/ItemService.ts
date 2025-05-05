@@ -3,6 +3,7 @@ import { userService } from "./UserService";
 import User from "../interfaces/User";
 import Item, { GalleryItem } from "../interfaces/Item";
 import ItemList from "interfaces/ItemList";
+import Activity from "interfaces/Activity";
 
 class ItemService {
   private maxRetries: number;
@@ -134,7 +135,36 @@ class ItemService {
       const items: GalleryItem[] = await res.json();
 
       return items
-      
+
+    } catch (err: any) {
+      console.error("Fehler beim Abrufen der Items:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Items.");
+    }
+  }
+
+  // New function to fetch items by item_list_id
+  async fetchActivities(): Promise<Activity[]> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    // Fetch items for the specific item list
+    try {
+      const res = await fetch(`${this.baseUrl}/activities`, {
+        method: "GET",
+        headers,
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Laden der Items: ${errorMessage}`);
+      }
+
+      const items: Activity[] = await res.json();
+
+      return items
+
     } catch (err: any) {
       console.error("Fehler beim Abrufen der Items:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Items.");
@@ -150,7 +180,6 @@ class ItemService {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          // DO NOT set "Content-Type"; browser will set it with boundary for multipart/form-data
         },
         body: formData,
       });
