@@ -10,6 +10,8 @@ export type AuthResponse = {
 export type Credentials = {
     username: string;
     password: string;
+    securityQuestion?: string;
+    securityAnswer?: string;
 };
 
 type UserChangeListener = (user: User | null) => void;
