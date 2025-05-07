@@ -17,6 +17,9 @@ import ItemListDetailView from './pages/memorySpaces/ItemListDetailView';
 import TimelineView from './pages/timeline/TimelineView';
 import NotFound from './pages/NotFound';
 import Gallery from './pages/gallery/Gallery';
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import HelpSupport from 'pages/legal/HelpSupport';
+import TermsOfUse  from 'pages/legal/TermsOfUse';
 
 // Contexts
 import { AuthContext } from './contexts/AuthContext';
@@ -202,10 +205,13 @@ function App() {
                   }
                 />
 
-                <Route path="*" element={<NotFound />} />
+                {/* Legal Pages */}
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/helpsupport" element={<HelpSupport />} />
+                <Route path="/termsofuse" element={<TermsOfUse />} />
               </Routes>
             </main>
-
+            
             <Footer />
           </div>
         </div>
