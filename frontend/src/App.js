@@ -11,7 +11,7 @@ import Dashboard from './pages/Dashboard';
 import LoginPage from './pages/auth/Login';
 import RegisterPage from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
-import ProfilePage from './pages/auth/Profile';
+import ProfilePage from './pages/auth/ProfilePage';
 import ItemListView from './pages/memorySpaces/ItemListView';
 import ItemListDetailView from './pages/memorySpaces/ItemListDetailView';
 import TimelineView from './pages/timeline/TimelineView';
@@ -94,8 +94,7 @@ function App() {
           <div className="flex flex-col flex-1 overflow-hidden">
             <Header 
               onNavigate={(route) => navigate(route)} 
-              toggleSidebar={setSidebarOpen} 
-              user={currentUser}
+              toggleSidebar={setSidebarOpen}
               sidebarOpen={sidebarOpen}
             />
             
@@ -113,7 +112,7 @@ function App() {
                 
                 <Route path="/profile" element={
                   <ProtectedRoute>
-                    <ProfilePage user={currentUser} />
+                    <ProfilePage />
                   </ProtectedRoute>
                 } />
                 

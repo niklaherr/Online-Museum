@@ -88,8 +88,12 @@ const Dashboard = () => {
         const activities = await itemService.fetchActivities();
         setActivities(activities)
         //setIsLoading(false)
-      } catch (err) {
-        NotyfService.showError("Fehler beim Laden der Items.");
+      } catch (error) {
+        let errorMessage = "Fehler beim Laden"
+        if(error instanceof Error) {
+          errorMessage = error.message
+        }
+        NotyfService.showError(errorMessage)
         userService.logout()
       }
     };
