@@ -10,24 +10,29 @@ import {
   Flex,
   Badge,
   AreaChart,
-  Grid,
-  DateRangePicker,
-  Button
+  BarChart
 } from '@tremor/react';
 import { userService } from 'services/UserService';
 import Activity from 'interfaces/Activity';
 import { itemService } from 'services/ItemService';
 import NotyfService from 'services/NotyfService';
+import NoResults from './NoResults';
 
-const activityData = [
-  { date: '2023-01', uploads: 12, views: 45, comments: 8 },
-  { date: '2023-02', uploads: 18, views: 62, comments: 15 },
-  { date: '2023-03', uploads: 14, views: 55, comments: 12 },
-  { date: '2023-04', uploads: 22, views: 85, comments: 24 },
-  { date: '2023-05', uploads: 32, views: 105, comments: 31 },
-  { date: '2023-06', uploads: 28, views: 95, comments: 22 },
-  { date: '2023-07', uploads: 42, views: 130, comments: 36 },
-];
+const uploadsData = [
+  {
+    date: '2025-05-07',
+    'Anzahl': 2338,
+  },
+  {
+    date: '2025-05-08',
+    'Anzahl': 2103,
+  },
+  {
+    date: '2025-06-07',
+    'Anzahl': 2338,
+  },
+]
+
 
 type ActivityItemProps = {
   activity: Activity
@@ -108,12 +113,42 @@ const Dashboard = () => {
         <Text>Willkommen zurück, {userService.getUserName() || 'Gast'}!</Text>
       </div>
       <Card>
-        <div className="mt-4 divide-y divide-gray-200">
+          <Title>Items über die Zeit</Title>
+          <BarChart
+            data={uploadsData}
+            index="x"
+            categories={['Uploads']}
+            colors={['blue']}
+            showLegend={false}
+            className="mt-6"
+          />
+        </Card>
+
+        <Card>
+          <Title>Itemlisten über die Zeit</Title>
+          <BarChart
+            className="h-80"
+            data={uploadsData}
+            index="date"
+            categories={['Anzahl']}
+            colors={['indigo']}
+            yAxisWidth={60}
+            onValueChange={(v) => console.log(v)}
+          />
+
+        </Card>
+      {activities.length == 0 ? (
+        <NoResults/>
+      ) : (
+      <Card>
+        <Title>Letzte Aktivitäten</Title>
+        <div className="divide-y divide-gray-200">
           {activities.map(activity => (
             <ActivityItem key={activity.id} activity={activity} />
           ))}
         </div>
       </Card>
+      )}
     </div>
   );
 };
