@@ -4,6 +4,7 @@ import User from "../interfaces/User";
 import Item, { GalleryItem } from "../interfaces/Item";
 import ItemList from "interfaces/ItemList";
 import Activity from "interfaces/Activity";
+import DateCount from "interfaces/DateCount";
 
 class ItemService {
   private maxRetries: number;
@@ -230,6 +231,66 @@ class ItemService {
       throw new Error(err.message || "Unbekannter Fehler beim Erstellen der Item-Liste.");
     }
   }
+  
+  async fetchItemListDataCounting(): Promise<DateCount[]> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+  
+    const headers = { Authorization: `Bearer ${token}` };
+    const response = await this.getWithRetry<ItemList[]>("/me/item-lists", headers);
+    const itemList = Array.isArray(response) ? response : [response];
+    // Group items by date, ignoring the time.
+    const groupedItems: { [key: string]: number } = {};
+
+    for (let i = 0; i < itemList.length; i++) {
+      const item = itemList[i];
+      const date = item.entered_on.split('T')[0]; // Get the date part of the ISO string (yyyy-mm-dd)
+      if (groupedItems[date]) {
+        groupedItems[date]++;
+      } else {
+        groupedItems[date] = 1;
+      }
+    }
+  
+    // Convert the grouped data into an array of GroupedItem objects
+    const result: DateCount[] = Object.keys(groupedItems).map(date => ({
+      date,
+      count: groupedItems[date],
+    }));
+  
+    return result;
+  }
+
+  async fetchItemDataCounting(): Promise<DateCount[]> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+  
+    const headers = { Authorization: `Bearer ${token}` };
+    const response = await this.getWithRetry<Item[]>("/me/items", headers);
+    const itemList = Array.isArray(response) ? response : [response];
+    
+  
+    // Group items by date, ignoring the time.
+    const groupedItems: { [key: string]: number } = {};
+  
+    itemList.forEach(item => {
+      const date = item.entered_on.split('T')[0]; // Get the date part of the ISO string (yyyy-mm-dd)
+      if (groupedItems[date]) {
+        groupedItems[date]++;
+      } else {
+        groupedItems[date] = 1;
+      }
+    });
+  
+    // Convert the grouped data into an array of GroupedItem objects
+    const result: DateCount[] = Object.keys(groupedItems).map(date => ({
+      date,
+      count: groupedItems[date],
+    }));
+  
+    return result;
+  }
+  
 
   private async getWithRetry<T>(endpoint: string, headers: Record<string, string>): Promise<T> {
     let attempts = 0;

@@ -251,6 +251,23 @@ app.post("/items", authenticateJWT, upload.single("image"), async (req, res) => 
     }
 });
 
+app.get("/me/items", authenticateJWT, async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const result = await pool.query("SELECT * FROM item WHERE user_id = $1", [userId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).send("Items not found");
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching items");
+    }
+});
+
 // Get all item lists
 app.get("/item-lists", authenticateJWT, async (req, res) => {
     try {
@@ -274,6 +291,23 @@ app.get("/item-lists/:id", authenticateJWT, async (req, res) => {
         }
 
         res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching item list");
+    }
+});
+
+app.get("/me/item-lists", authenticateJWT, async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const result = await pool.query("SELECT * FROM item_list WHERE user_id = $1", [userId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).send("Item list not found");
+        }
+
+        res.json(result);
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching item list");
