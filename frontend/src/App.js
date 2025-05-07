@@ -27,20 +27,18 @@ import CreateItemList from 'components/itemList/CreateItemList';
 import { CreateItem } from 'components/gallery/CreateItem';
 import ItemDetailView from 'components/gallery/ItemDetailView';
 
-
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
-  
-  // Authentifizierung beim Start prüfen
+
   useEffect(() => {
-    // Einfache Simulation - in einer echten App würden wir Token prüfen
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
-      userService.setCurrentUser(JSON.parse(storedUser))
+      const parsedUser = JSON.parse(storedUser);
+      setCurrentUser(parsedUser);
+      userService.setCurrentUser(parsedUser);
     }
     setLoading(false);
   }, []);
@@ -49,119 +47,165 @@ function App() {
     const handleUserChange = (user) => {
       if (user) {
         localStorage.setItem('user', JSON.stringify(user));
-        setCurrentUser(user)
+        setCurrentUser(user);
       } else {
         setCurrentUser(null);
         localStorage.removeItem('user');
         navigate('/login');
       }
-      
     };
 
     userService.subscribe(handleUserChange);
 
-    // Cleanup on unmount
     return () => {
       userService.unsubscribe(handleUserChange);
     };
-  }, []);
+  }, [navigate]);
 
-  // Geschützte Route - leitet zu Login weiter, wenn nicht angemeldet
   const ProtectedRoute = ({ children }) => {
-    if (loading) return <div>Lädt...</div>;
-    
+    if (loading) return <div className="text-center p-4">Lädt...</div>;
+
     if (!currentUser) {
       return <Navigate to="/login" />;
     }
-    
+
     return children;
   };
 
+
   return (
-    <AuthContext.Provider value={{ 
-      user: currentUser,
-      isAuthenticated: !!currentUser
-    }}>
+    <AuthContext.Provider
+      value={{
+        user: currentUser,
+        isAuthenticated: !!currentUser,
+      }}
+    >
       <MemorySpaceProvider>
         <div className="flex h-screen bg-gray-100">
           {currentUser && (
-            <Sidebar 
-              isOpen={sidebarOpen} 
-              setIsOpen={setSidebarOpen}
-            />
+            <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
           )}
-          
+
           <div className="flex flex-col flex-1 overflow-hidden">
-            <Header 
-              onNavigate={(route) => navigate(route)} 
+            <Header
+              onNavigate={(route) => navigate(route)}
               toggleSidebar={setSidebarOpen}
               sidebarOpen={sidebarOpen}
             />
-            
+
             <main className="flex-1 overflow-y-auto p-4 md:p-6">
               <Routes>
-                <Route path="/login" element={<LoginPage onNavigate={(route) => navigate(route)} />} />
-                <Route path="/register" element={<RegisterPage onNavigate={(route) => navigate(route)} />} />
-                <Route path="/forgot-password" element={<ForgotPassword onNavigate={(route) => navigate(route)} />} />
-                
-                <Route path="/" element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/profile" element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/item-list" element={
-                  <ProtectedRoute>
-                    <ItemListView onNavigate={(route) => navigate(route)} onViewSpace={(id) => navigate(`/item-list/${id}`)} />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/item-list/:id" element={
-                  <ProtectedRoute>
-                    <ItemListDetailView onNavigate={(route) => navigate(route)} />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/item-list/:id/timeline" element={
-                  <ProtectedRoute>
-                    <TimelineView />
-                  </ProtectedRoute>
-                } />
+                <Route
+                  path="/login"
+                  element={
+                    <LoginPage onNavigate={(route) => navigate(route)} />
+                  }
+                />
+                <Route
+                  path="/register"
+                  element={
+                    <RegisterPage onNavigate={(route) => navigate(route)} />
+                  }
+                />
+                <Route
+                  path="/forgot-password"
+                  element={
+                    <ForgotPassword
+                      onNavigate={(route) => navigate(route)}
+                    />
+                  }
+                />
 
-                <Route path="/item-list/create" element={
-                  <ProtectedRoute>
-                    <CreateItemList onNavigate={(route) => navigate(route)} />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/items" element={
-                  <ProtectedRoute>
-                    <Gallery onNavigate={(route) => navigate(route)}  />
-                  </ProtectedRoute>
-                } />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
-                <Route path="/items/:id" element={
-                  <ProtectedRoute>
-                    <ItemDetailView onNavigate={(route) => navigate(route)} />
-                  </ProtectedRoute>
-                } />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
 
-                <Route path="/items/create" element={
-                  <ProtectedRoute>
-                    <CreateItem onNavigate={(route) => navigate(route)}  />
-                  </ProtectedRoute>
-                } />
-                
+                <Route
+                  path="/item-list"
+                  element={
+                    <ProtectedRoute>
+                      <ItemListView
+                        onNavigate={(route) => navigate(route)}
+                        onViewSpace={(id) => navigate(`/item-list/${id}`)}
+                      />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/item-list/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ItemListDetailView
+                        onNavigate={(route) => navigate(route)}
+                      />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/item-list/:id/timeline"
+                  element={
+                    <ProtectedRoute>
+                      <TimelineView />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/item-list/create"
+                  element={
+                    <ProtectedRoute>
+                      <CreateItemList onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/items"
+                  element={
+                    <ProtectedRoute>
+                      <Gallery onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/items/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ItemDetailView onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/items/create"
+                  element={
+                    <ProtectedRoute>
+                      <CreateItem onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
+
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
-            
+
             <Footer />
           </div>
         </div>
