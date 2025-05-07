@@ -10,6 +10,7 @@ import Footer from './components/layout/Footer';
 import Dashboard from './pages/Dashboard';
 import LoginPage from './pages/auth/Login';
 import RegisterPage from './pages/auth/Register';
+import ForgotPassword from './pages/auth/ForgotPassword';
 import ProfilePage from './pages/auth/Profile';
 import ItemListView from './pages/memorySpaces/ItemListView';
 import ItemListDetailView from './pages/memorySpaces/ItemListDetailView';
@@ -102,6 +103,7 @@ function App() {
               <Routes>
                 <Route path="/login" element={<LoginPage onNavigate={(route) => navigate(route)} />} />
                 <Route path="/register" element={<RegisterPage onNavigate={(route) => navigate(route)} />} />
+                <Route path="/forgot-password" element={<ForgotPassword onNavigate={(route) => navigate(route)} />} />
                 
                 <Route path="/" element={
                   <ProtectedRoute>

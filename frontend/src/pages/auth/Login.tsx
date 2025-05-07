@@ -1,6 +1,6 @@
-import User from 'interfaces/User';
 import { useState } from 'react';
 import { Credentials, userService } from 'services/UserService';
+import NotyfService from 'services/NotyfService';
 
 type LoginPageProps = {
   onNavigate: (route: string) => void;
@@ -31,7 +31,9 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
 
     setIsLoading(false);
     
-    onNavigate('/');
+    if (user) {
+      onNavigate('/');
+    }
   };
 
   return (
@@ -50,13 +52,13 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
           </div>
         )}
 
-        <div className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Benutzername
             </label>
             <input
-              type="email"
+              type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -91,22 +93,26 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
             </div>
 
             <div className="text-sm">
-              <a className="font-medium text-blue-600 hover:text-blue-500 cursor-pointer">
+              <button 
+                type="button"
+                onClick={() => onNavigate('/forgot-password')}
+                className="font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
+              >
                 Passwort vergessen?
-              </a>
+              </button>
             </div>
           </div>
 
           <div>
             <button
-              onClick={handleSubmit}
+              type="submit"
               disabled={isLoading}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               {isLoading ? 'Anmeldung läuft...' : 'Anmelden'}
             </button>
           </div>
-        </div>
+        </form>
 
         <div className="mt-6">
           <div className="relative">
