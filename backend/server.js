@@ -261,7 +261,7 @@ app.get("/me/items", authenticateJWT, async (req, res) => {
             return res.status(404).send("Items not found");
         }
 
-        res.json(result.rows[0]);
+        res.json(result.rows);
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching items");
@@ -307,7 +307,7 @@ app.get("/me/item-lists", authenticateJWT, async (req, res) => {
             return res.status(404).send("Item list not found");
         }
 
-        res.json(result);
+        res.json(result.rows);
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching item list");

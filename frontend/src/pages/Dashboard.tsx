@@ -105,7 +105,7 @@ const Dashboard = () => {
           errorMessage = error.message
         }
         NotyfService.showError(errorMessage)
-        userService.logout()
+        //userService.logout()
       }
     };
 
