@@ -14,6 +14,12 @@ export type Credentials = {
     securityAnswer?: string;
 };
 
+export type ResetPasswordWithOldPasswordCredentials = {
+    oldPassword: string;
+    newPassword: string;
+    reNewPassword: string;
+}
+
 type UserChangeListener = (user: User | null) => void;
 
 class UserService {
@@ -46,6 +52,24 @@ class UserService {
         this.notifyListeners();
         return res;
     }
+
+    async resetPasswordWithOldPassword(credentials: ResetPasswordWithOldPasswordCredentials): Promise<Boolean> {
+        const response = await fetch(`${this.baseUrl}/reset-password-with-old-password`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.getToken()}` // Assumes you have a getToken() method
+            },
+            body: JSON.stringify(credentials),
+        });
+    
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Fehler beim Zurücksetzen des Passworts");
+        }
+        return true;
+    }
+    
 
     logout(): void {
         this.currentUser = null;
