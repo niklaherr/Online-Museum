@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Card, Title, Text, Divider, Button, TextInput, Textarea } from '@tremor/react';
-import { Link } from 'react-router-dom';
 import NotyfService from '../../services/NotyfService';
 
 const HelpSupport = () => {

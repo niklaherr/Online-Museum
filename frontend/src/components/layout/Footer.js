@@ -14,9 +14,9 @@ const Footer = () => {
   <Link to="/privacy" className="text-sm text-gray-600 hover:text-blue-600">
     Datenschutz
   </Link>
-  <a href="#" className="text-sm text-gray-600 hover:text-blue-600">
+  <Link to="/termsofuse" className="text-sm text-gray-600 hover:text-blue-600">
     Nutzungsbedingungen
-  </a>
+  </Link>
   <Link to="/helpsupport" className="text-sm text-gray-600 hover:text-blue-600">
     Hilfe & Support
   </Link>
