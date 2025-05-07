@@ -64,6 +64,29 @@ app.post("/register", async (req, res) => {
     }
 });
 
+// Delete the currently authenticated user
+app.delete("/users/me", authenticateJWT, async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+      const result = await pool.query(
+          "DELETE FROM users WHERE id = $1",
+          [userId]
+      );
+
+      if (result.rowCount === 0) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      const deletedUser = result.rows[0];
+      res.status(200).json({ message: "User deleted" });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "User deletion failed" });
+  }
+});
+
+
 // Login
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
@@ -82,6 +105,37 @@ app.post("/login", async (req, res) => {
         res.status(500).json({ error: "Login failed" });
     }
 });
+
+// Reset password (with PUT)
+app.put("/reset-password-with-old-password", authenticateJWT, async (req, res) => {
+    const { oldPassword, newPassword, reNewPassword } = req.body;
+  
+    if (!oldPassword || !newPassword || !reNewPassword) {
+      return res.status(400).json({ error: "Alle Felder müssen ausgefüllt werden." });
+    }
+  
+    if (newPassword !== reNewPassword) {
+      return res.status(400).json({ error: "Die neuen Passwörter stimmen nicht überein." });
+    }
+  
+    try {
+      const result = await pool.query("SELECT * FROM users WHERE id = $1", [req.user.id]);
+      const user = result.rows[0];
+      if (!user) return res.status(404).json({ error: "Benutzer nicht gefunden." });
+  
+      const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!passwordMatch) return res.status(401).json({ error: "Altes Passwort ist falsch." });
+  
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, user.id]);
+  
+      res.status(200).json({ message: "Passwort erfolgreich aktualisiert." });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Fehler beim Zurücksetzen des Passworts." });
+    }
+  });
+  
 
 // Get all users (secured)
 app.get("/users", authenticateJWT, async (req, res) => {

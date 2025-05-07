@@ -23,10 +23,13 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
         const item = await itemService.fetchItemById(parseInt(id!));
         setItem(item);
         setIsLoading(false);
-      } catch (err) {
-        NotyfService.showError("Fehler beim Laden der Items.");
+      } catch (error) {
+        let errorMessage = "Fehler beim Laden der Item Informationen"
+        if(error instanceof Error) {
+          errorMessage = error.message
+        }
+        NotyfService.showError(errorMessage)
         userService.logout();
-        onNavigate("/login");
       }
     };
 

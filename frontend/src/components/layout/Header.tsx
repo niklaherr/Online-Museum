@@ -9,17 +9,11 @@ type HeaderProps = {
   sidebarOpen: boolean;
 };
 const Header = ({onNavigate, toggleSidebar, sidebarOpen } : HeaderProps) => {
-  const { user } = useContext(AuthContext);
-
-  const logout = async () => {
-    await userService.logout();
-    onNavigate('/login');
-  };
 
   return (
     <header className="bg-white shadow px-4 py-2 flex items-center justify-between">
       <div className="flex items-center">
-        {user && (
+        {userService.isLoggedIn() && (
           <button
             onClick={() => toggleSidebar(!sidebarOpen)}
             className="mr-2 text-gray-600 hover:text-gray-900"
@@ -36,26 +30,17 @@ const Header = ({onNavigate, toggleSidebar, sidebarOpen } : HeaderProps) => {
       </div>
 
       <div className="flex items-center">
-        {user ? (
-          <div className="relative group">
-            <button className="flex items-center space-x-2">
+        {userService.isLoggedIn() ? (
+          <div className="flex items-center space-x-3">
+            <Link
+              to="/profile"
+              className="flex items-center space-x-2 transition-colors hover:text-blue-600 group"
+            >
               <span className="hidden md:block">{userService.getUserName()}</span>
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                {userService.getUserName() ? userService.getUserName()!.charAt(0) : ""}
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 group-hover:bg-blue-100">
+                {userService.getUserName()?.charAt(0)}
               </div>
-            </button>
-            
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-10">
-              <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                Profil
-              </Link>
-              <button 
-                onClick={logout}
-                className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
-              >
-                Abmelden
-              </button>
-            </div>
+            </Link>
           </div>
         ) : (
           <div className="space-x-2">
