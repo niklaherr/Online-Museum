@@ -17,6 +17,8 @@ import ItemListDetailView from './pages/memorySpaces/ItemListDetailView';
 import TimelineView from './pages/timeline/TimelineView';
 import NotFound from './pages/NotFound';
 import Gallery from './pages/gallery/Gallery';
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import HelpSupport from 'pages/legal/HelpSupport';
 
 // Contexts
 import { AuthContext } from './contexts/AuthContext';
@@ -159,10 +161,12 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
+                {/* Legal Pages */}
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/helpsupport" element={<HelpSupport />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
-            
             <Footer />
           </div>
         </div>
