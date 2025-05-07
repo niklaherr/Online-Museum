@@ -11,6 +11,7 @@ import {
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 import { ResetPasswordWithOldPasswordCredentials, userService } from 'services/UserService';
+import NotyfService from 'services/NotyfService';
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -26,9 +27,18 @@ const ProfilePage = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("true")
-    await userService.resetPasswordWithOldPassword(formData);
-    setIsEditing(false);
+    try {
+      await userService.resetPasswordWithOldPassword(formData);
+      setIsEditing(false);
+      NotyfService.showSuccess("Passwort erfolgreich geändert.")
+    } catch (error) {
+      let errorMessage = "Fehler beim Zurücksetzen"
+      if(error instanceof Error) {
+        errorMessage = error.message
+      }
+      NotyfService.showError(errorMessage)
+    }
+    
   };
 
   const logout = () => {

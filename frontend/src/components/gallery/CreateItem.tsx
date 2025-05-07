@@ -31,8 +31,12 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
       await itemService.createItem(formData);
       NotyfService.showSuccess("Item created successfully.");
       onNavigate('/items')
-    } catch (err) {
-      NotyfService.showError("Error creating item.");
+    } catch (error) {
+      let errorMessage = "Fehler beim Erstellen eines Items"
+      if(error instanceof Error) {
+        errorMessage = error.message
+      }
+      NotyfService.showError(errorMessage)
     }
   };
 

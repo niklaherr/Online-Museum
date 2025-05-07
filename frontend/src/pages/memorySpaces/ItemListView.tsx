@@ -57,10 +57,13 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
         const itemLists = await itemService.fetchItemLists();
         setItemLists(itemLists);
         setIsLoading(false);
-      } catch (err) {
-        NotyfService.showError("Fehler beim Laden der Items.");
+      } catch (error) {
+        let errorMessage = "Fehler beim Laden der Items"
+        if(error instanceof Error) {
+          errorMessage = error.message
+        }
+        NotyfService.showError(errorMessage)
         userService.logout()
-        onNavigate('/login')
       }
     };
 

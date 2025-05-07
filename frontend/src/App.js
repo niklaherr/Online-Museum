@@ -112,7 +112,7 @@ function App() {
                 
                 <Route path="/profile" element={
                   <ProtectedRoute>
-                    <ProfilePage user={currentUser} />
+                    <ProfilePage />
                   </ProtectedRoute>
                 } />
                 
