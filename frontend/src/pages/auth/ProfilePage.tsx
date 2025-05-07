@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
 import {
-  Card, Title, Text, Flex, Button, TextInput,
+  Card, Title, Text, Flex, Button, TextInput, Dialog, DialogPanel,
 } from '@tremor/react';
 import {
   PencilSquareIcon,
@@ -12,9 +12,13 @@ import {
 } from '@heroicons/react/24/outline';
 import { ResetPasswordWithOldPasswordCredentials, userService } from 'services/UserService';
 import NotyfService from 'services/NotyfService';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState<ResetPasswordWithOldPasswordCredentials>({
     oldPassword: '',
     newPassword: '',
@@ -33,16 +37,25 @@ const ProfilePage = () => {
       NotyfService.showSuccess("Passwort erfolgreich geändert.")
     } catch (error) {
       let errorMessage = "Fehler beim Zurücksetzen"
-      if(error instanceof Error) {
+      if (error instanceof Error) {
         errorMessage = error.message
       }
       NotyfService.showError(errorMessage)
     }
-    
   };
 
-  const logout = () => {
-    userService.logout();
+  const deleteUser = async () => {
+    try {
+      await userService.deleteUser();
+      NotyfService.showSuccess("Nutzer erfolgreich gelöscht");
+      navigate("/login"); // or any route you'd like to redirect to
+    } catch (error) {
+      let errorMessage = "Fehler beim Löschen des Benutzers"
+      if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      NotyfService.showError(errorMessage)
+    }
   };
 
   if (!userService.isLoggedIn()) {
@@ -123,7 +136,6 @@ const ProfilePage = () => {
             </div>
 
             <div className="mt-6 space-y-3">
-
               <Button
                 variant="light"
                 color="blue"
@@ -148,6 +160,7 @@ const ProfilePage = () => {
                 color="red"
                 icon={TrashIcon}
                 className="w-full justify-start"
+                onClick={() => setIsDeleteModalOpen(true)}
               >
                 Konto löschen
               </Button>
@@ -157,7 +170,7 @@ const ProfilePage = () => {
                 color="red"
                 icon={ArrowRightOnRectangleIcon}
                 className="w-full justify-start"
-                onClick={logout}
+                onClick={() => userService.logout()}
               >
                 Abmelden
               </Button>
@@ -165,6 +178,24 @@ const ProfilePage = () => {
           </div>
         )}
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
+        <DialogPanel className="max-w-sm bg-white rounded-xl shadow-md p-6">
+          <Title>Bist du sicher?</Title>
+          <Text>
+            Möchtest du dein Konto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+          </Text>
+          <Flex justifyContent="end" className="mt-6 space-x-2">
+            <Button variant="secondary" onClick={() => setIsDeleteModalOpen(false)}>
+              Abbrechen
+            </Button>
+            <Button color="red" variant="secondary" onClick={() => { deleteUser(); setIsDeleteModalOpen(false); }}>
+              Ja, löschen
+            </Button>
+          </Flex>
+        </DialogPanel>
+      </Dialog>
     </div>
   );
 };

@@ -69,6 +69,26 @@ class UserService {
         }
         return true;
     }
+
+    async deleteUser(): Promise<boolean> {
+        const response = await fetch(`${this.baseUrl}/users/me`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.getToken()}` // Assumes getToken() provides the JWT
+            }
+        });
+    
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Fehler beim Löschen des Benutzers");
+        }
+
+        this.logout();
+    
+        return true;
+    }
+    
     
 
     logout(): void {
