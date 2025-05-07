@@ -42,7 +42,7 @@ const HelpSupport = () => {
     <div className="max-w-4xl mx-auto py-8 px-4">
       <Card>
         <div className="space-y-6">
-          <Title>Hilfe & Support</Title>
+        <Title className="text-2xl mb-6">Hilfe & Support</Title>
           <Text>Wir sind für Sie da. Finden Sie Antworten auf häufig gestellte Fragen oder kontaktieren Sie uns direkt.</Text>
           
           <section>
