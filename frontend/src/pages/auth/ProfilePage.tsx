@@ -148,15 +148,6 @@ const ProfilePage = () => {
 
               <Button
                 variant="light"
-                color="purple"
-                icon={ShieldCheckIcon}
-                className="w-full justify-start"
-              >
-                Datenschutzeinstellungen
-              </Button>
-
-              <Button
-                variant="light"
                 color="red"
                 icon={TrashIcon}
                 className="w-full justify-start"
