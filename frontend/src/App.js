@@ -14,7 +14,6 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ProfilePage from './pages/auth/ProfilePage';
 import ItemListView from './pages/memorySpaces/ItemListView';
 import ItemListDetailView from './pages/memorySpaces/ItemListDetailView';
-import TimelineView from './pages/timeline/TimelineView';
 import NotFound from './pages/NotFound';
 import Gallery from './pages/gallery/Gallery';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
@@ -30,6 +29,7 @@ import CreateItemList from 'components/itemList/CreateItemList';
 import { CreateItem } from 'components/gallery/CreateItem';
 import ItemDetailView from 'components/gallery/ItemDetailView';
 import { EditItem } from 'components/gallery/EditItem';
+import EditItemList from 'components/itemList/EditItemList';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -162,10 +162,12 @@ function App() {
                 />
 
                 <Route
-                  path="/item-list/:id/timeline"
+                  path="/item-list/:id/edit"
                   element={
                     <ProtectedRoute>
-                      <TimelineView />
+                      <EditItemList
+                        onNavigate={(route) => navigate(route)}
+                      />
                     </ProtectedRoute>
                   }
                 />

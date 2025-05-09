@@ -257,6 +257,37 @@ class ItemService {
       throw new Error(err.message || "Unbekannter Fehler beim Erstellen der Item-Liste.");
     }
   }
+
+  async editItemList(id: number, data: {
+    title: string;
+    description?: string;
+    item_ids: number[];
+  }): Promise<any> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+  
+    try {
+      const res = await fetch(`${this.baseUrl}/item-lists/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Bearbeiten der Liste: ${errorMessage}`);
+      }
+  
+      return await res.json();
+    } catch (err: any) {
+      console.error("Item list editing failed:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Bearbeiten der Item-Liste.");
+    }
+  }
+  
   
   async fetchItemListDataCounting(): Promise<DateCount[]> {
     const token = userService.getToken();
