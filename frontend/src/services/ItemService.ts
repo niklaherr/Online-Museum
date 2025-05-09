@@ -196,6 +196,32 @@ class ItemService {
       throw new Error(err.message || "Unbekannter Fehler beim Erstellen des Items.");
     }
   }
+
+  async updateItem(id: number, formData: FormData): Promise<any> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+  
+    try {
+      const res = await fetch(`${this.baseUrl}/items/${id}`, {
+        method: "PUT", // or "PATCH" if your backend uses partial updates
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+  
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Aktualisieren: ${errorMessage}`);
+      }
+  
+      return await res.json();
+    } catch (err: any) {
+      console.error("Item update failed:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Aktualisieren des Items.");
+    }
+  }
+  
   
 
   async createItemList(data: {

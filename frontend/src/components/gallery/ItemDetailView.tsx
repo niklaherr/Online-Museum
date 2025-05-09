@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Text } from "@tremor/react";
-import { UserIcon } from "@heroicons/react/24/outline";
+import { Text, Button } from "@tremor/react";
+import { UserIcon, PencilIcon } from "@heroicons/react/24/outline";
 import { useParams } from "react-router-dom";
 import { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
@@ -24,11 +24,11 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
         setItem(item);
         setIsLoading(false);
       } catch (error) {
-        let errorMessage = "Fehler beim Laden der Item Informationen"
-        if(error instanceof Error) {
-          errorMessage = error.message
+        let errorMessage = "Fehler beim Laden der Item Informationen";
+        if (error instanceof Error) {
+          errorMessage = error.message;
         }
-        NotyfService.showError(errorMessage)
+        NotyfService.showError(errorMessage);
         userService.logout();
       }
     };
@@ -68,7 +68,18 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
   if (!item) return <NoResults />;
 
   return (
-    <div>
+    <div className="relative p-4">
+      {/* Edit Button */}
+      <div className="absolute top-4 right-4">
+        <Button
+          icon={PencilIcon}
+          onClick={() => onNavigate(`/items/${id}/edit`)}
+          color="blue"
+        >
+          Edit
+        </Button>
+      </div>
+
       <h2 className="text-2xl font-bold">{item.title}</h2>
       <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
         {item.category}
@@ -78,6 +89,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
         Description
       </Text>
       <Text className="text-sm text-gray-500">{item.description}</Text>
+
       {/* Image Gallery */}
       <div>
         <img
@@ -88,12 +100,11 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
       </div>
 
       {/* User Info */}
-      <div className="flex items-center">
-        <UserIcon className="w-5 h-5 text-gray-500" />
+      <div className="flex items-center mt-4">
+        <UserIcon className="w-5 h-5 text-gray-500 mr-2" />
         <Text className="text-sm text-gray-700">{item.username}</Text>
       </div>
     </div>
-
   );
 };
 

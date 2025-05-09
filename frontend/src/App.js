@@ -29,6 +29,7 @@ import { userService } from './services/UserService';
 import CreateItemList from 'components/itemList/CreateItemList';
 import { CreateItem } from 'components/gallery/CreateItem';
 import ItemDetailView from 'components/gallery/ItemDetailView';
+import { EditItem } from 'components/gallery/EditItem';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -192,6 +193,15 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <ItemDetailView onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/items/:id/edit"
+                  element={
+                    <ProtectedRoute>
+                      <EditItem onNavigate={(route) => navigate(route)} />
                     </ProtectedRoute>
                   }
                 />

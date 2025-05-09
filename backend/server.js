@@ -251,6 +251,46 @@ app.post("/items", authenticateJWT, upload.single("image"), async (req, res) => 
     }
 });
 
+// Update an existing item with optional image upload
+app.put("/items/:id", authenticateJWT, upload.single("image"), async (req, res) => {
+    const { title, description, category } = req.body;
+    const { id } = req.params;
+    const image = req.file ? req.file.buffer : null;
+
+    if (!title) {
+        return res.status(400).send("Missing required field: title");
+    }
+
+    try {
+        // Build dynamic update fields
+        const fields = ["title", "description", "category"];
+        const values = [title, description || null, category || null];
+        let query = `UPDATE item SET title = $1, description = $2, category = $3`;
+        let paramIndex = 4;
+
+        if (image) {
+            query += `, image = $${paramIndex}`;
+            values.push(image);
+            paramIndex++;
+        }
+
+        query += ` WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *`;
+        values.push(id, req.user.id);
+
+        const result = await pool.query(query, values);
+
+        if (result.rows.length === 0) {
+            return res.status(404).send("Item not found or not authorized");
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error("Error updating item:", err);
+        res.status(500).send("Error updating item");
+    }
+});
+
+
 app.get("/me/items", authenticateJWT, async (req, res) => {
     const userId = req.user.id;
 
