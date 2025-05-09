@@ -7,9 +7,11 @@ import {
   Button,
   Subtitle,
   Grid,
-  Col
+  Dialog,
+  DialogPanel,
+  Flex
 } from "@tremor/react";
-import { UserIcon } from "@heroicons/react/24/outline";
+import { UserIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import ItemList from "interfaces/ItemList";
 import { itemService } from "services/ItemService";
@@ -26,6 +28,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [list, setList] = useState<ItemList | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     const loadItemLists = async () => {
@@ -48,6 +51,23 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
     loadItemLists();
   }, [id]);
 
+  const handleDeleteItemList = async () => {
+    if (list) {
+      try {
+        await itemService.deleteItemList(list.id);
+        NotyfService.showSuccess("Item List erfolgreich gelöscht");
+        setIsDeleteModalOpen(false);
+        onNavigate('/'); // Navigate to another page, like home or a list overview
+      } catch (error) {
+        let errorMessage = "Fehler beim Löschen der Item List";
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        NotyfService.showError(errorMessage);
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center p-12">
@@ -57,7 +77,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-screen space-y-6">
       {/* Header */}
       <Card className="bg-blue-100 p-6 relative rounded-xl">
         <div className="flex justify-between items-start">
@@ -69,13 +89,11 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
             </Text>
           </div>
 
-          <div className="space-x-2">
-            <Button
-              onClick={() => onNavigate(`/item-list/${id}/edit`)}
-            >
-              Bearbeiten
-            </Button>
-          </div>
+          <Button
+            onClick={() => onNavigate(`/item-list/${id}/edit`)}
+          >
+            Bearbeiten
+          </Button>
         </div>
       </Card>
 
@@ -114,6 +132,36 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
       ) : (
         <NoResults />
       )}
+
+      {/* Centered Delete Button */}
+      <div className="mt-auto flex justify-center pb-6">
+        <Button
+          variant="light"
+          color="red"
+          icon={TrashIcon}
+          onClick={() => setIsDeleteModalOpen(true)} // Show confirmation modal
+        >
+          Liste löschen
+        </Button>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
+        <DialogPanel className="max-w-sm bg-white rounded-xl shadow-md p-6">
+          <Title>Bist du sicher?</Title>
+          <Text>
+            Möchtest du diese Liste wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+          </Text>
+          <Flex justifyContent="end" className="mt-6 space-x-2">
+            <Button variant="secondary" onClick={() => setIsDeleteModalOpen(false)}>
+              Abbrechen
+            </Button>
+            <Button color="red" variant="secondary" onClick={handleDeleteItemList}>
+              Ja, löschen
+            </Button>
+          </Flex>
+        </DialogPanel>
+      </Dialog>
     </div>
   );
 };

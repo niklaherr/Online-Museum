@@ -380,6 +380,33 @@ app.put("/item-lists/:id", authenticateJWT, async (req, res) => {
     }
 });
 
+// Delete an item list
+app.delete("/item-lists/:id", authenticateJWT, async (req, res) => {
+  const itemListId = parseInt(req.params.id);
+  const userId = req.user.id;
+
+  try {
+      // Ensure the item list exists and belongs to the current user
+      const itemListResult = await pool.query(
+          "SELECT * FROM item_list WHERE id = $1 AND user_id = $2",
+          [itemListId, userId]
+      );
+
+      if (itemListResult.rows.length === 0) {
+          return res.status(404).send("Item list not found or does not belong to you.");
+      }
+
+      // Delete the item list itself (cascading will handle associated items)
+      await pool.query("DELETE FROM item_list WHERE id = $1", [itemListId]);
+
+      res.status(200).send("Item list deleted successfully.");
+  } catch (err) {
+      console.error("Error deleting item list:", err);
+      res.status(500).send("Error deleting item list.");
+  }
+});
+
+
 // Create a new item list and link items to it
 app.post("/item-lists", authenticateJWT, async (req, res) => {
     const { title, description, item_ids } = req.body;
