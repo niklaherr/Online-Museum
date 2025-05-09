@@ -10,8 +10,16 @@ const app = express();
 const port = 3001;
 const JWT_SECRET = "your_secret_key"; // Replace with a secure value in production!
 
+// Erweiterte CORS-Konfiguration
+const corsOptions = {
+  origin: '*', // Im Produktionsbetrieb auf deine Frontend-Domain einschränken
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // PostgreSQL Connection Pool
@@ -41,6 +49,16 @@ const authenticateJWT = (req, res, next) => {
 
 // Setup multer to handle file uploads (store in memory)
 const upload = multer(); // This will store files in memory as buffers
+
+// Import des ItemAssistant-Service
+const itemAssistantService = require('./services/ItemAssistantService');
+
+// Verbesserte Middleware für den ItemAssistant-Service
+// Verwende erneut CORS-Optionen speziell für diesen Bereich
+app.use('/api/item-assistant', cors(corsOptions), (req, res, next) => {
+  console.log(`ItemAssistant API aufgerufen: ${req.method} ${req.path}`, req.body);
+  next();
+}, itemAssistantService);
 
 // ========== ROUTES ========== //
 
@@ -147,12 +165,6 @@ app.get("/users", authenticateJWT, async (req, res) => {
         res.status(500).send("Error fetching users");
     }
 });
-
-// Import des ItemAssistant-Service
-const itemAssistantService = require('./services/ItemAssistantService');
-
-// Middleware für den ItemAssistant-Service
-app.use('/api/item-assistant', itemAssistantService);
 
 // Get all items
 app.get("/items", authenticateJWT, async (req, res) => {

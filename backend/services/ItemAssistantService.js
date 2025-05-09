@@ -1,5 +1,3 @@
-// backend/services/ItemAssistantService.js
-
 const fetch = require('node-fetch');
 const express = require('express');
 const router = express.Router();
@@ -27,6 +25,8 @@ router.post('/generate-description', async (req, res) => {
     
     const prompt = generateDescriptionPrompt(title, category);
     
+    console.log("Sende Anfrage an Mistral API mit Prompt:", prompt);
+    
     // API-Anfrage an Mistral senden
     const response = await fetch(MISTRAL_API_URL, {
       method: "POST",
@@ -46,11 +46,25 @@ router.post('/generate-description', async (req, res) => {
       })
     });
     
-    const data = await response.json();
+    // Detaillierte Fehlerbehandlung
+    const responseText = await response.text();
+    console.log("Mistral API Antwort:", responseText);
+    
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Fehler beim Parsen der API-Antwort:", parseError);
+      return res.status(500).json({ 
+        error: "Konnte keine gültige Antwort vom API-Server erhalten",
+        rawResponse: responseText.substring(0, 200) // Erste 200 Zeichen zur Diagnose
+      });
+    }
     
     if (!response.ok) {
       return res.status(response.status).json({ 
-        error: data.error?.message || "API-Anfrage fehlgeschlagen" 
+        error: data.error?.message || "API-Anfrage fehlgeschlagen",
+        details: data.error || "Keine Details verfügbar"
       });
     }
     
@@ -58,7 +72,8 @@ router.post('/generate-description', async (req, res) => {
     
     if (!generatedDescription) {
       return res.status(500).json({ 
-        error: "Keine Beschreibung generiert" 
+        error: "Keine Beschreibung generiert",
+        apiResponse: data
       });
     }
     
@@ -66,7 +81,8 @@ router.post('/generate-description', async (req, res) => {
   } catch (error) {
     console.error("Fehler bei der Beschreibungsgenerierung:", error);
     return res.status(500).json({ 
-      error: "Fehler bei der Beschreibungsgenerierung" 
+      error: "Interner Serverfehler bei der Beschreibungsgenerierung",
+      details: error.message
     });
   }
 });
