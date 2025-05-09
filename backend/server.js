@@ -165,7 +165,8 @@ app.get("/items", authenticateJWT, async (req, res) => {
             entered_on: item.entered_on,
             description: item.description,
             user_id: item.user_id,
-            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : ''
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
+            username: item.username
         }));
 
         res.json(items);
