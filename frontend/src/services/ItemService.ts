@@ -386,6 +386,8 @@ class ItemService {
       }
 
       const itemList: Item[] = await res.json();
+
+      if (!itemList) return [];
     
       const groupedItems: { [key: string]: number } = {};
   

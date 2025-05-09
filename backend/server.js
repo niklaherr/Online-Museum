@@ -266,9 +266,6 @@ app.get("/me/items", authenticateJWT, async (req, res) => {
     const userId = req.user.id;
     try {
         const result = await pool.query("SELECT * FROM item WHERE user_id = $1", [userId]);
-
-        if (result.rows.length === 0) return res.status(404).send("Items not found");
-
         res.json(result.rows);
     } catch (err) {
         console.error(err);
@@ -307,7 +304,6 @@ app.get("/me/item-lists", authenticateJWT, async (req, res) => {
     const userId = req.user.id;
     try {
         const result = await pool.query("SELECT * FROM item_list WHERE user_id = $1", [userId]);
-        if (result.rows.length === 0) return res.status(404).send("Item list not found");
         res.json(result.rows);
     } catch (err) {
         console.error(err);
