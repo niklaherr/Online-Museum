@@ -1,48 +1,10 @@
 import React, { useState } from "react";
-import { Button, Card, TextInput, Textarea, Title, Select, SelectItem, Text, Dialog, DialogPanel } from "@tremor/react";
+import { Button, Card, TextInput, Textarea, Title, Text, Dialog, DialogPanel } from "@tremor/react";
+import { SparklesIcon } from "@heroicons/react/24/outline";
 import { itemService } from "../../services/ItemService";
+import { itemAssistantService } from "../../services/ItemAssistantService";
 import NotyfService from "services/NotyfService";
 
-// Konfiguration für die API
-const MISTRAL_API_KEY = "SpbqZllg57jFyYGIT0PnvGzn8QPAX5Hs";
-const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
-
-// Verfügbare Modelle
-const models = [
-  { value: "mistral-tiny", name: "Mistral Tiny (schnell)" },
-  { value: "mistral-small", name: "Mistral Small (ausgewogen)" },
-  { value: "mistral-medium", name: "Mistral Medium (kreativ)" },
-];
-
-// Verfügbare Schreibstile
-const styles = [
-  { value: "neutral", name: "Neutral" },
-  { value: "professional", name: "Professionell" },
-  { value: "casual", name: "Locker" },
-  { value: "enthusiastic", name: "Enthusiastisch" },
-  { value: "creative", name: "Kreativ" },
-];
-
-// Beschreibungs-Prompt erstellen
-const generatePrompt = (title: string, category: string, style: string, imageData?: string) => {
-  // Kontextinformationen ohne direkte Erwähnung
-  const contextInfo = `Es handelt sich um ein Produkt aus der Kategorie ${category}.`;
-  
-  switch (style) {
-    case "professional":
-      return `Erstelle eine präzise, professionelle Produktbeschreibung. ${contextInfo} Der Name des Produkts ist "${title}". Verwende sachliche Sprache und betone die wichtigsten Eigenschaften. Maximal 3 Sätze.`;
-    case "casual":
-      return `Erstelle eine lockere, leicht verständliche Produktbeschreibung. ${contextInfo} Das Produkt heißt "${title}". Verwende alltägliche Sprache und sei conversational. Maximal 3 Sätze.`;
-    case "enthusiastic":
-      return `Erstelle eine begeisterte, energiegeladene Produktbeschreibung. ${contextInfo} Das Produkt trägt den Namen "${title}". Verwende überzeugende Sprache und hebe die Vorteile hervor. Maximal 3 Sätze.`;
-    case "creative":
-      return `Erstelle eine kreative, ungewöhnliche Produktbeschreibung. ${contextInfo} Der Produktname ist "${title}". Sei originell und verwende bildhafte Sprache. Maximal 3 Sätze.`;
-    default: // neutral
-      return `Erstelle eine klare, informative Produktbeschreibung. ${contextInfo} Der Name lautet "${title}". Halte die Beschreibung sachlich und informativ. Maximal 3 Sätze.`;
-  }
-};
-
-// Hauptkomponente
 type CreateItemProps = {
   onNavigate: (route: string) => void;
 };
@@ -54,11 +16,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [generating, setGenerating] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("mistral-tiny");
-  const [selectedStyle, setSelectedStyle] = useState("neutral");
-  
-  // Dialog-States
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [generatedDescription, setGeneratedDescription] = useState("");
   
@@ -111,61 +69,21 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
     }
     
     if (!category.trim()) {
-      NotyfService.showError("Bitte wähle eine Kategorie aus.");
+      NotyfService.showError("Bitte gib eine Kategorie ein.");
       return;
     }
     
-    setGenerating(true);
+    setIsGenerating(true);
+    
     try {
-      // Optional: Bildinformationen extrahieren (falls vorhanden)
-      let imageInfo = "";
-      if (imageFile) {
-        imageInfo = "mit hochgeladenem Bild";
-      }
-      
-      // Prompt erstellen
-      const prompt = generatePrompt(title, category, selectedStyle, imageInfo);
-      
-      // API-Anfrage an Mistral senden
-      const response = await fetch(MISTRAL_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${MISTRAL_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: selectedModel,
-          messages: [
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          temperature: 0.7, // Fester Wert statt variabel
-        }),
-      });
-      
-      // Antwort verarbeiten
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error?.message || "API-Anfrage fehlgeschlagen");
-      }
-      
-      const generated = data.choices?.[0]?.message?.content;
-      if (generated) {
-        // Generierte Beschreibung im Dialog anzeigen
-        setGeneratedDescription(generated.trim());
-        setIsDialogOpen(true);
-        NotyfService.showSuccess("Beschreibung erfolgreich generiert.");
-      } else {
-        throw new Error("Keine Beschreibung erhalten.");
-      }
+      const generatedText = await itemAssistantService.generateDescription(title, category);
+      setGeneratedDescription(generatedText);
+      setIsDialogOpen(true);
+      NotyfService.showSuccess("Beschreibung erfolgreich generiert.");
     } catch (err) {
-      console.error(err);
-      NotyfService.showError("Fehler bei der Generierung der Beschreibung.");
+      console.error("Fehler bei der Generierung:", err);
     } finally {
-      setGenerating(false);
+      setIsGenerating(false);
     }
   };
   
@@ -194,57 +112,28 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
           onChange={(e) => setCategory(e.target.value)}
         />
         
-        <Textarea
-          placeholder="Beschreibung"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-        />
-      </div>
-      
-      {/* KI-Beschreibungsgenerator */}
-      <Card className="bg-gray-50 p-4">
-        <Title className="text-lg">Beschreibung automatisch generieren</Title>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div>
-            <Text>Modell</Text>
-            <Select 
-              value={selectedModel} 
-              onValueChange={setSelectedModel}
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <Text>Beschreibung</Text>
+            <Button
+              icon={SparklesIcon}
+              size="xs"
+              color="blue"
+              onClick={handleGenerateDescription}
+              loading={isGenerating}
+              disabled={!title || !category}
             >
-              {models.map((model) => (
-                <SelectItem key={model.value} value={model.value}>
-                  {model.name}
-                </SelectItem>
-              ))}
-            </Select>
+              KI-Beschreibung generieren
+            </Button>
           </div>
-          
-          <div>
-            <Text>Stil</Text>
-            <Select 
-              value={selectedStyle} 
-              onValueChange={setSelectedStyle}
-            >
-              {styles.map((style) => (
-                <SelectItem key={style.value} value={style.value}>
-                  {style.name}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
+          <Textarea
+            placeholder="Beschreibung"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+          />
         </div>
-        
-        <Button 
-          color="gray" 
-          onClick={handleGenerateDescription} 
-          loading={generating}
-          className="mt-4 w-full"
-        >
-          {generating ? "Generiere..." : "Beschreibung generieren"}
-        </Button>
-      </Card>
+      </div>
       
       {/* Bildupload */}
       <div className="space-y-2">
@@ -253,7 +142,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
           type="file"
           accept="image/*"
           onChange={handleImageChange}
-          className="w-full text-sm"
+          className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
         />
         
         {imagePreview && (

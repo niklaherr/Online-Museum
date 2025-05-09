@@ -148,6 +148,12 @@ app.get("/users", authenticateJWT, async (req, res) => {
     }
 });
 
+// Import des ItemAssistant-Service
+const itemAssistantService = require('./services/ItemAssistantService');
+
+// Middleware für den ItemAssistant-Service
+app.use('/api/item-assistant', itemAssistantService);
+
 // Get all items
 app.get("/items", authenticateJWT, async (req, res) => {
     try {
