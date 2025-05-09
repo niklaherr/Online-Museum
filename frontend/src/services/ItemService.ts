@@ -242,6 +242,30 @@ class ItemService {
     }
   }
 
+  async deleteItem(id: number): Promise<any> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+
+    try {
+      const res = await fetch(`${this.baseUrl}/items/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Löschen der Liste: ${errorMessage}`);
+      }
+
+      return await res; // Optional: Handle the response if you need any confirmation message from the backend
+    } catch (err: any) {
+      console.error("Item list deletion failed:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Löschen der Item-Liste.");
+    }
+  }
+
   async createItemList(data: {
     title: string;
     description?: string;

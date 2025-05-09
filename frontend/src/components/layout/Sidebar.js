@@ -1,13 +1,12 @@
 import { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { AuthContext } from '../../contexts/AuthContext';
+import { userService } from 'services/UserService';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
-  const { user } = useContext(AuthContext);
   const location = useLocation();
   
   // Wenn kein Benutzer angemeldet ist, Sidebar nicht anzeigen
-  if (!user) return null;
+  if (!userService.isLoggedIn) return null;
   
   // Navigation-Links
   const navItems = [

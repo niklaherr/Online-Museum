@@ -261,6 +261,32 @@ app.put("/items/:id", authenticateJWT, upload.single("image"), async (req, res) 
     }
 });
 
+// Delete an item list
+app.delete("/items/:id", authenticateJWT, async (req, res) => {
+  const itemListId = parseInt(req.params.id);
+  const userId = req.user.id;
+
+  try {
+      // Ensure the item list exists and belongs to the current user
+      const itemListResult = await pool.query(
+          "SELECT * FROM item WHERE id = $1 AND user_id = $2",
+          [itemListId, userId]
+      );
+
+      if (itemListResult.rows.length === 0) {
+          return res.status(404).send("Item not found or does not belong to you.");
+      }
+
+      // Delete the item list itself (cascading will handle associated items)
+      await pool.query("DELETE FROM item WHERE id = $1", [itemListId]);
+
+      res.status(200).send("Item deleted successfully.");
+  } catch (err) {
+      console.error("Error deleting item:", err);
+      res.status(500).send("Error deleting item.");
+  }
+});
+
 // Fetch all items for the current user
 app.get("/me/items", authenticateJWT, async (req, res) => {
     const userId = req.user.id;
