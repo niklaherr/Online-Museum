@@ -1,28 +1,22 @@
+// Import required modules
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const { Pool } = require("pg");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const multer = require("multer"); // Import multer for file handling
+const { Pool } = require("pg"); // PostgreSQL client
+const bcrypt = require("bcrypt"); // Password hashing
+const jwt = require("jsonwebtoken"); // JWT for authentication
+const multer = require("multer"); // File upload handling
 
+// Initialize express app
 const app = express();
 const port = 3001;
-const JWT_SECRET = "your_secret_key"; // Replace with a secure value in production!
+const JWT_SECRET = "your_secret_key"; // In production, store this securely!
 
-// Erweiterte CORS-Konfiguration
-const corsOptions = {
-  origin: '*', // Im Produktionsbetrieb auf deine Frontend-Domain einschränken
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 204
-};
+// Middleware setup
+app.use(cors()); // Enable Cross-Origin Resource Sharing
+app.use(bodyParser.json()); // Parse JSON bodies
 
-// Middleware
-app.use(cors(corsOptions));
-app.use(bodyParser.json());
-
-// PostgreSQL Connection Pool
+// PostgreSQL connection pool setup
 const pool = new Pool({
     user: "user",
     host: process.env.DATABASE_HOST || "localhost",
@@ -31,7 +25,7 @@ const pool = new Pool({
     port: 5432,
 });
 
-// JWT Authentication Middleware
+// Middleware to authenticate JWT token
 const authenticateJWT = (req, res, next) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
@@ -40,33 +34,23 @@ const authenticateJWT = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded;
-        next();
+        next(); // Continue to the next middleware/route
     } catch (err) {
         console.error(err);
         return res.status(401).json({ error: "Invalid or expired token." });
     }
 };
 
-// Setup multer to handle file uploads (store in memory)
-const upload = multer(); // This will store files in memory as buffers
+// Setup Multer to store uploaded files in memory
+const upload = multer(); // Files will be stored as Buffer in memory
 
-// Import des ItemAssistant-Service
-const itemAssistantService = require('./services/ItemAssistantService');
+// ======= USER AUTHENTICATION ROUTES ======= //
 
-// Verbesserte Middleware für den ItemAssistant-Service
-// Verwende erneut CORS-Optionen speziell für diesen Bereich
-app.use('/api/item-assistant', cors(corsOptions), (req, res, next) => {
-  console.log(`ItemAssistant API aufgerufen: ${req.method} ${req.path}`, req.body);
-  next();
-}, itemAssistantService);
-
-// ========== ROUTES ========== //
-
-// Register new user
+// Register a new user
 app.post("/register", async (req, res) => {
     const { username, password } = req.body;
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
         const result = await pool.query(
             "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username",
             [username, hashedPassword]
@@ -82,35 +66,30 @@ app.post("/register", async (req, res) => {
     }
 });
 
-// Delete the currently authenticated user
+// Delete the authenticated user
 app.delete("/users/me", authenticateJWT, async (req, res) => {
-  const userId = req.user.id;
+    const userId = req.user.id;
+    try {
+        const result = await pool.query("DELETE FROM users WHERE id = $1", [userId]);
 
-  try {
-      const result = await pool.query(
-          "DELETE FROM users WHERE id = $1",
-          [userId]
-      );
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
 
-      if (result.rowCount === 0) {
-          return res.status(404).json({ error: "User not found" });
-      }
-
-      const deletedUser = result.rows[0];
-      res.status(200).json({ message: "User deleted" });
-  } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "User deletion failed" });
-  }
+        res.status(200).json({ message: "User deleted" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "User deletion failed" });
+    }
 });
 
-
-// Login
+// Login a user and return a JWT
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     try {
         const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
         const user = result.rows[0];
+
         if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
         const match = await bcrypt.compare(password, user.password);
@@ -124,38 +103,39 @@ app.post("/login", async (req, res) => {
     }
 });
 
-// Reset password (with PUT)
+// Reset password with old password
 app.put("/reset-password-with-old-password", authenticateJWT, async (req, res) => {
     const { oldPassword, newPassword, reNewPassword } = req.body;
-  
-    if (!oldPassword || !newPassword || !reNewPassword) {
-      return res.status(400).json({ error: "Alle Felder müssen ausgefüllt werden." });
-    }
-  
-    if (newPassword !== reNewPassword) {
-      return res.status(400).json({ error: "Die neuen Passwörter stimmen nicht überein." });
-    }
-  
-    try {
-      const result = await pool.query("SELECT * FROM users WHERE id = $1", [req.user.id]);
-      const user = result.rows[0];
-      if (!user) return res.status(404).json({ error: "Benutzer nicht gefunden." });
-  
-      const passwordMatch = await bcrypt.compare(oldPassword, user.password);
-      if (!passwordMatch) return res.status(401).json({ error: "Altes Passwort ist falsch." });
-  
-      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-      await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, user.id]);
-  
-      res.status(200).json({ message: "Passwort erfolgreich aktualisiert." });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Fehler beim Zurücksetzen des Passworts." });
-    }
-  });
-  
 
-// Get all users (secured)
+    if (!oldPassword || !newPassword || !reNewPassword) {
+        return res.status(400).json({ error: "Alle Felder müssen ausgefüllt werden." });
+    }
+
+    if (newPassword !== reNewPassword) {
+        return res.status(400).json({ error: "Die neuen Passwörter stimmen nicht überein." });
+    }
+
+    try {
+        const result = await pool.query("SELECT * FROM users WHERE id = $1", [req.user.id]);
+        const user = result.rows[0];
+        if (!user) return res.status(404).json({ error: "Benutzer nicht gefunden." });
+
+        const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!passwordMatch) return res.status(401).json({ error: "Altes Passwort ist falsch." });
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, user.id]);
+
+        res.status(200).json({ message: "Passwort erfolgreich aktualisiert." });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Fehler beim Zurücksetzen des Passworts." });
+    }
+});
+
+// ======= USER DATA ROUTES ======= //
+
+// Fetch all users (requires authentication)
 app.get("/users", authenticateJWT, async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM users ORDER BY username DESC");
@@ -166,30 +146,29 @@ app.get("/users", authenticateJWT, async (req, res) => {
     }
 });
 
-// Get all items
+// ======= ITEM ROUTES ======= //
+
+// Get all items with user data
 app.get("/items", authenticateJWT, async (req, res) => {
     try {
         const query = `
-        SELECT item.*, users.username 
-        FROM item 
-        JOIN users ON item.user_id = users.id
-      `;
-
-        // Execute query
+            SELECT item.*, users.username 
+            FROM item 
+            JOIN users ON item.user_id = users.id
+        `;
         const result = await pool.query(query);
 
-        // Map each item and convert the image to a base64 string if it exists
-        const items = result.rows.map((item) => ({
+        const items = result.rows.map(item => ({
             id: item.id,
             title: item.title,
             category: item.category,
             entered_on: item.entered_on,
             description: item.description,
             user_id: item.user_id,
-            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '' // Convert image to base64 here
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
+            username: item.username
         }));
 
-        // Send the items (including base64 images) to the frontend
         res.json(items);
     } catch (err) {
         console.error(err);
@@ -197,70 +176,50 @@ app.get("/items", authenticateJWT, async (req, res) => {
     }
 });
 
-// Get a single item by ID along with the user's data in a single query
+// Get a specific item by ID
 app.get("/items/:id", authenticateJWT, async (req, res) => {
     const { id } = req.params;
-  
     try {
-      // Use a JOIN to fetch both the item and the user's username
-      const query = `
-        SELECT item.*, users.username 
-        FROM item 
-        JOIN users ON item.user_id = users.id
-        WHERE item.id = $1
-      `;
-  
-      const result = await pool.query(query, [id]);
-  
-      // Check if the item was found
-      if (result.rows.length === 0) {
-        return res.status(404).send("Item not found");
-      }
-  
-      const item = result.rows[0];
-  
-      // Return the item data along with the username
-      const galleryItem = {
-        id: item.id,
-        user_id: item.user_id,
-        title: item.title,
-        entered_on: item.entered_on,
-        image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '', // Convert image to base64 if it exists
-        description: item.description,
-        category: item.category,
-        username: item.username, // The username is fetched directly from the JOIN
-      };
-  
-      res.json(galleryItem);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Error fetching item or user data");
-    }
-  });
-  
+        const query = `
+            SELECT item.*, users.username 
+            FROM item 
+            JOIN users ON item.user_id = users.id
+            WHERE item.id = $1
+        `;
+        const result = await pool.query(query, [id]);
 
-// Add a new item with image upload
+        if (result.rows.length === 0) return res.status(404).send("Item not found");
+
+        const item = result.rows[0];
+        res.json({
+            id: item.id,
+            user_id: item.user_id,
+            title: item.title,
+            entered_on: item.entered_on,
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
+            description: item.description,
+            category: item.category,
+            username: item.username,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching item or user data");
+    }
+});
+
+// Create a new item with image upload
 app.post("/items", authenticateJWT, upload.single("image"), async (req, res) => {
     const { title, description, category } = req.body;
-    const image = req.file ? req.file.buffer : null; // Store the image as a buffer (BYTEA in PostgreSQL)
+    const image = req.file ? req.file.buffer : null;
 
-    // Validate required fields
-    if (!title) {
-        return res.status(400).send("Missing required fields: title, entered_on");
-    }
+    if (!title) return res.status(400).send("Missing required fields: title");
 
     try {
         const result = await pool.query(
             `INSERT INTO item (user_id, title, image, description, category)
              VALUES ($1, $2, $3, $4, $5)
              RETURNING *`,
-            [
-                req.user.id, 
-                title,
-                image, // image will be a buffer (BYTEA type in PostgreSQL)
-                description || null, 
-                category || null
-            ]
+            [req.user.id, title, image, description || null, category || null]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -269,7 +228,81 @@ app.post("/items", authenticateJWT, upload.single("image"), async (req, res) => 
     }
 });
 
-// Get all item lists
+// Update an existing item, optionally replacing its image
+app.put("/items/:id", authenticateJWT, upload.single("image"), async (req, res) => {
+    const { title, description, category } = req.body;
+    const { id } = req.params;
+    const image = req.file ? req.file.buffer : null;
+
+    if (!title) return res.status(400).send("Missing required field: title");
+
+    try {
+        const fields = ["title", "description", "category"];
+        const values = [title, description || null, category || null];
+        let query = `UPDATE item SET title = $1, description = $2, category = $3`;
+        let paramIndex = 4;
+
+        if (image) {
+            query += `, image = $${paramIndex}`;
+            values.push(image);
+            paramIndex++;
+        }
+
+        query += ` WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *`;
+        values.push(id, req.user.id);
+
+        const result = await pool.query(query, values);
+
+        if (result.rows.length === 0) return res.status(404).send("Item not found or not authorized");
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error("Error updating item:", err);
+        res.status(500).send("Error updating item");
+    }
+});
+
+// Delete an item list
+app.delete("/items/:id", authenticateJWT, async (req, res) => {
+  const itemListId = parseInt(req.params.id);
+  const userId = req.user.id;
+
+  try {
+      // Ensure the item list exists and belongs to the current user
+      const itemListResult = await pool.query(
+          "SELECT * FROM item WHERE id = $1 AND user_id = $2",
+          [itemListId, userId]
+      );
+
+      if (itemListResult.rows.length === 0) {
+          return res.status(404).send("Item not found or does not belong to you.");
+      }
+
+      // Delete the item list itself (cascading will handle associated items)
+      await pool.query("DELETE FROM item WHERE id = $1", [itemListId]);
+
+      res.status(200).send("Item deleted successfully.");
+  } catch (err) {
+      console.error("Error deleting item:", err);
+      res.status(500).send("Error deleting item.");
+  }
+});
+
+// Fetch all items for the current user
+app.get("/me/items", authenticateJWT, async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const result = await pool.query("SELECT * FROM item WHERE user_id = $1", [userId]);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching items");
+    }
+});
+
+// ======= ITEM LIST ROUTES ======= //
+
+// Fetch all item lists
 app.get("/item-lists", authenticateJWT, async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM item_list ORDER BY id ASC");
@@ -280,18 +313,25 @@ app.get("/item-lists", authenticateJWT, async (req, res) => {
     }
 });
 
-// Get a single item list by ID
+// Get one item list by ID
 app.get("/item-lists/:id", authenticateJWT, async (req, res) => {
     const { id } = req.params;
-
     try {
         const result = await pool.query("SELECT * FROM item_list WHERE id = $1", [id]);
-
-        if (result.rows.length === 0) {
-            return res.status(404).send("Item list not found");
-        }
-
+        if (result.rows.length === 0) return res.status(404).send("Item list not found");
         res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching item list");
+    }
+});
+
+// Fetch the authenticated user's item lists
+app.get("/me/item-lists", authenticateJWT, async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const result = await pool.query("SELECT * FROM item_list WHERE user_id = $1", [userId]);
+        res.json(result.rows);
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching item list");
@@ -300,7 +340,7 @@ app.get("/item-lists/:id", authenticateJWT, async (req, res) => {
 
 // Get items by item_list_id
 app.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) => {
-    const { item_list_id } = req.params; // Extract the item_list_id from the URL
+    const { item_list_id } = req.params;
     try {
         const result = await pool.query(
             `SELECT item.id, item.title, item.category, item.entered_on, item.description, item.user_id, item.image, users.username
@@ -309,22 +349,20 @@ app.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) => 
              JOIN users ON item.user_id = users.id
              WHERE item_itemlist.item_list_id = $1
              ORDER BY item.entered_on DESC`,
-            [item_list_id] // Pass the item_list_id as a parameter
+            [item_list_id]
         );
 
-        // Map each item and convert the image to a base64 string if it exists
-        const items = result.rows.map((item) => ({
+        const items = result.rows.map(item => ({
             id: item.id,
             user_id: item.user_id,
             title: item.title,
             entered_on: item.entered_on,
-            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '', // Convert image to base64 if it exists
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
             description: item.description,
             category: item.category,
-            username: item.username, // The username is fetched directly from the JOIN
-          }));
+            username: item.username,
+        }));
 
-        // Send the items (including base64 images) to the frontend
         res.json(items);
     } catch (err) {
         console.error(err);
@@ -332,122 +370,140 @@ app.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) => 
     }
 });
 
-app.post("/item-lists", authenticateJWT, async (req, res) => {
+// Update an item list and its associations
+app.put("/item-lists/:id", authenticateJWT, async (req, res) => {
+    const itemListId = parseInt(req.params.id, 10);
     const { title, description, item_ids } = req.body;
+    const userId = req.user.id;
+
+    if (!title || !Array.isArray(item_ids) || item_ids.length === 0) {
+        return res.status(400).send("Title and at least one item ID are required.");
+    }
 
     try {
-        // Get the user_id from the JWT token (req.user is set by authenticateJWT middleware)
+        const existingList = await pool.query(
+            "SELECT * FROM item_list WHERE id = $1 AND user_id = $2",
+            [itemListId, userId]
+        );
+        if (existingList.rowCount === 0) return res.status(404).send("Item list not found or not authorized.");
+
+        await pool.query("UPDATE item_list SET title = $1, description = $2 WHERE id = $3",
+            [title, description || "", itemListId]);
+
+        await pool.query("DELETE FROM item_itemlist WHERE item_list_id = $1", [itemListId]);
+
+        for (const itemId of item_ids) {
+            await pool.query("INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)", [itemListId, itemId]);
+        }
+
+        res.status(200).json({ id: itemListId, title, description, user_id: userId, item_ids });
+    } catch (err) {
+        console.error("Error updating item list:", err);
+        res.status(500).send("Error updating item list.");
+    }
+});
+
+// Delete an item list
+app.delete("/item-lists/:id", authenticateJWT, async (req, res) => {
+  const itemListId = parseInt(req.params.id);
+  const userId = req.user.id;
+
+  try {
+      // Ensure the item list exists and belongs to the current user
+      const itemListResult = await pool.query(
+          "SELECT * FROM item_list WHERE id = $1 AND user_id = $2",
+          [itemListId, userId]
+      );
+
+      if (itemListResult.rows.length === 0) {
+          return res.status(404).send("Item list not found or does not belong to you.");
+      }
+
+      // Delete the item list itself (cascading will handle associated items)
+      await pool.query("DELETE FROM item_list WHERE id = $1", [itemListId]);
+
+      res.status(200).send("Item list deleted successfully.");
+  } catch (err) {
+      console.error("Error deleting item list:", err);
+      res.status(500).send("Error deleting item list.");
+  }
+});
+
+
+// Create a new item list and link items to it
+app.post("/item-lists", authenticateJWT, async (req, res) => {
+    const { title, description, item_ids } = req.body;
+    try {
         const userId = req.user.id;
 
-        // Check if title and item_ids are provided
         if (!title || !item_ids || item_ids.length === 0) {
             return res.status(400).send("Title and at least one item ID are required.");
         }
 
-        // Insert the new item list into the database
         const result = await pool.query(
             "INSERT INTO item_list (title, description, user_id) VALUES ($1, $2, $3) RETURNING id",
-            [title, description || "", userId] // Use userId from JWT
+            [title, description || "", userId]
         );
 
         const newItemListId = result.rows[0].id;
 
-        // Now insert the selected items into the item_itemlist table to associate them with the new item list
         for (const itemId of item_ids) {
-            await pool.query(
-                "INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)",
-                [newItemListId, itemId]
-            );
+            await pool.query("INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)", [newItemListId, itemId]);
         }
 
-        // Send the created item list response
-        res.status(201).json({
-            id: newItemListId,
-            title,
-            description,
-            user_id: userId,
-            item_ids,
-        });
+        res.status(201).json({ id: newItemListId, title, description, user_id: userId, item_ids });
     } catch (err) {
         console.error("Error creating item list:", err);
         res.status(500).send("Error creating item list.");
     }
 });
 
+// ======= ACTIVITY FEED ROUTES ======= //
+
+// Utility to fetch latest activity logs
 async function fetchLatestActivities() {
     try {
-      // Query to fetch last 5 items
-      const itemsQuery = `
-        SELECT 
-          id,
-          'item' AS type,
-          entered_on,
-          'created item' AS action,
-          title AS target
-        FROM 
-          item
-        ORDER BY 
-          entered_on DESC
-        LIMIT 5;
-      `;
-      const itemsResult = await pool.query(itemsQuery);
-  
-      // Query to fetch last 5 item lists
-      const itemListsQuery = `
-        SELECT 
-          id,
-          'item_list' AS type,
-          entered_on,
-          'created list' AS action,
-          title AS target
-        FROM 
-          item_list
-        ORDER BY 
-          entered_on DESC
-        LIMIT 5;
-      `;
-      // Map the results to the Activity format
-        const mapToActivity = (rows) => {
-            return rows.map(row => ({
+        const itemsQuery = `
+            SELECT id, 'item' AS type, entered_on, 'created item' AS action, title AS target FROM item ORDER BY entered_on DESC LIMIT 5;
+        `;
+        const itemListsQuery = `
+            SELECT id, 'item_list' AS type, entered_on, 'created list' AS action, title AS target FROM item_list ORDER BY entered_on DESC LIMIT 5;
+        `;
+        const mapToActivity = (rows) => rows.map(row => ({
             id: row.id,
             type: row.type,
             username: row.username,
             entered_on: row.entered_on,
             action: row.action,
             target: row.target
-            }));
-        };
-        const itemListsResult = await pool.query(itemListsQuery)
-  
-      // Map each result set to the Activity interface
-      const itemsActivities = mapToActivity(itemsResult.rows);
-      const itemListsActivities = mapToActivity(itemListsResult.rows);
-  
-      // Combine the activities from both tables
-      const allActivities = [...itemsActivities, ...itemListsActivities];
-  
-      // Sort the combined results by entered_on (most recent first)
-      allActivities.sort((a, b) => new Date(b.entered_on) - new Date(a.entered_on));
-  
-      // Return the top 5 activities
-      return allActivities.slice(0, 5);
+        }));
+        const [itemsResult, itemListsResult] = await Promise.all([
+            pool.query(itemsQuery),
+            pool.query(itemListsQuery)
+        ]);
+
+        const activities = [...mapToActivity(itemsResult.rows), ...mapToActivity(itemListsResult.rows)];
+        activities.sort((a, b) => new Date(b.entered_on) - new Date(a.entered_on));
+        return activities.slice(0, 5);
     } catch (err) {
-      console.error('Error fetching activities:', err);
-      throw err;
+        console.error('Error fetching activities:', err);
+        throw err;
     }
-  }
-  
-// Express route to fetch all activities
-app.get('/activities', authenticateJWT, async (req, res) => {
-try {
-    const activities = await fetchLatestActivities();
-    res.json(activities);
-} catch (err) {
-    res.status(500).send('Error fetching activities');
 }
+
+// Route to return recent user activities
+app.get('/activities', authenticateJWT, async (req, res) => {
+    try {
+        const activities = await fetchLatestActivities();
+        res.json(activities);
+    } catch (err) {
+        res.status(500).send('Error fetching activities');
+    }
 });
 
-// Start server
+// ======= SERVER START ======= //
+
+// Start the server and listen on defined port
 app.listen(port, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${port}`);
 });

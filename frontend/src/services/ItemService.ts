@@ -4,6 +4,7 @@ import User from "../interfaces/User";
 import Item, { GalleryItem } from "../interfaces/Item";
 import ItemList from "interfaces/ItemList";
 import Activity from "interfaces/Activity";
+import DateCount from "interfaces/DateCount";
 
 class ItemService {
   private maxRetries: number;
@@ -25,7 +26,6 @@ class ItemService {
     const headers = { Authorization: `Bearer ${token}` };
 
     try {
-      // Fetch the item with the user data using the item ID
       const res = await fetch(`${this.baseUrl}/items`, {
         method: "GET",
         headers,
@@ -36,7 +36,6 @@ class ItemService {
         throw new Error(`Fehler beim Laden des Items: ${errorText}`);
       }
 
-      // Parse the response JSON into a GalleryItem type
       const item: GalleryItem[] = await res.json();
       return item;
     } catch (error) {
@@ -76,7 +75,6 @@ class ItemService {
     const headers = { Authorization: `Bearer ${token}` };
 
     try {
-      // Fetch the item with the user data using the item ID
       const res = await fetch(`${this.baseUrl}/items/${itemId}`, {
         method: "GET",
         headers,
@@ -87,7 +85,6 @@ class ItemService {
         throw new Error(`Fehler beim Laden des Items: ${errorText}`);
       }
 
-      // Parse the response JSON into a GalleryItem type
       const item: GalleryItem = await res.json();
       return item;
     } catch (error) {
@@ -95,14 +92,29 @@ class ItemService {
       throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
     }
   }
-  
 
   async fetchItemLists(): Promise<ItemList[]> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
 
     const headers = { Authorization: `Bearer ${token}` };
-    return await this.getWithRetry<ItemList[]>("/item-lists", headers);
+
+    try {
+      const res = await fetch(`${this.baseUrl}/item-lists`, {
+        method: "GET",
+        headers,
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Laden der Item-Listen: ${errorMessage}`);
+      }
+
+      return await res.json();
+    } catch (err: any) {
+      console.error("Fehler beim Abrufen der Item-Listen:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Listen.");
+    }
   }
 
   async fetchItemListById(id: string): Promise<ItemList> {
@@ -110,17 +122,30 @@ class ItemService {
     if (!token) throw new Error("Nicht eingeloggt.");
   
     const headers = { Authorization: `Bearer ${token}` };
-    return await this.getWithRetry<ItemList>(`/item-lists/${id}`, headers);
+    try {
+      const res = await fetch(`${this.baseUrl}/item-lists/${id}`, {
+        method: "GET",
+        headers,
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Laden der Item-Liste: ${errorMessage}`);
+      }
+
+      return await res.json();
+    } catch (err: any) {
+      console.error("Fehler beim Abrufen der Item-Liste:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Liste.");
+    }
   }
 
-  // New function to fetch items by item_list_id
   async fetchItemsByItemListId(itemListId: number): Promise<GalleryItem[]> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
 
     const headers = { Authorization: `Bearer ${token}` };
 
-    // Fetch items for the specific item list
     try {
       const res = await fetch(`${this.baseUrl}/item-lists/${itemListId}/items`, {
         method: "GET",
@@ -134,22 +159,19 @@ class ItemService {
 
       const items: GalleryItem[] = await res.json();
 
-      return items
-
+      return items;
     } catch (err: any) {
       console.error("Fehler beim Abrufen der Items:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Items.");
     }
   }
 
-  // New function to fetch items by item_list_id
   async fetchActivities(): Promise<Activity[]> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
 
     const headers = { Authorization: `Bearer ${token}` };
 
-    // Fetch items for the specific item list
     try {
       const res = await fetch(`${this.baseUrl}/activities`, {
         method: "GET",
@@ -158,16 +180,15 @@ class ItemService {
 
       if (!res.ok) {
         const errorMessage = await res.text();
-        throw new Error(`Fehler beim Laden der Items: ${errorMessage}`);
+        throw new Error(`Fehler beim Laden der Aktivitäten: ${errorMessage}`);
       }
 
-      const items: Activity[] = await res.json();
+      const activities: Activity[] = await res.json();
 
-      return items
-
+      return activities;
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Items:", err);
-      throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Items.");
+      console.error("Fehler beim Abrufen der Aktivitäten:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Aktivitäten.");
     }
   }
 
@@ -195,7 +216,55 @@ class ItemService {
       throw new Error(err.message || "Unbekannter Fehler beim Erstellen des Items.");
     }
   }
+
+  async updateItem(id: number, formData: FormData): Promise<any> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
   
+    try {
+      const res = await fetch(`${this.baseUrl}/items/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+  
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Aktualisieren: ${errorMessage}`);
+      }
+  
+      return await res.json();
+    } catch (err: any) {
+      console.error("Item update failed:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Aktualisieren des Items.");
+    }
+  }
+
+  async deleteItem(id: number): Promise<any> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+
+    try {
+      const res = await fetch(`${this.baseUrl}/items/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Löschen der Liste: ${errorMessage}`);
+      }
+
+      return await res; // Optional: Handle the response if you need any confirmation message from the backend
+    } catch (err: any) {
+      console.error("Item list deletion failed:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Löschen der Item-Liste.");
+    }
+  }
 
   async createItemList(data: {
     title: string;
@@ -206,7 +275,6 @@ class ItemService {
     if (!token) throw new Error("Nicht eingeloggt.");
 
     try {
-      // Sending the POST request to create a new item list
       const res = await fetch(`${this.baseUrl}/item-lists`, {
         method: "POST",
         headers: {
@@ -216,13 +284,11 @@ class ItemService {
         body: JSON.stringify(data),
       });
 
-      // Handling errors if the response is not ok
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Erstellen der Liste: ${errorMessage}`);
       }
 
-      // Return the response data (the created item list)
       const createdItemList = await res.json();
       return createdItemList;
     } catch (err: any) {
@@ -231,31 +297,143 @@ class ItemService {
     }
   }
 
-  private async getWithRetry<T>(endpoint: string, headers: Record<string, string>): Promise<T> {
-    let attempts = 0;
-    while (attempts < this.maxRetries) {
-      try {
-        const res = await fetch(`${this.baseUrl}${endpoint}`, {
-          method: "GET",
-          headers,
-        });
+  async editItemList(id: number, data: {
+    title: string;
+    description?: string;
+    item_ids: number[];
+  }): Promise<any> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+  
+    try {
+      const res = await fetch(`${this.baseUrl}/item-lists/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Bearbeiten der Liste: ${errorMessage}`);
+      }
+  
+      return await res.json();
+    } catch (err: any) {
+      console.error("Item list editing failed:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Bearbeiten der Item-Liste.");
+    }
+  }
 
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => null);
-          throw new Error(errorData?.error || `HTTP ${res.status}`);
-        }
+  async deleteItemList(id: number): Promise<any> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
 
-        return await res.json();
-      } catch (err) {
-        attempts += 1;
-        console.warn(`GET ${endpoint} failed (attempt ${attempts}):`, err);
-        if (attempts >= this.maxRetries) {
-          throw new Error(`Fehlgeschlagen nach ${this.maxRetries} Versuchen: ${err}`);
+    try {
+      const res = await fetch(`${this.baseUrl}/item-lists/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Löschen der Liste: ${errorMessage}`);
+      }
+
+      return await res; // Optional: Handle the response if you need any confirmation message from the backend
+    } catch (err: any) {
+      console.error("Item list deletion failed:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Löschen der Item-Liste.");
+    }
+  }
+
+  async fetchItemListDataCounting(): Promise<DateCount[]> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+  
+    const headers = { Authorization: `Bearer ${token}` };
+    try {
+      const res = await fetch(`${this.baseUrl}/me/item-lists`, {
+        method: "GET",
+        headers,
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Abrufen der Item-Listen-Daten: ${errorMessage}`);
+      }
+
+      const itemList: ItemList[] = await res.json();
+      
+      const groupedItems: { [key: string]: number } = {};
+
+      for (let i = 0; i < itemList.length; i++) {
+        const item = itemList[i];
+        const date = item.entered_on.split('T')[0]; // Get the date part of the ISO string (yyyy-mm-dd)
+        if (groupedItems[date]) {
+          groupedItems[date]++;
+        } else {
+          groupedItems[date] = 1;
         }
       }
+    
+      const result: DateCount[] = Object.keys(groupedItems).map(date => ({
+        date,
+        count: groupedItems[date],
+      }));
+  
+      return result;
+    } catch (err: any) {
+      console.error("Fehler beim Abrufen der Item-Listen-Daten:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Listen-Daten.");
     }
+  }
 
-    throw new Error("Unerwarteter Fehler bei getWithRetry.");
+  async fetchItemDataCounting(): Promise<DateCount[]> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+  
+    const headers = { Authorization: `Bearer ${token}` };
+    try {
+      const res = await fetch(`${this.baseUrl}/me/items`, {
+        method: "GET",
+        headers,
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Abrufen der Item-Daten: ${errorMessage}`);
+      }
+
+      const itemList: Item[] = await res.json();
+
+      if (!itemList) return [];
+    
+      const groupedItems: { [key: string]: number } = {};
+  
+      itemList.forEach(item => {
+        const date = item.entered_on.split('T')[0]; // Get the date part of the ISO string (yyyy-mm-dd)
+        if (groupedItems[date]) {
+          groupedItems[date]++;
+        } else {
+          groupedItems[date] = 1;
+        }
+      });
+    
+      const result: DateCount[] = Object.keys(groupedItems).map(date => ({
+        date,
+        count: groupedItems[date],
+      }));
+  
+      return result;
+    } catch (err: any) {
+      console.error("Fehler beim Abrufen der Item-Daten:", err);
+      throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Daten.");
+    }
   }
 }
 

@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
 
 // Tremor-Komponenten importieren
 import {
@@ -17,21 +16,8 @@ import Activity from 'interfaces/Activity';
 import { itemService } from 'services/ItemService';
 import NotyfService from 'services/NotyfService';
 import NoResults from './NoResults';
+import DateCount from 'interfaces/DateCount';
 
-const uploadsData = [
-  {
-    date: '2025-05-07',
-    'Anzahl': 2338,
-  },
-  {
-    date: '2025-05-08',
-    'Anzahl': 2103,
-  },
-  {
-    date: '2025-06-07',
-    'Anzahl': 2338,
-  },
-]
 
 
 type ActivityItemProps = {
@@ -86,6 +72,8 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
 const Dashboard = () => {
   
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [itemListDateCount, setItemListDateCount] = useState<DateCount[]>([]);
+  const [itemDataCount, setItemDataCount] = useState<DateCount[]>([]);
 
   useEffect(() => {
     const loadItemLists = async () => {
@@ -103,6 +91,24 @@ const Dashboard = () => {
       }
     };
 
+    const loadDataCount = async () => {
+      try {
+        const dateCount = await itemService.fetchItemListDataCounting();
+        setItemListDateCount(dateCount)
+        const itemDataCount = await itemService.fetchItemDataCounting();
+        setItemDataCount(itemDataCount)
+        //setIsLoading(false)
+      } catch (error) {
+        let errorMessage = "Fehler beim Laden"
+        if(error instanceof Error) {
+          errorMessage = error.message
+        }
+        NotyfService.showError(errorMessage)
+      }
+    };
+
+    loadDataCount();
+
     loadItemLists();
   }, []);
 
@@ -113,27 +119,27 @@ const Dashboard = () => {
         <Text>Willkommen zurück, {userService.getUserName() || 'Gast'}!</Text>
       </div>
       <Card>
-          <Title>Items über die Zeit</Title>
+          <Title>Itemlisten über die Zeit</Title>
           <BarChart
-            data={uploadsData}
-            index="x"
-            categories={['Uploads']}
+          className="h-80"
+            data={itemListDateCount}
+            index="date"
+            categories={['count']}
             colors={['blue']}
             showLegend={false}
-            className="mt-6"
+            yAxisWidth={60}
           />
         </Card>
 
         <Card>
-          <Title>Itemlisten über die Zeit</Title>
+          <Title>Items über die Zeit</Title>
           <BarChart
             className="h-80"
-            data={uploadsData}
+            data={itemDataCount}
             index="date"
-            categories={['Anzahl']}
+            categories={['count']}
             colors={['indigo']}
             yAxisWidth={60}
-            onValueChange={(v) => console.log(v)}
           />
 
         </Card>

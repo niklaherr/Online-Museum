@@ -1,5 +1,4 @@
 import { useState, useContext } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
 import {
   Card, Title, Text, Flex, Button, TextInput, Dialog, DialogPanel,
 } from '@tremor/react';
@@ -144,15 +143,6 @@ const ProfilePage = () => {
                 onClick={() => setIsEditing(true)}
               >
                 Passwort ändern
-              </Button>
-
-              <Button
-                variant="light"
-                color="purple"
-                icon={ShieldCheckIcon}
-                className="w-full justify-start"
-              >
-                Datenschutzeinstellungen
               </Button>
 
               <Button
