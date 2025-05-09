@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
 
 // Tremor-Komponenten importieren
 import {
@@ -105,7 +104,6 @@ const Dashboard = () => {
           errorMessage = error.message
         }
         NotyfService.showError(errorMessage)
-        //userService.logout()
       }
     };
 

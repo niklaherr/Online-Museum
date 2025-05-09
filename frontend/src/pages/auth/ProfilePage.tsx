@@ -1,5 +1,4 @@
 import { useState, useContext } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
 import {
   Card, Title, Text, Flex, Button, TextInput, Dialog, DialogPanel,
 } from '@tremor/react';
