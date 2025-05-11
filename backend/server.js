@@ -451,6 +451,8 @@ app.post("/item-lists", authenticateJWT, async (req, res) => {
             await pool.query("INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)", [newItemListId, itemId]);
         }
 
+        createActivity({category: "ITEM_LIST", element_id: newItemListId, type: "CREATE", user_id: userId})
+
         res.status(201).json({ id: newItemListId, title, description, user_id: userId, item_ids });
     } catch (err) {
         console.error("Error creating item list:", err);
@@ -460,46 +462,37 @@ app.post("/item-lists", authenticateJWT, async (req, res) => {
 
 // ======= ACTIVITY FEED ROUTES ======= //
 
-// Utility to fetch latest activity logs
-async function fetchLatestActivities() {
+// Fetch all item lists
+app.get("/activities", authenticateJWT, async (req, res) => {
     try {
-        const itemsQuery = `
-            SELECT id, 'item' AS type, entered_on, 'created item' AS action, title AS target FROM item ORDER BY entered_on DESC LIMIT 5;
-        `;
-        const itemListsQuery = `
-            SELECT id, 'item_list' AS type, entered_on, 'created list' AS action, title AS target FROM item_list ORDER BY entered_on DESC LIMIT 5;
-        `;
-        const mapToActivity = (rows) => rows.map(row => ({
-            id: row.id,
-            type: row.type,
-            username: row.username,
-            entered_on: row.entered_on,
-            action: row.action,
-            target: row.target
-        }));
-        const [itemsResult, itemListsResult] = await Promise.all([
-            pool.query(itemsQuery),
-            pool.query(itemListsQuery)
-        ]);
-
-        const activities = [...mapToActivity(itemsResult.rows), ...mapToActivity(itemListsResult.rows)];
-        activities.sort((a, b) => new Date(b.entered_on) - new Date(a.entered_on));
-        return activities.slice(0, 5);
+        const result = await pool.query("SELECT * FROM activities ORDER BY id ASC");
+        res.json(result.rows);
     } catch (err) {
-        console.error('Error fetching activities:', err);
-        throw err;
-    }
-}
-
-// Route to return recent user activities
-app.get('/activities', authenticateJWT, async (req, res) => {
-    try {
-        const activities = await fetchLatestActivities();
-        res.json(activities);
-    } catch (err) {
-        res.status(500).send('Error fetching activities');
+        console.error(err);
+        res.status(500).send("Error fetching item lists");
     }
 });
+
+// Create a new activity
+async function createActivity({ category, element_id, type, user_id }) {
+
+    if (!category || !element_id || !type || !user_id) {
+        throw new Error("Missing required fields: category, element_id, type, and user_id");
+    }
+
+    try {
+        const result = await pool.query(
+            `INSERT INTO activities (category, element_id, type, user_id)
+             VALUES ($1, $2, $3, $4)
+             RETURNING *`,
+            [category, element_id, type, user_id]
+        );
+        return result.rows[0];
+    } catch (err) {
+        console.error("Error creating activity:", err);
+        throw new Error("Database error");
+    }
+}
 
 // ======= SERVER START ======= //
 
