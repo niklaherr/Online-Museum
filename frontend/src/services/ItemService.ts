@@ -15,6 +15,26 @@ class ItemService {
     this.baseUrl = process.env.REACT_APP_BACKEND_API_URL || "http://localhost:3001";
   }
 
+  async fetchLandingPageItems(): Promise<any[]> {
+
+    try {
+      const res = await fetch(`${this.baseUrl}/items/no-auth`, {
+        method: "GET",
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Fehler beim Laden des Items: ${errorText}`);
+      }
+
+      const item: GalleryItem[] = await res.json();
+      return item;
+    } catch (error) {
+      console.error(error);
+      throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
+    }
+  }
+
   async fetchAllItemsWithUsers(): Promise<any[]> {
     const token = userService.getToken();
     const userID = userService.getUserID();

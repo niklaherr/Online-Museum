@@ -17,13 +17,10 @@ import {
   ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
-
-type Entry = {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-};
+import { itemService } from "services/ItemService";
+import { GalleryItem } from "interfaces/Item";
+import NotyfService from "services/NotyfService";
+import NoResults from "./NoResults";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -38,16 +35,43 @@ const fadeUp = {
   }),
 };
 
-const LandingPage: React.FC = () => {
-  const [latestEntries, setLatestEntries] = useState<Entry[]>([]);
+type LandingPageProps = {
+  onNavigate: (route: string) => void;
+};
+const LandingPage = ({onNavigate} : LandingPageProps) => {
+  const [museumItems, setMuseumItems] = useState<GalleryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadItems = async () => {
+    try {
+      const items = await itemService.fetchLandingPageItems();
+      setMuseumItems(items);
+      setIsLoading(false);
+    } catch (error) {
+      let errorMessage = "Fehler beim Laden der Items"
+      if(error instanceof Error) {
+        errorMessage = error.message
+      }
+      NotyfService.showError(errorMessage)
+    }
+  };
 
   useEffect(() => {
-    fetch("/api/entries/latest?limit=5")
-      .then((res) => res.json())
-      .then((data) => setLatestEntries(data))
-      .catch((err) => console.error("Failed to fetch entries", err));
+    loadItems();
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center p-12">
+        <div className="text-blue-500">
+          <svg className="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="px-4 py-10 md:py-16 max-w-7xl mx-auto space-y-16">
       {/* Hero Section */}
@@ -63,7 +87,7 @@ const LandingPage: React.FC = () => {
           Interaktive Ausstellungen. Eigene Beiträge. Deine Favoriten. Alles online.
         </Text>
         <div className="mt-6">
-          <Button size="lg" icon={ArrowRightIcon}>
+          <Button size="lg" icon={ArrowRightIcon} onClick={() => onNavigate('/register')}>
             Jetzt entdecken
           </Button>
         </div>
@@ -91,8 +115,8 @@ const LandingPage: React.FC = () => {
               color: "green",
             },
             {
-              title: "Favoriten",
-              text: "Speichere deine Lieblingsstücke und teile sie.",
+              title: "Listen",
+              text: "Erstelle Listen, die alle deine eigenen Objekte zusammenfassen.",
               icon: StarIcon,
               color: "yellow",
             },
@@ -125,7 +149,7 @@ const LandingPage: React.FC = () => {
           {[
             "Konto erstellen & anmelden",
             "Durch Beiträge stöbern oder selbst hochladen",
-            "Lieblingsstücke speichern und teilen",
+            "Listen erstellen und speichern",
           ].map((step, i) => (
             <motion.div key={step} custom={i} variants={fadeUp}>
               <Card>
@@ -149,19 +173,36 @@ const LandingPage: React.FC = () => {
           <ClockIcon className="w-6 h-6 text-gray-500" />
         </Flex>
 
-        <Grid numItemsSm={1} numItemsMd={2} numItemsLg={3} className="gap-4">
-          {latestEntries.map((entry, i) => (
-            <motion.div key={entry.id} custom={i} variants={fadeUp}>
-              <Card>
-                <Title>{entry.title}</Title>
-                <Text>{entry.description}</Text>
-                <Text className="text-sm text-gray-400 mt-2">
-                  {new Date(entry.date).toLocaleDateString()}
-                </Text>
-              </Card>
-            </motion.div>
-          ))}
-        </Grid>
+        {museumItems.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {museumItems.map((item, i) => (
+              <motion.div key={item.id} custom={i} variants={fadeUp}>
+                <Card
+                key={item.id}
+                className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
+                >
+                  <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
+                    {item.category}
+                  </Text>
+                  <Text className="mt-2 text-lg font-semibold">{item.title}</Text>
+                  <Text className="text-sm text-gray-500 mt-1">
+                    Entered on: {item.entered_on}
+                  </Text>
+
+                  <div className="mt-2">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-48 object-cover rounded-lg border border-gray-300"
+                    />
+                  </div>
+                  </Card>
+              </motion.div>  
+            ))}
+          </div>
+        ) : (
+          <NoResults />
+        )}
       </motion.div>
 
       {/* CTA */}
@@ -173,7 +214,7 @@ const LandingPage: React.FC = () => {
         className="text-center py-12 border-t"
       >
         <Title className="mb-4">Bereit, Teil des Museums zu werden?</Title>
-        <Button size="lg" icon={PlusCircleIcon}>
+        <Button size="lg" icon={PlusCircleIcon} onClick={() => onNavigate('/register')}>
           Jetzt Beitrag erstellen
         </Button>
       </motion.div>

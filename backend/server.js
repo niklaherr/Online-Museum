@@ -149,6 +149,37 @@ app.get("/users", authenticateJWT, async (req, res) => {
 // ======= ITEM ROUTES ======= //
 
 // Get all items with user data
+
+// Get all items for landing-page
+app.get("/items/no-auth", async (req, res) => {
+    try {
+        const query = `
+            SELECT item.*, users.username 
+            FROM item
+            JOIN users ON item.user_id = users.id
+            ORDER BY item.entered_on DESC
+            LIMIT 5;
+        `;
+        const result = await pool.query(query);
+
+        const items = result.rows.map(item => ({
+            id: item.id,
+            title: item.title,
+            category: item.category,
+            entered_on: item.entered_on,
+            description: item.description,
+            user_id: item.user_id,
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
+            username: item.username
+        }));
+
+        res.json(items);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching items");
+    }
+});
+
 app.get("/items", authenticateJWT, async (req, res) => {
     try {
         const query = `

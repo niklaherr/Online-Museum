@@ -92,7 +92,9 @@ function App() {
           <Route
               path="/"
               element={
-                <LandingPage/>
+                <LandingPage
+                  onNavigate={(route) => navigate(route)}
+                />
               }
             />
             <Route
