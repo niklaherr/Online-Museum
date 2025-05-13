@@ -26,6 +26,7 @@ import { CreateItem } from 'components/gallery/CreateItem';
 import ItemDetailView from 'components/gallery/ItemDetailView';
 import { EditItem } from 'components/gallery/EditItem';
 import EditItemList from 'components/itemList/EditItemList';
+import LandingPage from 'pages/LandingPage';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -66,7 +67,7 @@ function App() {
     if (loading) return <div className="text-center p-4">Lädt...</div>;
 
     if (!currentUser) {
-      return <Navigate to="/login" />;
+      return <Navigate to="/" />;
     }
 
     return children;
@@ -88,6 +89,12 @@ function App() {
 
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <Routes>
+          <Route
+              path="/"
+              element={
+                <LandingPage/>
+              }
+            />
             <Route
               path="/login"
               element={
@@ -110,7 +117,7 @@ function App() {
             />
 
             <Route
-              path="/"
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />

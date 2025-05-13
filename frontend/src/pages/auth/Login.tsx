@@ -32,7 +32,7 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
     setIsLoading(false);
     
     if (user) {
-      onNavigate('/');
+      onNavigate('/dashboard');
     }
   };
 

@@ -52,7 +52,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
       
       const user = await userService.signup(credentials);
       NotyfService.showSuccess('Registrierung erfolgreich!');
-      onNavigate('/');
+      onNavigate('/dashboard');
     } catch (err) {
       setError('Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.');
       NotyfService.showError('Registrierung fehlgeschlagen');

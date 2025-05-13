@@ -57,7 +57,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
         await itemService.deleteItemList(list.id);
         NotyfService.showSuccess("Item List erfolgreich gelöscht");
         setIsDeleteModalOpen(false);
-        onNavigate('/'); // Navigate to another page, like home or a list overview
+        onNavigate('/dashboard'); 
       } catch (error) {
         let errorMessage = "Fehler beim Löschen der Item List";
         if (error instanceof Error) {

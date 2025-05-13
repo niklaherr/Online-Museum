@@ -46,7 +46,7 @@ class ItemService {
 
   async fetchOwnItems(): Promise<Item[]> {
     const token = userService.getToken();
-    const userID = userService.getUserID(); // Assumes this returns the logged-in user
+    const userID = userService.getUserID();
     if (!token || !userID) throw new Error("Nicht eingeloggt.");
   
     const headers = { Authorization: `Bearer ${token}` };
@@ -56,6 +56,11 @@ class ItemService {
       headers,
     });
   
+    if (res.status === 401) {
+      userService.logout(); // Perform logout
+      throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+    }
+  
     if (!res.ok) {
       const errorText = await res.text();
       throw new Error(`Fehler beim Laden der eigenen Items: ${errorText}`);
@@ -63,6 +68,7 @@ class ItemService {
   
     return await res.json();
   }
+  
 
   async fetchItemById(itemId: number): Promise<GalleryItem> {
     const token = userService.getToken();
@@ -161,7 +167,6 @@ class ItemService {
 
       return items;
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Items:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Items.");
     }
   }

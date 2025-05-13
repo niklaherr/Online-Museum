@@ -23,7 +23,7 @@ const Header = ({onNavigate, toggleSidebar, sidebarOpen } : HeaderProps) => {
           </button>
         )}
         
-        <Link to="/" className="flex items-center">
+        <Link to="/dashboard" className="flex items-center">
           <span className="text-xl font-semibold text-blue-600">HeritageStory</span>
         </Link>
       </div>

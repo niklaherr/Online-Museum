@@ -35,7 +35,6 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
           errorMessage = error.message;
         }
         NotyfService.showError(errorMessage);
-        userService.logout();
       }
     };
 
