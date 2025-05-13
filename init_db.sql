@@ -42,3 +42,11 @@ CREATE TABLE item_itemlist (
         ON DELETE CASCADE,
     CONSTRAINT unique_item_itemlist UNIQUE (item_list_id, item_id)
 );
+
+CREATE TABLE activities (
+    id SERIAL PRIMARY KEY,
+    category TEXT NOT NULL,
+    type TEXT NOT NULL,
+    entered_on TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    element_id INTEGER
+);

@@ -1,8 +1,8 @@
 export default interface Activity {
     id: number;
-    type: string;
-    username: string;
+    category: string;
     entered_on: string;
-    action: string;
-    target: string;
+    type: string;
+    element_id: number;
+    user_id: number;
 };

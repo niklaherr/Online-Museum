@@ -46,10 +46,23 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
   // Badge-Farbe basierend auf Aktivitätstyp
   const getBadgeColor = () => {
     switch(activity.type) {
-      case 'upload': return 'emerald';
-      case 'comment': return 'blue';
-      case 'create': return 'purple';
+      case 'CREATE': return 'emerald';
+      case 'UPDATE': return 'blue';
+      case 'DELETE': return 'purple';
       default: return 'gray';
+    }
+  };
+
+  const getMessage = () => {
+    switch (activity.type) {
+      case 'CREATE':
+        return `Element with ID ${activity.element_id} has been created.`;
+      case 'UPDATE':
+        return `Element with ID ${activity.element_id} has been updated.`;
+      case 'DELETE':
+        return `Element with ID ${activity.element_id} has been deleted.`;
+      default:
+        return `Activity on element ID ${activity.element_id}.`;
     }
   };
   
@@ -57,10 +70,10 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
     <Flex className="py-2">
       <div>
         <Badge color={getBadgeColor()} size="xs">
-          {activity.type.toUpperCase()}
+          {activity.category.toUpperCase()}
         </Badge>
         <Text className="mt-1">
-          <span className="font-medium">{activity.username}</span> {activity.action} in <span className="font-medium">{activity.target}</span>
+          {getMessage()}
         </Text>
       </div>
       <Text>{formatTime(activity.entered_on)}</Text>

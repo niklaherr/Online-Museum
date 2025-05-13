@@ -221,6 +221,12 @@ app.post("/items", authenticateJWT, upload.single("image"), async (req, res) => 
              RETURNING *`,
             [req.user.id, title, image, description || null, category || null]
         );
+        
+        const newItem = result.rows[0]; // This is the inserted item
+        const id = newItem.id; // Extract the new item's ID
+
+        createActivity({category: "ITEM", element_id: id, type: "CREATE", user_id: req.user.id})
+        
         res.status(201).json(result.rows[0]);
     } catch (err) {
         console.error(err);
@@ -255,6 +261,8 @@ app.put("/items/:id", authenticateJWT, upload.single("image"), async (req, res) 
 
         if (result.rows.length === 0) return res.status(404).send("Item not found or not authorized");
 
+        createActivity({category: "ITEM", element_id: id, type: "UPDATE", user_id: req.user.id})
+
         res.json(result.rows[0]);
     } catch (err) {
         console.error("Error updating item:", err);
@@ -264,22 +272,24 @@ app.put("/items/:id", authenticateJWT, upload.single("image"), async (req, res) 
 
 // Delete an item list
 app.delete("/items/:id", authenticateJWT, async (req, res) => {
-  const itemListId = parseInt(req.params.id);
+  const itemID = parseInt(req.params.id);
   const userId = req.user.id;
 
   try {
       // Ensure the item list exists and belongs to the current user
-      const itemListResult = await pool.query(
+      const itemResult = await pool.query(
           "SELECT * FROM item WHERE id = $1 AND user_id = $2",
-          [itemListId, userId]
+          [itemID, userId]
       );
 
-      if (itemListResult.rows.length === 0) {
+      if (itemResult.rows.length === 0) {
           return res.status(404).send("Item not found or does not belong to you.");
       }
 
       // Delete the item list itself (cascading will handle associated items)
       await pool.query("DELETE FROM item WHERE id = $1", [itemListId]);
+
+      createActivity({category: "ITEM", element_id: itemID, type: "DELETE", user_id: userId})
 
       res.status(200).send("Item deleted successfully.");
   } catch (err) {
@@ -396,6 +406,8 @@ app.put("/item-lists/:id", authenticateJWT, async (req, res) => {
             await pool.query("INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)", [itemListId, itemId]);
         }
 
+        createActivity({category: "ITEM_LIST", element_id: itemListId, type: "UPDATE", user_id: userId})
+
         res.status(200).json({ id: itemListId, title, description, user_id: userId, item_ids });
     } catch (err) {
         console.error("Error updating item list:", err);
@@ -421,6 +433,8 @@ app.delete("/item-lists/:id", authenticateJWT, async (req, res) => {
 
       // Delete the item list itself (cascading will handle associated items)
       await pool.query("DELETE FROM item_list WHERE id = $1", [itemListId]);
+
+      createActivity({category: "ITEM_LIST", element_id: itemListId, type: "DELETE", user_id: userId})
 
       res.status(200).send("Item list deleted successfully.");
   } catch (err) {
@@ -451,6 +465,8 @@ app.post("/item-lists", authenticateJWT, async (req, res) => {
             await pool.query("INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)", [newItemListId, itemId]);
         }
 
+        createActivity({category: "ITEM_LIST", element_id: newItemListId, type: "CREATE", user_id: userId})
+
         res.status(201).json({ id: newItemListId, title, description, user_id: userId, item_ids });
     } catch (err) {
         console.error("Error creating item list:", err);
@@ -460,46 +476,46 @@ app.post("/item-lists", authenticateJWT, async (req, res) => {
 
 // ======= ACTIVITY FEED ROUTES ======= //
 
-// Utility to fetch latest activity logs
-async function fetchLatestActivities() {
-    try {
-        const itemsQuery = `
-            SELECT id, 'item' AS type, entered_on, 'created item' AS action, title AS target FROM item ORDER BY entered_on DESC LIMIT 5;
-        `;
-        const itemListsQuery = `
-            SELECT id, 'item_list' AS type, entered_on, 'created list' AS action, title AS target FROM item_list ORDER BY entered_on DESC LIMIT 5;
-        `;
-        const mapToActivity = (rows) => rows.map(row => ({
-            id: row.id,
-            type: row.type,
-            username: row.username,
-            entered_on: row.entered_on,
-            action: row.action,
-            target: row.target
-        }));
-        const [itemsResult, itemListsResult] = await Promise.all([
-            pool.query(itemsQuery),
-            pool.query(itemListsQuery)
-        ]);
+// Fetch all item lists
+app.get("/activities", authenticateJWT, async (req, res) => {
+    const userId = req.user.id;  // Assuming req.user contains the authenticated user's info
 
-        const activities = [...mapToActivity(itemsResult.rows), ...mapToActivity(itemListsResult.rows)];
-        activities.sort((a, b) => new Date(b.entered_on) - new Date(a.entered_on));
-        return activities.slice(0, 5);
-    } catch (err) {
-        console.error('Error fetching activities:', err);
-        throw err;
-    }
-}
-
-// Route to return recent user activities
-app.get('/activities', authenticateJWT, async (req, res) => {
     try {
-        const activities = await fetchLatestActivities();
-        res.json(activities);
+        const result = await pool.query(
+            `SELECT * FROM activities 
+             WHERE user_id = $1
+             ORDER BY entered_on DESC 
+             LIMIT 10`,
+            [userId]
+        );
+
+        res.json(result.rows);
     } catch (err) {
-        res.status(500).send('Error fetching activities');
+        console.error(err);
+        res.status(500).send("Error fetching activities");
     }
 });
+
+// Create a new activity
+async function createActivity({ category, element_id, type, user_id }) {
+
+    if (!category || !element_id || !type || !user_id) {
+        throw new Error("Missing required fields: category, element_id, type, and user_id");
+    }
+
+    try {
+        const result = await pool.query(
+            `INSERT INTO activities (category, element_id, type, user_id)
+             VALUES ($1, $2, $3, $4)
+             RETURNING *`,
+            [category, element_id, type, user_id]
+        );
+        return result.rows[0];
+    } catch (err) {
+        console.error("Error creating activity:", err);
+        throw new Error("Database error");
+    }
+}
 
 // ======= SERVER START ======= //
 
