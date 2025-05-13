@@ -90,7 +90,7 @@ const PrivacyPolicy = () => {
             <Text className="mb-2">
               Sie haben Fragen zum Datenschutz oder möchten eines Ihrer Rechte ausüben? Schreiben Sie uns gerne:
             </Text>
-            <Text className="font-medium">datenschutz@myheritagestory.com</Text>
+            <Text className="font-medium">datenschutz@online-museum.com</Text>
           </div>
 
           {/* Abschnitt 7 */}

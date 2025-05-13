@@ -24,7 +24,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       {/* Sidebar Header */}
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">HeritageStory</h2>
+          <h2 className="text-xl font-bold">Online-Museum</h2>
           <button 
             onClick={() => setIsOpen(false)}
             className="md:hidden text-gray-300 hover:text-white"
