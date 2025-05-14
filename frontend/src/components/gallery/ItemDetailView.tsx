@@ -55,10 +55,6 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
     }
   };
 
-  const handleCancelDelete = () => {
-    setIsDeleteModalOpen(false);
-  };
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center p-12">
@@ -93,7 +89,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
   return (
     <div className="relative p-4">
       {/* Edit Button */}
-      <div className="absolute top-4 right-4">
+      {item.user_id == userService.getUserID() && (<div className="absolute top-4 right-4">
         <Button
           icon={PencilIcon}
           onClick={() => onNavigate(`/items/${id}/edit`)}
@@ -101,7 +97,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
         >
           Edit
         </Button>
-      </div>
+      </div>)}
 
       <h2 className="text-2xl font-bold">{item.title}</h2>
       <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
@@ -128,16 +124,19 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
         <Text className="text-sm text-gray-700">{item.username}</Text>
       </div>
 
-      <div className="mt-auto flex justify-center pb-6">
-        <Button
-          variant="light"
-          color="red"
-          icon={TrashIcon}
-          onClick={() => setIsDeleteModalOpen(true)} // Show confirmation modal
-        >
-          Item löschen
-        </Button>
-      </div>
+      
+      {item.user_id == userService.getUserID() && (
+        <div className="mt-auto flex justify-center pb-6">
+          <Button
+            variant="light"
+            color="red"
+            icon={TrashIcon}
+            onClick={() => setIsDeleteModalOpen(true)} // Show confirmation modal
+          >
+            Item löschen
+          </Button>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
