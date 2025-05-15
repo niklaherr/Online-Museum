@@ -57,23 +57,28 @@ class UserService {
         }
     }
 
-    async signup(credentials: Credentials): Promise<AuthResponse> {
-        const response = await fetch(`${this.baseUrl}/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(credentials),
-        });
+   async signup(credentials: Credentials): Promise<AuthResponse> {
+    const response = await fetch(`${this.baseUrl}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            username: credentials.username,
+            password: credentials.password,
+            securityQuestion: credentials.securityQuestion,
+            securityAnswer: credentials.securityAnswer
+        }),
+    });
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => null);
-            throw new Error(errorData?.error || `HTTP Error: ${response.status}`);
-        }
-
-        const res: AuthResponse = await response.json();
-        this.currentUser = res;
-        this.notifyListeners();
-        return res;
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || `HTTP Error: ${response.status}`);
     }
+
+    const res: AuthResponse = await response.json();
+    this.currentUser = res;
+    this.notifyListeners();
+    return res;
+}
 
     async resetPasswordWithOldPassword(credentials: ResetPasswordWithOldPasswordCredentials): Promise<Boolean> {
         const response = await fetch(`${this.baseUrl}/reset-password-with-old-password`, {

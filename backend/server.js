@@ -48,12 +48,14 @@ const upload = multer(); // Files will be stored as Buffer in memory
 
 // Register a new user
 app.post("/register", async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, securityQuestion, securityAnswer } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+        const hashedSecurityAnswer = await bcrypt.hash(securityAnswer, 10); // Hash the security answer too
+        
         const result = await pool.query(
-            "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username",
-            [username, hashedPassword]
+            "INSERT INTO users (username, password, security_question, security_answer) VALUES ($1, $2, $3, $4) RETURNING id, username",
+            [username, hashedPassword, securityQuestion, hashedSecurityAnswer]
         );
 
         const user = result.rows[0];
@@ -63,6 +65,101 @@ app.post("/register", async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Registration failed" });
+    }
+});
+
+app.post("/verify-security-question", async (req, res) => {
+    const { username, securityAnswer } = req.body;
+    
+    try {
+        // Find the user
+        const result = await pool.query(
+            "SELECT * FROM users WHERE username = $1", 
+            [username]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        
+        const user = result.rows[0];
+        
+        // Verify the security answer with bcrypt.compare (secure way)
+        const answerMatch = await bcrypt.compare(securityAnswer, user.security_answer);
+        
+        if (answerMatch) {
+            // Generate a temporary token for password reset
+            const resetToken = jwt.sign(
+                { id: user.id, username: user.username, purpose: 'password-reset' }, 
+                JWT_SECRET, 
+                { expiresIn: "15m" }
+            );
+            
+            return res.json({ 
+                success: true, 
+                message: "Security answer verified",
+                resetToken: resetToken,
+                userId: user.id
+            });
+        } else {
+            return res.status(401).json({ error: "Invalid security answer" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error verifying security question" });
+    }
+});
+
+// New endpoint for fetching security question
+app.get("/security-question/:username", async (req, res) => {
+    const { username } = req.params;
+    
+    try {
+        const result = await pool.query(
+            "SELECT security_question FROM users WHERE username = $1", 
+            [username]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        
+        res.json({ securityQuestion: result.rows[0].security_question });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error retrieving security question" });
+    }
+});
+
+// New endpoint for resetting password with token
+app.post("/reset-password", async (req, res) => {
+    const { resetToken, newPassword } = req.body;
+    
+    try {
+        // Verify the reset token
+        const decoded = jwt.verify(resetToken, JWT_SECRET);
+        
+        // Check if token was issued for password reset
+        if (decoded.purpose !== 'password-reset') {
+            return res.status(401).json({ error: "Invalid token purpose" });
+        }
+        
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        // Update the user's password
+        await pool.query(
+            "UPDATE users SET password = $1 WHERE id = $2",
+            [hashedPassword, decoded.id]
+        );
+        
+        res.json({ success: true, message: "Password reset successful" });
+    } catch (err) {
+        console.error(err);
+        if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
+        res.status(500).json({ error: "Error resetting password" });
     }
 });
 
