@@ -24,7 +24,7 @@ const Header = ({onNavigate, toggleSidebar, sidebarOpen } : HeaderProps) => {
         )}
         
         <Link to="/dashboard" className="flex items-center">
-          <span className="text-xl font-semibold text-blue-600">HeritageStory</span>
+          <span className="text-xl font-semibold text-blue-600">Online-Museum</span>
         </Link>
       </div>
 

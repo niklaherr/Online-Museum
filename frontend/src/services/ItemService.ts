@@ -15,6 +15,26 @@ class ItemService {
     this.baseUrl = process.env.REACT_APP_BACKEND_API_URL || "http://localhost:3001";
   }
 
+  async fetchLandingPageItems(): Promise<any[]> {
+
+    try {
+      const res = await fetch(`${this.baseUrl}/items/no-auth`, {
+        method: "GET",
+      });
+      
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Fehler beim Laden des Items: ${errorText}`);
+      }
+
+      const item: GalleryItem[] = await res.json();
+      return item;
+    } catch (error) {
+      throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
+    }
+  }
+
   async fetchAllItemsWithUsers(): Promise<any[]> {
     const token = userService.getToken();
     const userID = userService.getUserID();
@@ -31,6 +51,12 @@ class ItemService {
         headers,
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Fehler beim Laden des Items: ${errorText}`);
@@ -39,7 +65,6 @@ class ItemService {
       const item: GalleryItem[] = await res.json();
       return item;
     } catch (error) {
-      console.error(error);
       throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
     }
   }
@@ -86,6 +111,12 @@ class ItemService {
         headers,
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Fehler beim Laden des Items: ${errorText}`);
@@ -94,7 +125,6 @@ class ItemService {
       const item: GalleryItem = await res.json();
       return item;
     } catch (error) {
-      console.error(error);
       throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
     }
   }
@@ -111,6 +141,12 @@ class ItemService {
         headers,
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Laden der Item-Listen: ${errorMessage}`);
@@ -118,7 +154,6 @@ class ItemService {
 
       return await res.json();
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Item-Listen:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Listen.");
     }
   }
@@ -134,6 +169,12 @@ class ItemService {
         headers,
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Laden der Item-Liste: ${errorMessage}`);
@@ -141,7 +182,6 @@ class ItemService {
 
       return await res.json();
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Item-Liste:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Liste.");
     }
   }
@@ -157,6 +197,12 @@ class ItemService {
         method: "GET",
         headers,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
 
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -183,6 +229,11 @@ class ItemService {
         headers,
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }  
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Laden der Aktivitäten: ${errorMessage}`);
@@ -192,7 +243,6 @@ class ItemService {
 
       return activities;
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Aktivitäten:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Aktivitäten.");
     }
   }
@@ -209,6 +259,12 @@ class ItemService {
         },
         body: formData,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
   
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -217,7 +273,6 @@ class ItemService {
   
       return await res.json();
     } catch (err: any) {
-      console.error("Item creation failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Erstellen des Items.");
     }
   }
@@ -234,6 +289,12 @@ class ItemService {
         },
         body: formData,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
   
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -242,7 +303,6 @@ class ItemService {
   
       return await res.json();
     } catch (err: any) {
-      console.error("Item update failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Aktualisieren des Items.");
     }
   }
@@ -259,6 +319,12 @@ class ItemService {
         },
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Löschen der Liste: ${errorMessage}`);
@@ -266,7 +332,6 @@ class ItemService {
 
       return await res; // Optional: Handle the response if you need any confirmation message from the backend
     } catch (err: any) {
-      console.error("Item list deletion failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Löschen der Item-Liste.");
     }
   }
@@ -289,6 +354,12 @@ class ItemService {
         body: JSON.stringify(data),
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Erstellen der Liste: ${errorMessage}`);
@@ -297,7 +368,6 @@ class ItemService {
       const createdItemList = await res.json();
       return createdItemList;
     } catch (err: any) {
-      console.error("Item list creation failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Erstellen der Item-Liste.");
     }
   }
@@ -319,6 +389,12 @@ class ItemService {
         },
         body: JSON.stringify(data),
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
   
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -327,7 +403,6 @@ class ItemService {
   
       return await res.json();
     } catch (err: any) {
-      console.error("Item list editing failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Bearbeiten der Item-Liste.");
     }
   }
@@ -344,6 +419,12 @@ class ItemService {
         },
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Löschen der Liste: ${errorMessage}`);
@@ -351,7 +432,6 @@ class ItemService {
 
       return await res; // Optional: Handle the response if you need any confirmation message from the backend
     } catch (err: any) {
-      console.error("Item list deletion failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Löschen der Item-Liste.");
     }
   }
@@ -366,6 +446,12 @@ class ItemService {
         method: "GET",
         headers,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
 
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -393,7 +479,6 @@ class ItemService {
   
       return result;
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Item-Listen-Daten:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Listen-Daten.");
     }
   }
@@ -408,6 +493,12 @@ class ItemService {
         method: "GET",
         headers,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
 
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -436,7 +527,6 @@ class ItemService {
   
       return result;
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Item-Daten:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Daten.");
     }
   }

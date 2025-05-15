@@ -67,7 +67,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Registrieren</h1>
           <p className="mt-2 text-gray-600">
-            Erstellen Sie Ihr Heritage Story Konto
+            Erstellen Sie Ihr Online-Museum Konto
           </p>
         </div>
 

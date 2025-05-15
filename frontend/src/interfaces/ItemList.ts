@@ -3,4 +3,5 @@ export default interface ItemList {
   title: string;
   description: string;
   entered_on: string;
+  user_id: number;
 }

@@ -44,7 +44,6 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
           errorMessage = error.message;
         }
         NotyfService.showError(errorMessage);
-        userService.logout();
       }
     };
 
@@ -89,12 +88,16 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
             </Text>
           </div>
 
-          <Button
+          
+          {list?.user_id == userService.getUserID() && (<div className="absolute top-4 right-4">
+            <Button
             onClick={() => onNavigate(`/item-list/${id}/edit`)}
           >
             Bearbeiten
           </Button>
+          </div>)}
         </div>
+        
       </Card>
 
       {/* Items */}
@@ -134,16 +137,18 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
       )}
 
       {/* Centered Delete Button */}
-      <div className="mt-auto flex justify-center pb-6">
-        <Button
-          variant="light"
-          color="red"
-          icon={TrashIcon}
-          onClick={() => setIsDeleteModalOpen(true)} // Show confirmation modal
-        >
-          Liste löschen
-        </Button>
-      </div>
+      {list?.user_id == userService.getUserID() && (
+        <div className="mt-auto flex justify-center pb-6">
+          <Button
+            variant="light"
+            color="red"
+            icon={TrashIcon}
+            onClick={() => setIsDeleteModalOpen(true)} // Show confirmation modal
+          >
+            Liste löschen
+          </Button>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>

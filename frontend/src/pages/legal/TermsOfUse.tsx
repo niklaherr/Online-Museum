@@ -17,7 +17,7 @@ const TermsOfUse = () => {
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">1. Geltungsbereich</h2>
             <Text>
-              Diese Nutzungsbedingungen regeln die Nutzung der HeritageStory-Plattform durch registrierte Benutzer. Durch die Registrierung und/oder Nutzung unserer Plattform erklären Sie sich mit diesen Nutzungsbedingungen einverstanden.
+              Diese Nutzungsbedingungen regeln die Nutzung der Online-Museum-Plattform durch registrierte Benutzer. Durch die Registrierung und/oder Nutzung unserer Plattform erklären Sie sich mit diesen Nutzungsbedingungen einverstanden.
             </Text>
           </div>
 

@@ -42,7 +42,7 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Anmelden</h1>
           <p className="mt-2 text-gray-600">
-            Willkommen zurück bei Heritage Story
+            Willkommen zurück beim Online-Museum
           </p>
         </div>
 

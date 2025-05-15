@@ -9,5 +9,5 @@ export default interface Item {
   };  
 
 export interface GalleryItem extends Item {
-  username: string
+  username: string;
 }
