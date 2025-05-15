@@ -36,18 +36,40 @@ class UserService {
 
     async login(credentials: Credentials): Promise<AuthResponse | undefined> {
         try {
-            const res = await this.postWithRetry<AuthResponse>("/login", credentials);
+            const response = await fetch(`${this.baseUrl}/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(credentials),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.error || `HTTP Error: ${response.status}`);
+            }
+
+            const res: AuthResponse = await response.json();
             this.currentUser = res;
             this.notifyListeners();
-            return res
+            return res;
         } catch (error) {
-            NotyfService.showError("Fehler beim Anmelden")
+            NotyfService.showError("Fehler beim Anmelden");
             return undefined;
         }
     }
 
     async signup(credentials: Credentials): Promise<AuthResponse> {
-        const res = await this.postWithRetry<AuthResponse>("/register", credentials);
+        const response = await fetch(`${this.baseUrl}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(credentials),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.error || `HTTP Error: ${response.status}`);
+        }
+
+        const res: AuthResponse = await response.json();
         this.currentUser = res;
         this.notifyListeners();
         return res;
@@ -58,7 +80,7 @@ class UserService {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${this.getToken()}` // Assumes you have a getToken() method
+                Authorization: `Bearer ${this.getToken()}`
             },
             body: JSON.stringify(credentials),
         });
@@ -67,7 +89,7 @@ class UserService {
             this.logout();
             throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
         }
-    
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || "Fehler beim Zurücksetzen des Passworts");
@@ -80,7 +102,7 @@ class UserService {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${this.getToken()}` // Assumes getToken() provides the JWT
+                Authorization: `Bearer ${this.getToken()}`
             }
         });
 
@@ -88,18 +110,15 @@ class UserService {
             this.logout();
             throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
         }
-    
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || "Fehler beim Löschen des Benutzers");
         }
 
         this.logout();
-    
         return true;
     }
-    
-    
 
     logout(): void {
         this.currentUser = null;
@@ -126,58 +145,16 @@ class UserService {
         this.currentUser = user;
     }
 
-
-    /**
-     * Subscribes a listener to user changes.
-     */
     subscribe(listener: UserChangeListener): void {
         this.listeners.push(listener);
     }
 
-    /**
-     * Unsubscribes a listener.
-     */
     unsubscribe(listener: UserChangeListener): void {
         this.listeners = this.listeners.filter((l) => l !== listener);
     }
 
-    /**
-     * Notify all listeners about the current user change.
-     */
     private notifyListeners(): void {
         this.listeners.forEach((listener) => listener(this.currentUser));
-    }
-
-    private async postWithRetry<T>(endpoint: string, body: any): Promise<T> {
-        let attempts = 0;
-        while (attempts < this.maxRetries) {
-            try {
-                const response = await fetch(`${this.baseUrl}${endpoint}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(body),
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => null);
-                    throw new Error(errorData?.error || `HTTP Error: ${response.status}`);
-                }
-
-                if (response.status === 204) {
-                    return {} as T;
-                }
-
-                return await response.json();
-            } catch (error) {
-                attempts += 1;
-                console.warn(`Attempt ${attempts} failed: ${error}`);
-
-                if (attempts >= this.maxRetries) {
-                    throw new Error(`Failed after ${this.maxRetries} attempts: ${error}`);
-                }
-            }
-        }
-        throw new Error("Unexpected error: Retry logic failed.");
     }
 }
 
