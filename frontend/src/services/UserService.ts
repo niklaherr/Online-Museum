@@ -62,6 +62,11 @@ class UserService {
             },
             body: JSON.stringify(credentials),
         });
+
+        if (response.status === 401) {
+            this.logout();
+            throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+        }
     
         if (!response.ok) {
             const errorData = await response.json();
@@ -78,6 +83,11 @@ class UserService {
                 Authorization: `Bearer ${this.getToken()}` // Assumes getToken() provides the JWT
             }
         });
+
+        if (response.status === 401) {
+            this.logout();
+            throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+        }
     
         if (!response.ok) {
             const errorData = await response.json();
