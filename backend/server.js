@@ -543,8 +543,8 @@ async function createActivity({ category, element_id, type, user_id }) {
         );
         return result.rows[0];
     } catch (err) {
-        console.error("Error creating activity:", err);
-        throw new Error("Database error");
+        console.error(err);
+        res.status(500).send("Error fetching items");
     }
 }
 

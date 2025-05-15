@@ -31,7 +31,6 @@ class ItemService {
       const item: GalleryItem[] = await res.json();
       return item;
     } catch (error) {
-      console.error(error);
       throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
     }
   }
@@ -66,7 +65,6 @@ class ItemService {
       const item: GalleryItem[] = await res.json();
       return item;
     } catch (error) {
-      console.error(error);
       throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
     }
   }
@@ -127,7 +125,6 @@ class ItemService {
       const item: GalleryItem = await res.json();
       return item;
     } catch (error) {
-      console.error(error);
       throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
     }
   }
@@ -157,7 +154,6 @@ class ItemService {
 
       return await res.json();
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Item-Listen:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Listen.");
     }
   }
@@ -186,7 +182,6 @@ class ItemService {
 
       return await res.json();
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Item-Liste:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Liste.");
     }
   }
@@ -248,7 +243,6 @@ class ItemService {
 
       return activities;
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Aktivitäten:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Aktivitäten.");
     }
   }
@@ -279,7 +273,6 @@ class ItemService {
   
       return await res.json();
     } catch (err: any) {
-      console.error("Item creation failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Erstellen des Items.");
     }
   }
@@ -310,7 +303,6 @@ class ItemService {
   
       return await res.json();
     } catch (err: any) {
-      console.error("Item update failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Aktualisieren des Items.");
     }
   }
@@ -340,7 +332,6 @@ class ItemService {
 
       return await res; // Optional: Handle the response if you need any confirmation message from the backend
     } catch (err: any) {
-      console.error("Item list deletion failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Löschen der Item-Liste.");
     }
   }
@@ -377,7 +368,6 @@ class ItemService {
       const createdItemList = await res.json();
       return createdItemList;
     } catch (err: any) {
-      console.error("Item list creation failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Erstellen der Item-Liste.");
     }
   }
@@ -413,7 +403,6 @@ class ItemService {
   
       return await res.json();
     } catch (err: any) {
-      console.error("Item list editing failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Bearbeiten der Item-Liste.");
     }
   }
@@ -443,7 +432,6 @@ class ItemService {
 
       return await res; // Optional: Handle the response if you need any confirmation message from the backend
     } catch (err: any) {
-      console.error("Item list deletion failed:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Löschen der Item-Liste.");
     }
   }
@@ -491,7 +479,6 @@ class ItemService {
   
       return result;
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Item-Listen-Daten:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Listen-Daten.");
     }
   }
@@ -540,7 +527,6 @@ class ItemService {
   
       return result;
     } catch (err: any) {
-      console.error("Fehler beim Abrufen der Item-Daten:", err);
       throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Item-Daten.");
     }
   }
