@@ -1,41 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Title, Text, Divider, Button, TextInput, Textarea } from '@tremor/react';
 import NotyfService from '../../services/NotyfService';
+import { contactFormService, ContactFormData } from '../../services/ContactFormService';
 
 const HelpSupport = () => {
   // Scroll to top on component mount
-  React.useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const [contactForm, setContactForm] = useState({
+  const [contactForm, setContactForm] = useState<ContactFormData>({
     name: '',
     email: '',
     subject: '',
     message: ''
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setContactForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // In a real application, here you would send the form data to the backend
-    console.log('Form submitted:', contactForm);
+    // Validate form fields
+    if (!contactForm.name || !contactForm.email || !contactForm.subject || !contactForm.message) {
+      NotyfService.showError('Bitte füllen Sie alle Felder aus.');
+      return;
+    }
     
-    // Show success message and reset form
-    NotyfService.showSuccess('Ihre Nachricht wurde erfolgreich gesendet. Wir werden uns so schnell wie möglich bei Ihnen melden.');
-    setFormSubmitted(true);
-    setContactForm({
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
-    });
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(contactForm.email)) {
+      NotyfService.showError('Bitte geben Sie eine gültige E-Mail-Adresse ein.');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Submit the form to the backend
+      const success = await contactFormService.submitContactForm(contactForm);
+      
+      if (success) {
+        NotyfService.showSuccess('Ihre Nachricht wurde erfolgreich gesendet. Wir werden uns so schnell wie möglich bei Ihnen melden.');
+        setFormSubmitted(true);
+        setContactForm({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -190,7 +214,14 @@ const HelpSupport = () => {
                       />
                     </div>
                     
-                    <Button type="submit" color="blue">Nachricht senden</Button>
+                    <Button 
+                      type="submit" 
+                      color="blue"
+                      loading={isSubmitting}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Wird gesendet...' : 'Nachricht senden'}
+                    </Button>
                   </form>
                 )}
               </div>

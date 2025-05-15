@@ -3,7 +3,9 @@ SET timezone = 'Europe/Berlin';
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    security_question VARCHAR(255),
+    security_answer TEXT
 );
 
 CREATE TABLE item (
@@ -49,4 +51,14 @@ CREATE TABLE activities (
     type TEXT NOT NULL,
     entered_on TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     element_id INTEGER
+);
+
+CREATE TABLE contact_form (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    submitted_on TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(50) DEFAULT 'new' -- Options: 'new', 'in_progress', 'completed'
 );
