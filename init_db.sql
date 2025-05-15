@@ -50,3 +50,23 @@ CREATE TABLE activities (
     entered_on TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     element_id INTEGER
 );
+
+CREATE TABLE editorial (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    entered_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE item_editorial (
+    id SERIAL PRIMARY KEY,
+    editorial_id INTEGER NOT NULL,
+    item_id INTEGER NOT NULL,
+    CONSTRAINT fk_editorial FOREIGN KEY (editorial_id)
+        REFERENCES editorial(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_item FOREIGN KEY (item_id)
+        REFERENCES item(id)
+        ON DELETE CASCADE,
+    CONSTRAINT unique_item_editorial UNIQUE (editorial_id, item_id)
+);

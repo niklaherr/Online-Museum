@@ -48,7 +48,6 @@ type ItemListViewProps = {
 const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
   const [itemLists, setItemLists] = useState<ItemList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // 'all', 'private', 'public'
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -108,55 +107,23 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
           + Neuer Raum
         </button>
       </div>
-      
-      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Suchen..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full md:w-64"
-          />
-          <div className="absolute left-3 top-2.5 text-gray-400">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
+
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Von unserer Redaktion</h1>
+      </div>
+
+      {filteredLists.length === 0 ? (
+        <NoResults />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredLists.map(list => (
+            <ItemListCard key={list.id} list={list} onView={onViewSpace} />
+          ))}
         </div>
-        
-        <div className="flex space-x-2">
-          <button 
-            onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
-              filter === 'all' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Alle
-          </button>
-          <button 
-            onClick={() => setFilter('public')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
-              filter === 'public' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Öffentlich
-          </button>
-          <button 
-            onClick={() => setFilter('private')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
-              filter === 'private' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Privat
-          </button>
-        </div>
+      )}
+
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Öffentliche Listen</h1>
       </div>
       
       {filteredLists.length === 0 ? (
@@ -168,6 +135,22 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
           ))}
         </div>
       )}
+
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Deine Listen</h1>
+      </div>
+      
+      {filteredLists.length === 0 ? (
+        <NoResults />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredLists.map(list => (
+            <ItemListCard key={list.id} list={list} onView={onViewSpace} />
+          ))}
+        </div>
+      )}
+
+      
     </div>
   );
 };
