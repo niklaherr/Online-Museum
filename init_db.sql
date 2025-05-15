@@ -3,7 +3,9 @@ SET timezone = 'Europe/Berlin';
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    security_question VARCHAR(255),
+    security_answer TEXT
 );
 
 CREATE TABLE item (
