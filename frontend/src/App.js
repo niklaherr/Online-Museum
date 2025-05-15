@@ -215,6 +215,15 @@ function App() {
               }
             />
 
+            <Route
+              path="/editorial"
+              element={
+                <ProtectedRoute>
+                  </>
+                </ProtectedRoute>
+              }
+            />
+
             {/* Legal Pages */}
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/helpsupport" element={<HelpSupport />} />
