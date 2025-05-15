@@ -30,7 +30,6 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
           errorMessage = error.message;
         }
         NotyfService.showError(errorMessage);
-        userService.logout();
       }
     };
 

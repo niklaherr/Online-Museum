@@ -27,7 +27,6 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
         errorMessage = error.message
       }
       NotyfService.showError(errorMessage)
-      userService.logout();
     }
   };
 

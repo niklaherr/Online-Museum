@@ -63,7 +63,6 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
           errorMessage = error.message
         }
         NotyfService.showError(errorMessage)
-        userService.logout()
       }
     };
 

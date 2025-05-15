@@ -21,6 +21,7 @@ class ItemService {
       const res = await fetch(`${this.baseUrl}/items/no-auth`, {
         method: "GET",
       });
+      
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -50,6 +51,12 @@ class ItemService {
         method: "GET",
         headers,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -106,6 +113,12 @@ class ItemService {
         headers,
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Fehler beim Laden des Items: ${errorText}`);
@@ -131,6 +144,12 @@ class ItemService {
         headers,
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Laden der Item-Listen: ${errorMessage}`);
@@ -153,6 +172,12 @@ class ItemService {
         method: "GET",
         headers,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
 
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -178,6 +203,12 @@ class ItemService {
         headers,
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Laden der Items: ${errorMessage}`);
@@ -202,6 +233,11 @@ class ItemService {
         method: "GET",
         headers,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }  
 
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -229,6 +265,12 @@ class ItemService {
         },
         body: formData,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
   
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -254,6 +296,12 @@ class ItemService {
         },
         body: formData,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
   
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -278,6 +326,12 @@ class ItemService {
           "Authorization": `Bearer ${token}`,
         },
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
 
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -309,6 +363,12 @@ class ItemService {
         body: JSON.stringify(data),
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Erstellen der Liste: ${errorMessage}`);
@@ -339,6 +399,12 @@ class ItemService {
         },
         body: JSON.stringify(data),
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
   
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -364,6 +430,12 @@ class ItemService {
         },
       });
 
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Löschen der Liste: ${errorMessage}`);
@@ -386,6 +458,12 @@ class ItemService {
         method: "GET",
         headers,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
 
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -428,6 +506,12 @@ class ItemService {
         method: "GET",
         headers,
       });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
 
       if (!res.ok) {
         const errorMessage = await res.text();
