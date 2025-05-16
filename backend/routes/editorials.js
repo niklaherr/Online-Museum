@@ -180,7 +180,7 @@ router.put("/editorial-lists/:id", authenticateJWT, async (req, res) => {
         }
 
         // Create activity record
-        await createActivity({
+        await createActivity(pool, {
             category: "EDITORIAL_LIST", 
             element_id: editorialId, 
             type: "UPDATE", 
@@ -250,6 +250,40 @@ router.delete("/editorial-lists/:id", authenticateJWT, async (req, res) => {
         await pool.query('ROLLBACK');
         console.error("Error deleting editorial list:", err);
         res.status(500).json({ error: "Unbekannter Fehler beim Löschen der Redaktionsliste." });
+    }
+});
+
+// Get items by item_list_id
+router.get("/editorial-lists/:editorial_id/items", authenticateJWT, async (req, res) => {
+    const { editorial_id } = req.params;
+    const pool = req.app.locals.pool;
+    
+    try {
+        const result = await pool.query(
+            `SELECT item.id, item.title, item.category, item.entered_on, item.description, item.user_id, item.image, users.username
+             FROM item
+             JOIN item_editorial ON item.id = item_editorial.item_id
+             JOIN users ON item.user_id = users.id
+             WHERE item_editorial.editorial_id = $1
+             ORDER BY item.entered_on DESC`,
+            [editorial_id]
+        );
+
+        const items = result.rows.map(item => ({
+            id: item.id,
+            user_id: item.user_id,
+            title: item.title,
+            entered_on: item.entered_on,
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
+            description: item.description,
+            category: item.category,
+            username: item.username,
+        }));
+
+        res.json(items);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching items");
     }
 });
 

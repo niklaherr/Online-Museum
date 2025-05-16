@@ -67,6 +67,37 @@ class EditorialService {
     }
   }
 
+  async fetchItemsByEditorialId(editorialId: number): Promise<GalleryItem[]> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    try {
+      const res = await fetch(`${this.baseUrl}/editorial-lists/${editorialId}/items`, {
+        method: "GET",
+        headers,
+      });
+
+      if (res.status === 401) {
+        userService.logout(); // Perform logout
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+    
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Laden der Items: ${errorMessage}`);
+      }
+
+      const items: GalleryItem[] = await res.json();
+
+      return items;
+    } catch (err: any) {
+      throw new Error(err.message || "Unbekannter Fehler beim Abrufen der Items.");
+    }
+  }
+
   // Search for items across all users
   async searchItems(query: string): Promise<GalleryItem[]> {
     const token = userService.getToken();
@@ -205,33 +236,6 @@ class EditorialService {
       }
     } catch (err: any) {
       throw new Error(err.message || "Unbekannter Fehler beim Löschen der Redaktionsliste.");
-    }
-  }
-
-  // Check if current user is an admin
-  async isAdmin(): Promise<boolean> {
-    const token = userService.getToken();
-    if (!token) return false;
-
-    try {
-      const res = await fetch(`${this.baseUrl}/users/me/permissions`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (res.status === 401) {
-        userService.logout();
-        return false;
-      }
-
-      if (!res.ok) return false;
-
-      const data = await res.json();
-      return data.isAdmin === true;
-    } catch (err) {
-      return false;
     }
   }
 }

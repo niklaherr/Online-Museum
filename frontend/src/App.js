@@ -28,6 +28,7 @@ import { EditItem } from 'components/gallery/EditItem';
 import EditItemList from 'components/itemList/EditItemList';
 import LandingPage from 'pages/LandingPage';
 import EditorialManagement from 'pages/Editorial';
+import EditEditorial from 'components/editorial/EditEditorial';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -218,14 +219,33 @@ function App() {
 
 ^           {userService.isAdmin() && (
               <Route
-                path="/editorial"
-                element={
-                  <ProtectedRoute>
-                    <EditorialManagement onNavigate={(route) => navigate(route)} />
-                  </ProtectedRoute>
-                }
-              />
+              path="/editorial"
+              element={
+                <ProtectedRoute>
+                  <EditorialManagement onNavigate={(route) => navigate(route)} />
+                </ProtectedRoute>
+              }
+            />
+            
+              
+
+              
             )}
+            {userService.isAdmin() && (
+               <Route
+               path="/editorial/:id/edit"
+               element={
+                 <ProtectedRoute>
+                   <EditEditorial onNavigate={(route) => navigate(route)} />
+                 </ProtectedRoute>
+               }
+             />
+            
+              
+
+              
+            )}
+           
             
 
             {/* Legal Pages */}

@@ -1,0 +1,268 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Card, Title, TextInput, Textarea, Button, Badge, Dialog, DialogPanel, Flex, Grid, Text } from "@tremor/react";
+import Item, { GalleryItem } from "interfaces/Item";
+import { itemService } from "services/ItemService";
+import NotyfService from "services/NotyfService";
+import { userService } from "services/UserService";
+import { editorialService } from "services/EditorialService";
+import { MagnifyingGlassIcon, PlusIcon, XMarkIcon, TrashIcon } from "@heroicons/react/24/outline";
+import Editorial from "interfaces/Editorial";
+
+type EditEditorialProps = {
+  onNavigate: (route: string) => void;
+};
+
+function EditEditorial({ onNavigate }: EditEditorialProps) {
+  const { id } = useParams<{ id: string }>();
+
+   // State for editorial list form
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [selectedItems, setSelectedItems] = useState<GalleryItem[]>([]);
+    
+    // State for search functionality
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState<GalleryItem[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    
+    const [isLoading, setIsLoading] = useState(true);
+
+
+  useEffect(() => {
+    const loadEditorial = async () => {
+      try {
+        const [listDetails, listItems] = await Promise.all([
+          editorialService.fetchEditorialListById(id!),
+          editorialService.fetchItemsByEditorialId(parseInt(id!)),
+        ]);
+
+        setTitle(listDetails.title);
+        setDescription(listDetails.description || "");
+        setSelectedItems(listItems);
+        setIsLoading(false);
+      } catch (error) {
+        let errorMessage = "Fehler beim Laden der Item-Liste";
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        NotyfService.showError(errorMessage);
+      }
+    };
+
+    loadEditorial();
+  }, [id]);
+  
+  // Search for items
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setIsSearching(true);
+    try {
+      const results = await editorialService.searchItems(searchQuery);
+      
+      // Filter out items that are already selected
+      const selectedItemIds = selectedItems.map(item => item.id);
+      const filteredResults = results.filter(item => !selectedItemIds.includes(item.id));
+      
+      setSearchResults(filteredResults);
+    } catch (error) {
+      let errorMessage = "Fehler bei der Suche nach Items";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      NotyfService.showError(errorMessage);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  
+  // Add item to selection
+  const addItem = (item: GalleryItem) => {
+    setSelectedItems(prev => [...prev, item]);
+    setSearchResults(prev => prev.filter(i => i.id !== item.id));
+  };
+  
+  // Remove item from selection
+  const removeItem = (itemId: number) => {
+    setSelectedItems(prev => prev.filter(item => item.id !== itemId));
+  };
+  
+  // Create a new editorial list
+  const handleUpdateList = async () => {
+    if (!title.trim()) {
+      NotyfService.showError("Bitte geben Sie einen Titel ein");
+      return;
+    }
+    
+    if (selectedItems.length === 0) {
+      NotyfService.showError("Bitte fügen Sie mindestens ein Item zur Liste hinzu");
+      return;
+    }
+    
+    try {
+      await editorialService.updateEditorialList(parseInt(id!), {
+        title: title.trim(),
+        description: description.trim(),
+        item_ids: selectedItems.map(item => item.id)
+      });
+      
+      NotyfService.showSuccess("Redaktionelle Liste erfolgreich erstellt");
+      onNavigate('/editorial')
+    } catch (error) {
+      let errorMessage = "Fehler beim Bearbeiten der redaktionellen Liste";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      NotyfService.showError(errorMessage);
+    }
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center p-12">
+        <div className="text-amber-500">
+          <svg className="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-8">
+      <h1 className="text-2xl font-bold text-gray-900 mb-2 mt-8">Redaktionelle Listen bearbeiten</h1>
+      
+      {/* Create new editorial list */}
+      <Card>
+        <Title className="mb-4">Redaktionelle Liste bearbeiten</Title>
+        
+        <div className="space-y-4 mb-6">
+          <TextInput
+            placeholder="Titel der Liste"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+          
+          <Textarea
+            placeholder="Beschreibung (optional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+          />
+        </div>
+        
+        {/* Search for items */}
+        <div className="border-t pt-4 mb-6">
+          <Title className="text-lg mb-4">Items finden und hinzufügen</Title>
+          
+          <div className="flex items-center space-x-2 mb-4">
+            <TextInput
+              placeholder="Nach Items suchen (Titel, Kategorie, Benutzer...)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-grow"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
+            />
+            <Button
+              icon={MagnifyingGlassIcon}
+              onClick={handleSearch}
+              loading={isSearching}
+              color="amber"
+            >
+              Suchen
+            </Button>
+          </div>
+          
+          {/* Search results */}
+          {searchResults.length > 0 && (
+            <div className="mb-6">
+              <Text className="font-medium mb-2">Suchergebnisse</Text>
+              <Grid numItemsLg={3} numItemsMd={2} numItemsSm={1} className="gap-3">
+                {searchResults.map(item => (
+                  <Card key={item.id} className="!p-3 cursor-pointer hover:bg-gray-50" onClick={() => addItem(item)}>
+                    <Flex alignItems="center" justifyContent="between">
+                      <Flex alignItems="center" className="space-x-3">
+                        <div className="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                          {item.image && (
+                            <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <Text className="font-medium truncate">{item.title}</Text>
+                          <div className="flex items-center text-xs text-gray-500">
+                            <Badge color="gray" size="xs">{item.category}</Badge>
+                            <span className="ml-2 truncate">von {item.username}</span>
+                          </div>
+                        </div>
+                      </Flex>
+                      <Button icon={PlusIcon} variant="light" color="amber" tooltip="Hinzufügen" />
+                    </Flex>
+                  </Card>
+                ))}
+              </Grid>
+            </div>
+          )}
+          
+          {/* Selected items */}
+          <div>
+            <Text className="font-medium mb-2">Ausgewählte Items ({selectedItems.length})</Text>
+            
+            {selectedItems.length === 0 ? (
+              <Text className="text-gray-500 italic">Keine Items ausgewählt. Nutzen Sie die Suche, um Items hinzuzufügen.</Text>
+            ) : (
+              <div className="space-y-2 max-h-72 overflow-y-auto p-1">
+                {selectedItems.map(item => (
+                  <Card key={item.id} className="!p-3">
+                    <Flex alignItems="center" justifyContent="between">
+                      <Flex alignItems="center" className="space-x-3">
+                        <div className="w-10 h-10 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                          {item.image && (
+                            <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <Text className="font-medium truncate">{item.title}</Text>
+                          <div className="flex items-center text-xs text-gray-500">
+                            <Badge color="gray" size="xs">{item.category}</Badge>
+                            <span className="ml-2 truncate">von {item.username}</span>
+                          </div>
+                        </div>
+                      </Flex>
+                      <Button 
+                        icon={XMarkIcon}
+                        variant="light"
+                        color="red"
+                        tooltip="Entfernen"
+                        onClick={() => removeItem(item.id)}
+                      />
+                    </Flex>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div className="border-t pt-4">
+          <Button
+            color="amber"
+            onClick={handleUpdateList}
+            disabled={!title.trim() || selectedItems.length === 0}
+          >
+            Redaktionelle Liste bearbeiten
+          </Button>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+export default EditEditorial;
