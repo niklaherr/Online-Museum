@@ -184,24 +184,17 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
         </div>
       </div>
 
-      {/* Editorial Lists Section */}
-      <div className="mb-10">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Von unserer Redaktion</h2>
-        </div>
+      {filteredEditorials.length === 0 && filteredItemLists.length === 0 && filteredUserItemLists.length === 0 && (
+        <NoResults />
+      )}
 
-        {isLoadingEditorials ? (
-          <div className="flex justify-center items-center p-6">
-            <div className="text-amber-500">
-              <svg className="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </div>
+      {filteredEditorials.length !== 0 && (
+        <div className="mb-10">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Von unserer Redaktion</h2>
           </div>
-        ) : filteredEditorials.length === 0 ? (
-          <NoResults />
-        ) : (
+
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredEditorials.map(editorial => (
               <ItemListCard 
@@ -211,68 +204,49 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
               />
             ))}
           </div>
-        )}
-      </div>
-
-      {/* Public Lists Section */}
-      <div className="mb-10">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Öffentliche Listen</h2>
         </div>
-        
-        {isLoadingItems ? (
-          <div className="flex justify-center items-center p-6">
-            <div className="text-blue-500">
-              <svg className="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </div>
-          </div>
-        ) : filteredItemLists.length === 0 ? (
-          <NoResults />
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItemLists.map(list => (
-              <ItemListCard 
-                key={`itemlist-${list.id}`} 
-                list={list} 
-                onView={(id) => handleViewSpace(id, 'item-list')} 
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      )}
 
-      {/* User's Personal Lists Section */}
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Deine Listen</h2>
-        </div>
-        
-        {isLoadingItems ? (
-          <div className="flex justify-center items-center p-6">
-            <div className="text-blue-500">
-              <svg className="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </div>
+      
+
+      {filteredItemLists.length !== 0 && (
+        <div className="mb-10">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Öffentliche Listen</h2>
           </div>
-        ) : filteredUserItemLists.length === 0 ? (
-          <NoResults />
-        ) : (
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredUserItemLists.map(list => (
-              <ItemListCard 
-                key={`user-itemlist-${list.id}`} 
-                list={list} 
-                onView={(id) => handleViewSpace(id, 'item-list')} 
-              />
-            ))}
+              {filteredItemLists.map(list => (
+                <ItemListCard 
+                  key={`itemlist-${list.id}`} 
+                  list={list} 
+                  onView={(id) => handleViewSpace(id, 'item-list')} 
+                />
+              ))}
+            </div>
+        </div>
+      )}
+      
+      {filteredUserItemLists.length !== 0 && (
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Deine Listen</h2>
           </div>
-        )}
-      </div>
+          
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredUserItemLists.map(list => (
+                <ItemListCard 
+                  key={`user-itemlist-${list.id}`} 
+                  list={list} 
+                  onView={(id) => handleViewSpace(id, 'item-list')} 
+                />
+              ))}
+            </div>
+        </div>
+      )}
+
+      
     </div>
   );
 };

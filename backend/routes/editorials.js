@@ -8,10 +8,6 @@ const router = express.Router();
 router.get("/editorial-lists", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
     try {
-        // Only admin users can fetch all editorial lists
-        if (!req.user.isAdmin) {
-            return res.status(403).json({ error: "Sie haben keine Berechtigung, redaktionelle Listen einzusehen." });
-        }
         
         const result = await pool.query("SELECT * FROM editorial ORDER BY id DESC");
         res.json(result.rows);
