@@ -236,10 +236,17 @@ router.get("/items-search", authenticateJWT, async (req, res) => {
     
     try {
         const sqlQuery = `
-        SELECT i.*, u.username 
+        SELECT 
+            i.*, 
+            u.username
         FROM item i
         JOIN users u ON i.user_id = u.id
-        WHERE i.title ILIKE $1 OR i.description ILIKE $1
+        WHERE 
+            i.title ILIKE $1 OR 
+            i.description ILIKE $1 OR 
+            i.category ILIKE $1 OR
+            u.username ILIKE $1 OR
+            i.id::TEXT ILIKE $1
         ORDER BY i.entered_on DESC
         `;
         
