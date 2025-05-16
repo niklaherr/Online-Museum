@@ -5,6 +5,7 @@ import Item from "interfaces/Item";
 import { itemService } from "services/ItemService";
 import NotyfService from "services/NotyfService";
 import { userService } from "services/UserService";
+import Loading from "components/helper/Loading";
 
 type EditItemListProps = {
   onNavigate: (route: string) => void;
@@ -70,9 +71,7 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
     }
   };
 
-  if (isLoading) {
-    return <div className="text-center p-6">Lade Liste...</div>;
-  }
+  if (isLoading) return <Loading />
 
   return (
     <Card className="max-w-2xl mx-auto mt-6 space-y-4">

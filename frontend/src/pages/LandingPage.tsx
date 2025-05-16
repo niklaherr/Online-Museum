@@ -20,7 +20,8 @@ import { motion } from "framer-motion";
 import { itemService } from "services/ItemService";
 import { GalleryItem } from "interfaces/Item";
 import NotyfService from "services/NotyfService";
-import NoResults from "./NoResults";
+import NoResults from "../components/helper/NoResults";
+import Loading from "components/helper/Loading";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -60,18 +61,9 @@ const LandingPage = ({onNavigate} : LandingPageProps) => {
     loadItems();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center p-12">
-        <div className="text-blue-500">
-          <svg className="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <Loading />
+
+  
   return (
     <div className="px-4 py-10 md:py-16 max-w-7xl mx-auto space-y-16">
       {/* Hero Section */}

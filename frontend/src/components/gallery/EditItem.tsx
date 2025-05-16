@@ -5,6 +5,7 @@ import { itemService } from "../../services/ItemService";
 import NotyfService from "services/NotyfService";
 import { GalleryItem } from "interfaces/Item";
 import { userService } from "services/UserService";
+import Loading from "components/helper/Loading";
 
 type EditItemProps = {
   onNavigate: (route: string) => void;
@@ -68,9 +69,7 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
     }
   };
 
-  if (isLoading) {
-    return <div className="text-center p-6">Lade Item-Daten...</div>;
-  }
+  if (isLoading) return <Loading />
 
   return (
     <Card className="max-w-2xl mx-auto mt-6 space-y-4">

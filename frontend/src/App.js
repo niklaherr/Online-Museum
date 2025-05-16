@@ -12,9 +12,9 @@ import LoginPage from './pages/auth/Login';
 import RegisterPage from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ProfilePage from './pages/auth/ProfilePage';
-import ItemListView from './pages/memorySpaces/ItemListView';
-import ItemListDetailView from './pages/memorySpaces/ItemListDetailView';
-import NotFound from './pages/NotFound';
+import ItemListView from './pages/itemlist/ItemListView';
+import ItemListDetailView from './pages/itemlist/ItemListDetailView';
+import NotFound from './components/helper/NotFound';
 import Gallery from './pages/gallery/Gallery';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import HelpSupport from 'pages/legal/HelpSupport';
@@ -27,6 +27,9 @@ import ItemDetailView from 'components/gallery/ItemDetailView';
 import { EditItem } from 'components/gallery/EditItem';
 import EditItemList from 'components/itemList/EditItemList';
 import LandingPage from 'pages/LandingPage';
+import EditorialManagement from 'pages/Editorial';
+import EditEditorial from 'components/editorial/EditEditorial';
+import EditorialDetailView from 'components/editorial/EditorialDetailView';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -215,10 +218,59 @@ function App() {
               }
             />
 
+^           {userService.isAdmin() && (
+              <Route
+              path="/editorial"
+              element={
+                <ProtectedRoute>
+                  <EditorialManagement onNavigate={(route) => navigate(route)} />
+                </ProtectedRoute>
+              }
+            />
+            
+              
+
+              
+            )}
+            {userService.isAdmin() && (
+               <Route
+               path="/editorial/:id/edit"
+               element={
+                 <ProtectedRoute>
+                   <EditEditorial onNavigate={(route) => navigate(route)} />
+                 </ProtectedRoute>
+               }
+             />
+            
+              
+
+              
+            )}
+
+            <Route
+              path="/editorial/:id"
+              element={
+                <ProtectedRoute>
+                  <EditorialDetailView onNavigate={(route) => navigate(route)} />
+                </ProtectedRoute>
+              }
+            />
+           
+            
+
             {/* Legal Pages */}
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/helpsupport" element={<HelpSupport />} />
             <Route path="/termsofuse" element={<TermsOfUse />} />
+
+            <Route
+               path="*"
+               element={
+                 <ProtectedRoute>
+                   <NotFound/>
+                 </ProtectedRoute>
+               }
+             />
           </Routes>
         </main>
         

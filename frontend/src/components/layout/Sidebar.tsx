@@ -1,8 +1,13 @@
-import { useContext } from 'react';
+import { Dispatch, SetStateAction, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { userService } from 'services/UserService';
 
-const Sidebar = ({ isOpen, setIsOpen }) => {
+type SidebarProps = {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+const Sidebar = ({ isOpen, setIsOpen } : SidebarProps ) => {
   const location = useLocation();
   
   // Wenn kein Benutzer angemeldet ist, Sidebar nicht anzeigen
@@ -14,6 +19,14 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     { path: '/item-list', label: 'Listen', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
     { path: '/items', label: 'Galerie', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
     ];
+
+    if (userService.isAdmin()) {
+      navItems.push({
+        path: '/editorial',
+        label: 'Redaktion',
+        icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h2l2-2h6l2 2h2a2 2 0 012 2v12a2 2 0 01-2 2zM7 10h10M7 14h10M7 18h6'
+      });
+    }
 
   return (
     <div 

@@ -13,30 +13,29 @@ import {
 } from "@tremor/react";
 import { UserIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
-import ItemList from "interfaces/ItemList";
-import { itemService } from "services/ItemService";
 import NotyfService from "services/NotyfService";
-import { userService } from "services/UserService";
-import NoResults from "pages/NoResults";
+import NoResults from "components/helper/NoResults";
+import Editorial from "interfaces/Editorial";
+import { editorialService } from "services/EditorialService";
+import Loading from "components/helper/Loading";
 
-type ItemListDetailViewProps = {
+type EditorialDetailViewProps = {
   onNavigate: (route: string) => void;
 };
 
-const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
+const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState<GalleryItem[]>([]);
-  const [list, setList] = useState<ItemList | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [list, setList] = useState<Editorial | null>(null);
 
   useEffect(() => {
     const loadItemLists = async () => {
       try {
-        const itemLists = await itemService.fetchItemsByItemListId(parseInt(id!));
-        setItems(itemLists);
-        const itemList = await itemService.fetchItemListById(id!);
+        const itemLists = await editorialService.fetchItemsByEditorialId(parseInt(id!));
+        const itemList = await editorialService.fetchEditorialListById(id!);
         setList(itemList);
+        setItems(itemLists);
         setIsLoading(false);
       } catch (error) {
         let errorMessage = "Fehler beim Laden der Items";
@@ -50,30 +49,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
     loadItemLists();
   }, [id]);
 
-  const handleDeleteItemList = async () => {
-    if (list) {
-      try {
-        await itemService.deleteItemList(list.id);
-        NotyfService.showSuccess("Item List erfolgreich gelöscht");
-        setIsDeleteModalOpen(false);
-        onNavigate('/dashboard'); 
-      } catch (error) {
-        let errorMessage = "Fehler beim Löschen der Item List";
-        if (error instanceof Error) {
-          errorMessage = error.message;
-        }
-        NotyfService.showError(errorMessage);
-      }
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center p-12">
-        <Text>Liste wird geladen...</Text>
-      </div>
-    );
-  }
+  if (isLoading) return <Loading />
 
   return (
     <div className="flex flex-col h-screen space-y-6">
@@ -87,15 +63,6 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
               Erstellt am: {list?.entered_on} • {true ? "Privat" : "Öffentlich"}
             </Text>
           </div>
-
-          
-          {list?.user_id == userService.getUserID() && (<div className="absolute top-4 right-4">
-            <Button
-            onClick={() => onNavigate(`/item-list/${id}/edit`)}
-          >
-            Bearbeiten
-          </Button>
-          </div>)}
         </div>
         
       </Card>
@@ -135,40 +102,8 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
       ) : (
         <NoResults />
       )}
-
-      {/* Centered Delete Button */}
-      {list?.user_id == userService.getUserID() && (
-        <div className="mt-auto flex justify-center pb-6">
-          <Button
-            variant="light"
-            color="red"
-            icon={TrashIcon}
-            onClick={() => setIsDeleteModalOpen(true)} // Show confirmation modal
-          >
-            Liste löschen
-          </Button>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
-        <DialogPanel className="max-w-sm bg-white rounded-xl shadow-md p-6">
-          <Title>Bist du sicher?</Title>
-          <Text>
-            Möchtest du diese Liste wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
-          </Text>
-          <Flex justifyContent="end" className="mt-6 space-x-2">
-            <Button variant="secondary" onClick={() => setIsDeleteModalOpen(false)}>
-              Abbrechen
-            </Button>
-            <Button color="red" variant="secondary" onClick={handleDeleteItemList}>
-              Ja, löschen
-            </Button>
-          </Flex>
-        </DialogPanel>
-      </Dialog>
     </div>
   );
 };
 
-export default ItemListDetailView;
+export default EditorialDetailView;
