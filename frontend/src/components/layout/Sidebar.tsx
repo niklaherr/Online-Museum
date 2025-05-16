@@ -1,8 +1,13 @@
-import { useContext } from 'react';
+import { Dispatch, SetStateAction, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { userService } from 'services/UserService';
 
-const Sidebar = ({ isOpen, setIsOpen }) => {
+type SidebarProps = {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+const Sidebar = ({ isOpen, setIsOpen } : SidebarProps ) => {
   const location = useLocation();
   
   // Wenn kein Benutzer angemeldet ist, Sidebar nicht anzeigen
