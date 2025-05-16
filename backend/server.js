@@ -52,14 +52,14 @@ app.post("/register", async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
         const result = await pool.query(
-            "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username",
+            "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username, isAdmin",
             [username, hashedPassword]
         );
 
         const user = result.rows[0];
-        const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ id: user.id, username: user.username, isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: "1h" });
 
-        res.status(201).json({ token, id: user.id, username: user.username });
+        res.status(201).json({ token, id: user.id, username: user.username, isAdmin: user.isAdmin });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Registration failed" });
@@ -95,8 +95,9 @@ app.post("/login", async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
         if (!match) return res.status(401).json({ error: "Invalid credentials" });
 
-        const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: "1h" });
-        res.json({ token, id: user.id, username: user.username });
+        const token = jwt.sign({ id: user.id, username: user.username, isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: "1h" });
+
+        res.json({ token, id: user.id, username: user.username, isAdmin: user.isAdmin });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Login failed" });

@@ -27,6 +27,7 @@ import ItemDetailView from 'components/gallery/ItemDetailView';
 import { EditItem } from 'components/gallery/EditItem';
 import EditItemList from 'components/itemList/EditItemList';
 import LandingPage from 'pages/LandingPage';
+import Editorial from 'pages/Editorial';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -215,14 +216,17 @@ function App() {
               }
             />
 
-            <Route
-              path="/editorial"
-              element={
-                <ProtectedRoute>
-                  </>
-                </ProtectedRoute>
-              }
-            />
+^           {userService.isAdmin() && (
+              <Route
+                path="/editorial"
+                element={
+                  <ProtectedRoute>
+                    <Editorial />
+                  </ProtectedRoute>
+                }
+              />
+            )}
+            
 
             {/* Legal Pages */}
             <Route path="/privacy" element={<PrivacyPolicy />} />

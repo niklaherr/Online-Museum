@@ -3,8 +3,10 @@ SET timezone = 'Europe/Berlin';
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    isAdmin BOOLEAN DEFAULT FALSE
 );
+
 
 CREATE TABLE item (
     id SERIAL PRIMARY KEY,

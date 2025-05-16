@@ -26,7 +26,7 @@ const initialMuseumData: MuseumItem[] = [
   { id: 3, name: "The Thinker", category: "Sculpture", year: 1904 },
 ];
 
-export default function MuseumEditorial(): JSX.Element {
+export default function Editorial(): JSX.Element {
   const [items, setItems] = useState<MuseumItem[]>(initialMuseumData);
   const [isEditingId, setIsEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<{ name: string; category: string; year: string }>({
