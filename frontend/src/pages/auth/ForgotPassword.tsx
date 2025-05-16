@@ -6,25 +6,18 @@ type ForgotPasswordProps = {
   onNavigate: (route: string) => void;
 };
 
-// Sicherheitsfragen-Optionen - müssen mit denen in RegisterPage übereinstimmen
-const securityQuestions = [
-  "Familienname der Mutter",
-  "Name des ersten Haustieres",
-  "Name bester Freund in der Grundschule"
-];
-
 const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState('');
-  const [securityQuestion, setSecurityQuestion] = useState('');
   const [securityAnswer, setSecurityAnswer] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [userSecurityQuestion, setUserSecurityQuestion] = useState('');
+  const [resetToken, setResetToken] = useState('');
 
-  // Schritt 1: Benutzer mit Benutzernamen finden
+  // Step 1: Find user and get their security question
   const findUser = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (!username) {
@@ -34,12 +27,15 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
 
     setIsLoading(true);
     try {
-      // In einer echten App würden wir den Benutzernamen überprüfen und die Sicherheitsfrage abrufen
-      // Hier simulieren wir das mit einer setTimeout-Funktion
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call the backend to get the user's security question
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:3001'}/security-question/${username}`);
       
-      // Wir simulieren, dass wir die Sicherheitsfrage des Benutzers vom Backend erhalten haben
-      setUserSecurityQuestion(securityQuestions[Math.floor(Math.random() * securityQuestions.length)]);
+      if (!response.ok) {
+        throw new Error('Benutzername nicht gefunden');
+      }
+      
+      const data = await response.json();
+      setUserSecurityQuestion(data.securityQuestion);
       setStep(2);
       setError('');
     } catch (err) {
@@ -50,7 +46,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
     }
   };
 
-  // Schritt 2: Sicherheitsfrage überprüfen
+  // Step 2: Verify security question answer
   const verifySecurityQuestion = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (!securityAnswer) {
@@ -60,11 +56,21 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
 
     setIsLoading(true);
     try {
-      // In einer echten App würden wir die Sicherheitsantwort mit dem Backend überprüfen
-      // Hier simulieren wir das mit einer setTimeout-Funktion
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call the backend to verify the security answer
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:3001'}/verify-security-question`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, securityAnswer }),
+      });
       
-      // Für Demo-Zwecke ist jede Antwort erfolgreich
+      if (!response.ok) {
+        throw new Error('Die Antwort auf die Sicherheitsfrage ist falsch');
+      }
+      
+      const data = await response.json();
+      setResetToken(data.resetToken);
       setStep(3);
       setError('');
     } catch (err) {
@@ -75,7 +81,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
     }
   };
 
-  // Schritt 3: Passwort zurücksetzen
+  // Step 3: Reset password
   const resetPassword = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (!newPassword || !confirmPassword) {
@@ -95,9 +101,18 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
 
     setIsLoading(true);
     try {
-      // In einer echten App würden wir das neue Passwort an das Backend senden
-      // Hier simulieren wir das mit einer setTimeout-Funktion
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call the backend to reset the password
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:3001'}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ resetToken, newPassword }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Fehler beim Zurücksetzen des Passworts');
+      }
       
       NotyfService.showSuccess('Ihr Passwort wurde erfolgreich zurückgesetzt');
       onNavigate('/login');
@@ -127,7 +142,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
           </div>
         )}
 
-        {/* Schritt 1: Benutzername eingeben */}
+        {/* Step 1: Username input */}
         {step === 1 && (
           <form className="space-y-6" onSubmit={findUser}>
             <div>
@@ -156,7 +171,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
           </form>
         )}
 
-        {/* Schritt 2: Sicherheitsfrage */}
+        {/* Step 2: Security question */}
         {step === 2 && (
           <form className="space-y-6" onSubmit={verifySecurityQuestion}>
             <div>
@@ -194,7 +209,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
           </form>
         )}
 
-        {/* Schritt 3: Neues Passwort */}
+        {/* Step 3: New password */}
         {step === 3 && (
           <form className="space-y-6" onSubmit={resetPassword}>
             <div>
