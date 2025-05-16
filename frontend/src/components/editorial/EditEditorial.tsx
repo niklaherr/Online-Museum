@@ -107,7 +107,7 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
         item_ids: selectedItems.map(item => item.id)
       });
       
-      NotyfService.showSuccess("Redaktionelle Liste erfolgreich erstellt");
+      NotyfService.showSuccess("Redaktionelle Liste erfolgreich bearbeitet");
       onNavigate('/editorial')
     } catch (error) {
       let errorMessage = "Fehler beim Bearbeiten der redaktionellen Liste";

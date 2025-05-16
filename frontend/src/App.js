@@ -29,6 +29,7 @@ import EditItemList from 'components/itemList/EditItemList';
 import LandingPage from 'pages/LandingPage';
 import EditorialManagement from 'pages/Editorial';
 import EditEditorial from 'components/editorial/EditEditorial';
+import EditorialDetailView from 'components/editorial/EditorialDetailView';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -245,6 +246,15 @@ function App() {
 
               
             )}
+
+            <Route
+              path="/editorial/:id"
+              element={
+                <ProtectedRoute>
+                  <EditorialDetailView onNavigate={(route) => navigate(route)} />
+                </ProtectedRoute>
+              }
+            />
            
             
 
@@ -252,6 +262,15 @@ function App() {
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/helpsupport" element={<HelpSupport />} />
             <Route path="/termsofuse" element={<TermsOfUse />} />
+
+            <Route
+               path="*"
+               element={
+                 <ProtectedRoute>
+                   <NotFound/>
+                 </ProtectedRoute>
+               }
+             />
           </Routes>
         </main>
         
