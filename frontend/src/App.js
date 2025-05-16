@@ -14,7 +14,7 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ProfilePage from './pages/auth/ProfilePage';
 import ItemListView from './pages/itemlist/ItemListView';
 import ItemListDetailView from './pages/itemlist/ItemListDetailView';
-import NotFound from './pages/NotFound';
+import NotFound from './components/helper/NotFound';
 import Gallery from './pages/gallery/Gallery';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import HelpSupport from 'pages/legal/HelpSupport';

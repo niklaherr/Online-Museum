@@ -15,8 +15,9 @@ import { userService } from 'services/UserService';
 import Activity from 'interfaces/Activity';
 import { itemService } from 'services/ItemService';
 import NotyfService from 'services/NotyfService';
-import NoResults from './NoResults';
+import NoResults from '../components/helper/NoResults';
 import DateCount from 'interfaces/DateCount';
+import Loading from 'components/helper/Loading';
 
 
 
@@ -87,13 +88,14 @@ const Dashboard = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [itemListDateCount, setItemListDateCount] = useState<DateCount[]>([]);
   const [itemDataCount, setItemDataCount] = useState<DateCount[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const loadItemLists = async () => {
       try {
         const activities = await itemService.fetchActivities();
         setActivities(activities)
-        //setIsLoading(false)
+        setIsLoading(false)
       } catch (error) {
         let errorMessage = "Fehler beim Laden"
         if(error instanceof Error) {
@@ -123,6 +125,8 @@ const Dashboard = () => {
 
     loadItemLists();
   }, []);
+
+  if (isLoading) return <Loading />
 
   return (
     <div className="space-y-6">

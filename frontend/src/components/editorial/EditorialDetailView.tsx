@@ -14,9 +14,10 @@ import {
 import { UserIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import NotyfService from "services/NotyfService";
-import NoResults from "pages/NoResults";
+import NoResults from "components/helper/NoResults";
 import Editorial from "interfaces/Editorial";
 import { editorialService } from "services/EditorialService";
+import Loading from "components/helper/Loading";
 
 type EditorialDetailViewProps = {
   onNavigate: (route: string) => void;
@@ -48,13 +49,7 @@ const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
     loadItemLists();
   }, [id]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center p-12">
-        <Text>Liste wird geladen...</Text>
-      </div>
-    );
-  }
+  if (isLoading) return <Loading />
 
   return (
     <div className="flex flex-col h-screen space-y-6">

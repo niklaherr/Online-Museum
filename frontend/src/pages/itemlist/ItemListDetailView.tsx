@@ -17,7 +17,8 @@ import ItemList from "interfaces/ItemList";
 import { itemService } from "services/ItemService";
 import NotyfService from "services/NotyfService";
 import { userService } from "services/UserService";
-import NoResults from "pages/NoResults";
+import NoResults from "components/helper/NoResults";
+import Loading from "components/helper/Loading";
 
 type ItemListDetailViewProps = {
   onNavigate: (route: string) => void;
@@ -67,13 +68,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center p-12">
-        <Text>Liste wird geladen...</Text>
-      </div>
-    );
-  }
+  if (isLoading) return <Loading />
 
   return (
     <div className="flex flex-col h-screen space-y-6">

@@ -1,11 +1,12 @@
 import ItemList from 'interfaces/ItemList';
 import Editorial from 'interfaces/Editorial';
-import NoResults from 'pages/NoResults';
+import NoResults from 'components/helper/NoResults';
 import { useState, useEffect } from 'react';
 import { itemService } from 'services/ItemService';
 import { editorialService } from 'services/EditorialService';
 import NotyfService from 'services/NotyfService';
 import { userService } from 'services/UserService';
+import Loading from 'components/helper/Loading';
 
 type ItemListCardProps = {
   list: ItemList | Editorial;
@@ -49,9 +50,7 @@ type ItemListViewProps = {
 const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
   const [itemLists, setItemLists] = useState<ItemList[]>([]);
   const [editorialLists, setEditorialLists] = useState<Editorial[]>([]);
-  const [isLoadingItems, setIsLoadingItems] = useState(true);
-  const [isLoadingEditorials, setIsLoadingEditorials] = useState(true);
-  const [filter, setFilter] = useState('all'); // 'all', 'private', 'public'
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [userItemLists, setUserItemLists] = useState<ItemList[]>([]);
 
@@ -68,23 +67,13 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
           const userLists = fetchedItemLists.filter(list => list.user_id === userId);
           setUserItemLists(userLists);
         }
-        
-        setIsLoadingItems(false);
-      } catch (error) {
-        let errorMessage = "Fehler beim Laden der Erinnerungsräume";
-        if(error instanceof Error) {
-          errorMessage = error.message;
-        }
-        NotyfService.showError(errorMessage);
-      }
 
-      try {
-        // Load editorial lists
         const fetchedEditorials = await editorialService.fetchEditorialLists();
         setEditorialLists(fetchedEditorials);
-        setIsLoadingEditorials(false);
+        setIsLoading(false)
+        
       } catch (error) {
-        let errorMessage = "Fehler beim Laden der redaktionellen Listen";
+        let errorMessage = "Fehler beim Laden der Listen";
         if(error instanceof Error) {
           errorMessage = error.message;
         }
@@ -93,6 +82,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
     };
 
     loadData();
+    
   }, []);
 
   // Filtering and searching for item lists
@@ -142,18 +132,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
     }
   };
 
-  if (isLoadingItems && isLoadingEditorials) {
-    return (
-      <div className="flex justify-center items-center p-12">
-        <div className="text-blue-500">
-          <svg className="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <Loading />
 
   return (
     <div>

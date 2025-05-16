@@ -8,6 +8,7 @@ import { userService } from "services/UserService";
 import { editorialService } from "services/EditorialService";
 import { MagnifyingGlassIcon, PlusIcon, XMarkIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Editorial from "interfaces/Editorial";
+import Loading from "components/helper/Loading";
 
 type EditEditorialProps = {
   onNavigate: (route: string) => void;
@@ -118,18 +119,7 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
     }
   };
   
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center p-12">
-        <div className="text-amber-500">
-          <svg className="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <Loading />
   
   return (
     <div className="space-y-8">
@@ -175,7 +165,7 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
               icon={MagnifyingGlassIcon}
               onClick={handleSearch}
               loading={isSearching}
-              color="amber"
+              color="blue"
             >
               Suchen
             </Button>
@@ -203,7 +193,7 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
                           </div>
                         </div>
                       </Flex>
-                      <Button icon={PlusIcon} variant="light" color="amber" tooltip="Hinzufügen" />
+                      <Button icon={PlusIcon} variant="light" color="blue" tooltip="Hinzufügen" />
                     </Flex>
                   </Card>
                 ))}
@@ -253,7 +243,7 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
         
         <div className="border-t pt-4">
           <Button
-            color="amber"
+            color="blue"
             onClick={handleUpdateList}
             disabled={!title.trim() || selectedItems.length === 0}
           >
