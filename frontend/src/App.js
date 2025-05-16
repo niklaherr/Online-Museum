@@ -27,7 +27,7 @@ import ItemDetailView from 'components/gallery/ItemDetailView';
 import { EditItem } from 'components/gallery/EditItem';
 import EditItemList from 'components/itemList/EditItemList';
 import LandingPage from 'pages/LandingPage';
-import Editorial from 'pages/Editorial';
+import EditorialManagement from 'pages/Editorial';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -221,7 +221,7 @@ function App() {
                 path="/editorial"
                 element={
                   <ProtectedRoute>
-                    <Editorial />
+                    <EditorialManagement onNavigate={(route) => navigate(route)} />
                   </ProtectedRoute>
                 }
               />
