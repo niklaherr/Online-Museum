@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Card, Title, TextInput, Textarea, Button, Grid, Text, Badge, Flex, Dialog, DialogPanel } from "@tremor/react";
+import { useState, useEffect } from "react";
+import { Card, Title, TextInput, Textarea, Button, Grid, Text, Flex, Dialog, DialogPanel } from "@tremor/react";
 import { XMarkIcon, PlusIcon, MagnifyingGlassIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import { editorialService } from "services/EditorialService";
 import NotyfService from "services/NotyfService";
-import NoResults from "components/helper/NoResults";
 import Editorial from "interfaces/Editorial";
 import Loading from "components/helper/Loading";
 

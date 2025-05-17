@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Title, TextInput, Textarea, Button, Badge, Dialog, DialogPanel, Flex, Grid, Text } from "@tremor/react";
-import Item, { GalleryItem } from "interfaces/Item";
-import { itemService } from "services/ItemService";
+import { Card, Title, TextInput, Textarea, Button, Flex, Grid, Text } from "@tremor/react";
+import { GalleryItem } from "interfaces/Item";
 import NotyfService from "services/NotyfService";
-import { userService } from "services/UserService";
 import { editorialService } from "services/EditorialService";
-import { MagnifyingGlassIcon, PlusIcon, XMarkIcon, TrashIcon } from "@heroicons/react/24/outline";
-import Editorial from "interfaces/Editorial";
+import { MagnifyingGlassIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Loading from "components/helper/Loading";
 
 type EditEditorialProps = {
