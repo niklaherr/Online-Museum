@@ -63,6 +63,11 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
   
   // KI-Beschreibung generieren basierend auf ausgewählten Items
   const handleGenerateDescription = async () => {
+    if (!title.trim()) {
+      NotyfService.showError("Bitte gib zuerst einen Titel ein.");
+      return;
+    }
+    
     if (selectedItemIds.length === 0) {
       NotyfService.showError("Bitte wähle zuerst mindestens ein Item aus.");
       return;
@@ -71,20 +76,27 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     setIsGenerating(true);
     
     try {
-      // Sammle Informationen über die ausgewählten Items
+      // Sammle detaillierte Informationen über die ausgewählten Items
       const selectedItems = userItems.filter(item => selectedItemIds.includes(item.id));
-      const itemTitles = selectedItems.map(item => item.title);
-      const itemCategories = selectedItems.map(item => item.category).filter(Boolean);
       
-      // Erstelle eine Beschreibung der Sammlung
-      const prompt = `
-        Erstelle eine kurze und ansprechende Beschreibung für eine Sammlung mit dem Titel "${title || 'Meine Sammlung'}", 
-        die folgende Elemente enthält: ${itemTitles.join(', ')}. 
-        ${itemCategories.length > 0 ? `Die Sammlung enthält Elemente aus folgenden Kategorien: ${[...new Set(itemCategories)].join(', ')}.` : ''}
-        Die Beschreibung sollte maximal 3 Sätze umfassen und die Einzigartigkeit dieser Sammlung hervorheben.
-      `;
+      // Erstelle einen umfassenderen Prompt mit Titeln, Kategorien und Beschreibungen
+      let promptText = `Erstelle eine ansprechende Beschreibung für eine Sammlung mit dem Titel "${title}". `;
       
-      const generatedText = await itemAssistantService.generateDescription(title || "Sammlung", itemTitles.join(", "));
+      // Füge Details zu jedem ausgewählten Item hinzu
+      promptText += "Die Sammlung enthält folgende Elemente:\n";
+      
+      selectedItems.forEach(item => {
+        promptText += `- ${item.title}`;
+        if (item.category) promptText += ` (Kategorie: ${item.category})`;
+        if (item.description) promptText += `: ${item.description}`;
+        promptText += "\n";
+      });
+      
+      // Füge Anweisungen für die KI hinzu
+      promptText += "\nBitte erstelle basierend auf diesen Informationen eine zusammenfassende Beschreibung, die die Einzigartigkeit dieser Sammlung in 2-3 Sätzen hervorhebt.";
+      
+      // Rufe die KI mit dem Titel und dem umfassenden Prompt auf
+      const generatedText = await itemAssistantService.generateDescription(title, promptText);
       setGeneratedDescription(generatedText);
       setIsDialogOpen(true);
       NotyfService.showSuccess("Beschreibung erfolgreich generiert.");
@@ -121,7 +133,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
             color="blue"
             onClick={handleGenerateDescription}
             loading={isGenerating}
-            disabled={selectedItemIds.length === 0}
+            disabled={selectedItemIds.length === 0 || !title.trim()}
           >
             KI-Beschreibung generieren
           </Button>
