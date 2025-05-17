@@ -212,25 +212,51 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
               <Text className="font-medium mb-2">Suchergebnisse</Text>
               <Grid numItemsLg={3} numItemsMd={2} numItemsSm={1} className="gap-3">
                 {searchResults.map(item => (
-                  <Card key={item.id} className="!p-3 cursor-pointer hover:bg-gray-50" onClick={() => addItem(item)}>
-                    <Flex alignItems="center" justifyContent="between">
-                      <Flex alignItems="center" className="space-x-3">
-                        <div className="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                          {item.image && (
-                            <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                          )}
+                <Card
+                  key={item.id}
+                  className="!p-3 cursor-pointer hover:bg-gray-50"
+                  onClick={() => addItem(item)}
+                >
+                  <Flex alignItems="center" justifyContent="between">
+                    {/* Left: Image and Text */}
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+            
+                      {/* Text content aligned left */}
+                      <div className="min-w-0 text-left">
+                        <Text className="font-medium truncate">{item.title}</Text>
+            
+                        <div className="text-xs text-gray-500 truncate">
+                          Kategorie: {item.category} &nbsp;&bull;&nbsp; von {item.username}
                         </div>
-                        <div className="min-w-0">
-                          <Text className="font-medium truncate">{item.title}</Text>
-                          <div className="flex items-center text-xs text-gray-500">
-                            <Badge color="gray" size="xs">{item.category}</Badge>
-                            <span className="ml-2 truncate">von {item.username}</span>
-                          </div>
+            
+                        <div className="text-xs text-gray-400 mt-0.5 truncate">
+                          Erstellt am: {new Date(item.entered_on).toLocaleDateString()}
                         </div>
-                      </Flex>
-                      <Button icon={PlusIcon} variant="light" color="blue" tooltip="Hinzufügen" />
-                    </Flex>
-                  </Card>
+            
+                        <div className="text-xs text-gray-400 truncate">
+                          ID: {item.id}
+                        </div>
+                      </div>
+                    </div>
+            
+                    {/* Right: Add Button */}
+                    <Button
+                      icon={PlusIcon}
+                      variant="light"
+                      color="blue"
+                      tooltip="Hinzufügen"
+                    />
+                  </Flex>
+                </Card>
                 ))}
               </Grid>
             </div>
@@ -246,30 +272,47 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
               <div className="space-y-2 max-h-72 overflow-y-auto p-1">
                 {selectedItems.map(item => (
                   <Card key={item.id} className="!p-3">
-                    <Flex alignItems="center" justifyContent="between">
-                      <Flex alignItems="center" className="space-x-3">
-                        <div className="w-10 h-10 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                          {item.image && (
-                            <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                          )}
+                  <Flex alignItems="center" justifyContent="between">
+                    {/* Left: Image and text */}
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className="w-10 h-10 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+            
+                      <div className="min-w-0 text-left">
+                        <Text className="font-medium truncate">{item.title}</Text>
+            
+                        <div className="text-xs text-gray-500 truncate">
+                          Kategorie: {item.category} &nbsp;&bull;&nbsp; von {item.username}
                         </div>
-                        <div className="min-w-0">
-                          <Text className="font-medium truncate">{item.title}</Text>
-                          <div className="flex items-center text-xs text-gray-500">
-                            <Badge color="gray" size="xs">{item.category}</Badge>
-                            <span className="ml-2 truncate">von {item.username}</span>
-                          </div>
+            
+                        <div className="text-xs text-gray-400 mt-0.5 truncate">
+                          Erstellt am: {new Date(item.entered_on).toLocaleDateString()}
                         </div>
-                      </Flex>
-                      <Button 
-                        icon={XMarkIcon}
-                        variant="light"
-                        color="red"
-                        tooltip="Entfernen"
-                        onClick={() => removeItem(item.id)}
-                      />
-                    </Flex>
-                  </Card>
+            
+                        <div className="text-xs text-gray-400 truncate">
+                          ID: {item.id}
+                        </div>
+                      </div>
+                    </div>
+            
+                    {/* Right: Remove button */}
+                    <Button
+                      icon={XMarkIcon}
+                      variant="light"
+                      color="red"
+                      tooltip="Entfernen"
+                      onClick={() => removeItem(item.id)}
+                    />
+                  </Flex>
+                </Card>
+            
                 ))}
               </div>
             )}
@@ -296,18 +339,24 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
         ) : (
           <div className="space-y-3">
             {editorialLists.map(list => (
-              <Card key={list.id} className="!p-4">
-                <Flex alignItems="center" justifyContent="between">
-                  <div>
-                    <Text className="font-medium">{list.title}</Text>
-                    {list.description && (
-                      <Text className="text-sm text-gray-500 line-clamp-1">{list.description}</Text>
-                    )}
-                    <Text className="text-xs text-gray-400 mt-1">
-                      Erstellt am: {new Date(list.entered_on).toLocaleDateString()}
+              <Card key={list.id} className="p-4">
+              <div className="flex justify-between items-stretch">
+                {/* Left content block */}
+                <div className="flex-1">
+                  <Text className="font-medium">{list.title}</Text>
+        
+                  {list.description && (
+                    <Text className="text-sm text-gray-500 line-clamp-1">
+                      {list.description}
                     </Text>
-                  </div>
-                  <Flex className="space-x-2">
+                  )}
+        
+                  <Text className="text-xs text-gray-400 mt-1">
+                    Erstellt am: {new Date(list.entered_on).toLocaleDateString()}
+                  </Text>
+        
+                  {/* Action buttons underneath title */}
+                  <div className="mt-3 flex space-x-2">
                     <Button
                       size="xs"
                       variant="light"
@@ -324,16 +373,22 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
                     >
                       Bearbeiten
                     </Button>
-                    <Button
-                      size="xs"
-                      variant="light"
-                      color="red"
-                      icon={TrashIcon}
-                      onClick={() => confirmDeleteList(list.id)}
-                    />
-                  </Flex>
-                </Flex>
-              </Card>
+                  </div>
+                </div>
+        
+                {/* Centered delete button on the right */}
+                <div className="flex items-center ml-4">
+                  <Button
+                    size="sm" // slightly bigger than xs
+                    variant="light"
+                    color="red"
+                    icon={TrashIcon}
+                    onClick={() => confirmDeleteList(list.id)}
+                  />
+                </div>
+              </div>
+            </Card>
+        
             ))}
           </div>
         )}
