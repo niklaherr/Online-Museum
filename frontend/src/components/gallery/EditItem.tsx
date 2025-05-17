@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, TextInput, Textarea, Button, Title, Text } from "@tremor/react";
+import { Card, TextInput, Textarea, Button, Title, Text, Dialog, DialogPanel } from "@tremor/react";
+import { SparklesIcon } from "@heroicons/react/24/outline";
 import { itemService } from "../../services/ItemService";
+import { itemAssistantService } from "../../services/ItemAssistantService";
 import NotyfService from "services/NotyfService";
-import { GalleryItem } from "interfaces/Item";
-import { userService } from "services/UserService";
 import Loading from "components/helper/Loading";
 
 type EditItemProps = {
@@ -20,6 +20,11 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [existingImage, setExistingImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Neuer State für KI-Beschreibung
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [generatedDescription, setGeneratedDescription] = useState("");
 
   useEffect(() => {
     const loadItem = async () => {
@@ -68,6 +73,39 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
       NotyfService.showError(errorMessage);
     }
   };
+  
+  // KI-Beschreibung generieren
+  const handleGenerateDescription = async () => {
+    if (!title.trim()) {
+      NotyfService.showError("Bitte gib zuerst einen Titel ein.");
+      return;
+    }
+    
+    if (!category.trim()) {
+      NotyfService.showError("Bitte gib eine Kategorie ein.");
+      return;
+    }
+    
+    setIsGenerating(true);
+    
+    try {
+      const generatedText = await itemAssistantService.generateDescription(title, category);
+      setGeneratedDescription(generatedText);
+      setIsDialogOpen(true);
+      NotyfService.showSuccess("Beschreibung erfolgreich generiert.");
+    } catch (err) {
+      console.error("Fehler bei der Generierung:", err);
+      NotyfService.showError("Fehler bei der Generierung der Beschreibung.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+  
+  // Beschreibung übernehmen
+  const handleAcceptDescription = () => {
+    setDescription(generatedDescription);
+    setIsDialogOpen(false);
+  };
 
   if (isLoading) return <Loading />
 
@@ -77,11 +115,32 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
       <div className="space-y-4">
         <TextInput placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
         <TextInput placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
-        <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+        
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <Text>Beschreibung</Text>
+            <Button
+              icon={SparklesIcon}
+              size="xs"
+              color="blue"
+              onClick={handleGenerateDescription}
+              loading={isGenerating}
+              disabled={!title || !category}
+            >
+              KI-Beschreibung generieren
+            </Button>
+          </div>
+          <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
 
         <div className="space-y-2">
-          <Text className="font-medium">Wähle ein neues Image</Text>
-          <input type="file" accept="image/*" onChange={handleImageChange} className="w-full text-sm" />
+          <Text>Bild hochladen</Text>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
         </div>
 
         {(imageFile || existingImage) && (
@@ -89,16 +148,50 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
             <Text className="text-sm text-gray-600 mb-2">Vorschau:</Text>
             <img
               src={imageFile ? URL.createObjectURL(imageFile) : existingImage!}
-              alt="Preview"
-              className="max-w-full h-auto rounded shadow"
+              alt="Vorschau" 
+              className="max-h-40 rounded-md"
             />
           </div>
         )}
       </div>
 
-      <Button color="blue" onClick={handleUpdate}>
+      <Button 
+        color="blue" 
+        onClick={handleUpdate}
+        size="lg"
+        className="w-full"
+      >
         Änderungen speichern
       </Button>
+      
+      {/* Dialog für Beschreibungsvorschau */}
+      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>
+        <DialogPanel>
+          <Title className="mb-4">Generierte Beschreibung</Title>
+          
+          <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
+            <Text>{generatedDescription}</Text>
+          </div>
+          
+          <div className="flex justify-end space-x-2">
+            <Button
+              color="gray"
+              onClick={() => {
+                setIsDialogOpen(false);
+                handleGenerateDescription();
+              }}
+            >
+              Neu generieren
+            </Button>
+            <Button
+              color="blue"
+              onClick={handleAcceptDescription}
+            >
+              Übernehmen
+            </Button>
+          </div>
+        </DialogPanel>
+      </Dialog>
     </Card>
   );
 };
