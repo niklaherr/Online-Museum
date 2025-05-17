@@ -11,6 +11,7 @@ const itemRoutes = require("./routes/items");
 const itemListRoutes = require("./routes/itemLists");
 const editorialRoutes = require("./routes/editorials");
 const activityRoutes = require("./routes/activities");
+const contactFormRoutes = require("./routes/contactForms");
 
 // Import middleware
 const { authenticateJWT } = require("./middleware/auth");
