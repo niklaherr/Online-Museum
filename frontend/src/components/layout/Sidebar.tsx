@@ -21,12 +21,18 @@ const Sidebar = ({ isOpen, setIsOpen } : SidebarProps ) => {
     ];
 
     if (userService.isAdmin()) {
-      navItems.push({
-        path: '/editorial',
-        label: 'Redaktion',
-        icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h2l2-2h6l2 2h2a2 2 0 012 2v12a2 2 0 01-2 2zM7 10h10M7 14h10M7 18h6'
-      });
-    }
+  navItems.push({
+    path: '/editorial',
+    label: 'Redaktion',
+    icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h2l2-2h6l2 2h2a2 2 0 012 2v12a2 2 0 01-2 2zM7 10h10M7 14h10M7 18h6'
+  });
+
+  navItems.push({
+    path: '/support-requests',
+    label: 'Support-Anfragen',
+    icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
+  });
+}
 
   return (
     <div 
