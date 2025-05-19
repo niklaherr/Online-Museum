@@ -31,6 +31,7 @@ import LandingPage from 'pages/LandingPage';
 import EditorialManagement from 'pages/Editorial';
 import EditEditorial from 'components/editorial/EditEditorial';
 import EditorialDetailView from 'components/editorial/EditorialDetailView';
+import AdminManagement from 'pages/AdminManagement';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -209,7 +210,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/items/create"
               element={
@@ -218,8 +218,18 @@ function App() {
                 </ProtectedRoute>
               }
             />
+           {userService.isAdmin() && (
+              <Route
+              path="/editorial"
+              element={
+                <ProtectedRoute>
+                  <EditorialManagement onNavigate={(route) => navigate(route)} />
+                </ProtectedRoute>
+              }
+            />
+            )}
 
-^           {userService.isAdmin() && (
+            {userService.isAdmin() && (
               <>
                 <Route
                   path="/editorial"
@@ -238,6 +248,15 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <AdminManagement/>
+                    </ProtectedRoute>
+                  }
+                />
                 
                 <Route
                   path="/support-requests"
@@ -248,16 +267,8 @@ function App() {
                   }
                 />
               </>
+               
             )}
-
-            <Route
-              path="/editorial/:id"
-              element={
-                <ProtectedRoute>
-                  <EditorialDetailView onNavigate={(route) => navigate(route)} />
-                </ProtectedRoute>
-              }
-            />
            
             
 

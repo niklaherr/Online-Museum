@@ -12,6 +12,7 @@ const itemListRoutes = require("./routes/itemLists");
 const editorialRoutes = require("./routes/editorials");
 const activityRoutes = require("./routes/activities");
 const contactFormRoutes = require("./routes/contact-form");
+const adminRoutes = require("./routes/admin");
 
 // Import middleware
 const { authenticateJWT } = require("./middleware/auth");
@@ -44,6 +45,7 @@ app.use("/", itemListRoutes);
 app.use("/", editorialRoutes);
 app.use("/", activityRoutes);
 app.use("/", contactFormRoutes);
+app.use("/", adminRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
