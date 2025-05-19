@@ -1,122 +1,92 @@
 import User from "interfaces/User";
 import NotyfService from "./NotyfService";
-
-export type AuthResponse = {
-    id: number;
-    username: string;
-    token: string;
-    isAdmin: boolean;
-};
+import { userService } from "./UserService";
 
 class AdminService {
     private baseUrl: string;
-    
+
     constructor() {
         this.baseUrl = process.env.REACT_APP_BACKEND_API_URL || "http://localhost:3001";
     }
-    
+
     async addAdmin(userId: number): Promise<boolean> {
-        // Simulate API call
-        console.log(`Adding admin privileges to user with ID: ${userId}`);
-        
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Simulate success
-        NotyfService.showSuccess("Benutzer wurde erfolgreich zum Administrator ernannt");
-        return true;
+        try {
+            const response = await fetch(`${this.baseUrl}/admin/${userId}`, {
+                method: "PUT",
+                headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userService.getToken()}`
+                },
+                body: JSON.stringify({ isAdmin: true }),
+            });
+
+            if (!response.ok) throw new Error("Failed to assign admin");
+            return true;
+        } catch (error) {
+            console.error("addAdmin error:", error);
+            throw new Error("Problem beim Hinzufügen des Admins");
+        }
     }
-    
+
     async deleteAdmin(userId: number): Promise<boolean> {
-        // Simulate API call
-        console.log(`Removing admin privileges from user with ID: ${userId}`);
-        
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Simulate success
-        NotyfService.showSuccess("Administrator-Status wurde erfolgreich entfernt");
-        return true;
+        try {
+            const response = await fetch(`${this.baseUrl}/admin/${userId}`, {
+                method: "PUT",
+                headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userService.getToken()}`
+                },
+                body: JSON.stringify({ isAdmin: false }),
+            });
+
+            if (!response.ok) throw new Error("Failed to remove admin");
+            return true;
+        } catch (error) {
+            console.error("deleteAdmin error:", error);
+            NotyfService.showError("Fehler beim Entfernen des Admins");
+            return false;
+        }
     }
-    
+
     async searchUsers(query: string): Promise<User[]> {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 700));
-        
-        // Create dummy data
-        const dummyUsers: User[] = [
-            {
-                id: 1,
-                username: "johndoe",
-                token: "dummy-token-1",
-                isAdmin: false
-            },
-            {
-                id: 2,
-                username: "janedoe",
-                token: "dummy-token-2",
-                isAdmin: false
-            },
-            {
-                id: 3,
-                username: "bobsmith",
-                token: "dummy-token-3",
-                isAdmin: false
-            },
-            {
-                id: 4,
-                username: "alicejones",
-                token: "dummy-token-4",
-                isAdmin: false
-            },
-            {
-                id: 5,
-                username: "mikebrown",
-                token: "dummy-token-5",
-                isAdmin: false
-            }
-        ];
-        
-        // Filter by query
-        if (!query) return [];
-        
-        const filteredUsers = dummyUsers.filter(user => 
-            user.username.toLowerCase().includes(query.toLowerCase())
-        );
-        
-        console.log(`Searched for users with query "${query}", found ${filteredUsers.length} results`);
-        return filteredUsers;
+        try {
+            const response = await fetch(`${this.baseUrl}/admin/search?q=${encodeURIComponent(query)}`, {
+                headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userService.getToken()}`
+                },
+            });
+
+            if (!response.ok) throw new Error("Search failed");
+
+            const users: User[] = await response.json();
+            return users;
+        } catch (error) {
+            console.error("searchUsers error:", error);
+            NotyfService.showError("Fehler bei der Benutzersuche");
+            return [];
+        }
     }
-    
+
     async getAdmins(): Promise<User[]> {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 600));
-        
-        // Create dummy admin data
-        const dummyAdmins: User[] = [
-            {
-                id: 6,
-                username: "admin1",
-                token: "admin-token-1",
-                isAdmin: true
-            },
-            {
-                id: 7,
-                username: "admin2",
-                token: "admin-token-2",
-                isAdmin: true
-            },
-            {
-                id: 8,
-                username: "superadmin",
-                token: "admin-token-3",
-                isAdmin: true
-            }
-        ];
-        
-        console.log(`Retrieved ${dummyAdmins.length} administrators`);
-        return dummyAdmins;
+        try {
+            const response = await fetch(`${this.baseUrl}/admin`, {
+                headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userService.getToken()}`
+                },
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch admins");
+
+            const admins: User[] = await response.json();
+            return admins;
+        } catch (error) {
+            console.error("getAdmins error:", error);
+            NotyfService.showError("Fehler beim Abrufen der Administratoren");
+            return [];
+        }
     }
 }
 
-export const adminService = new AdminService()
+export const adminService = new AdminService();
