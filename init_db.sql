@@ -52,7 +52,11 @@ CREATE TABLE activities (
     category TEXT NOT NULL,
     type TEXT NOT NULL,
     entered_on TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    element_id INTEGER
+    element_id INTEGER,
+    user_id INTEGER NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE contact_form (
