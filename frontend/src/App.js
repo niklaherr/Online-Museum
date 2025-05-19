@@ -28,9 +28,8 @@ import ItemDetailView from 'components/gallery/ItemDetailView';
 import { EditItem } from 'components/gallery/EditItem';
 import EditItemList from 'components/itemList/EditItemList';
 import LandingPage from 'pages/LandingPage';
-import EditorialManagement from 'pages/Editorial';
+import EditorialManagement from 'pages/EditorialManagement';
 import EditEditorial from 'components/editorial/EditEditorial';
-import EditorialDetailView from 'components/editorial/EditorialDetailView';
 import AdminManagement from 'pages/AdminManagement';
 
 function App() {

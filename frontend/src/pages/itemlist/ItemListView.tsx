@@ -29,7 +29,12 @@ const ItemListCard = ({ list, onView }: ItemListCardProps) => {
           <h3 className="text-white font-medium truncate">{list.title}</h3>
         </div>
         <div className="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full px-2 py-1 text-xs font-medium">
-          {'editorial' in list ? 'Redaktionell' : (false ? 'Privat' : 'Öffentlich')}
+          {!('isprivate' in list)
+            ? 'Redaktionell'
+            : list.isprivate
+              ? 'Privat'
+              : 'Öffentlich'}
+
         </div>
       </div>
       <div className="p-4">
@@ -58,15 +63,12 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
     const loadData = async () => {
       try {
         // Load regular item lists
-        const fetchedItemLists = await itemService.fetchItemLists();
+        const fetchedItemLists = await itemService.fetchPublicLists();
         setItemLists(fetchedItemLists);
         
         // Filter for user's own item lists
-        const userId = userService.getUserID();
-        if (userId) {
-          const userLists = fetchedItemLists.filter(list => list.user_id === userId);
-          setUserItemLists(userLists);
-        }
+        const userlists = await itemService.fetchUserLists();
+        setUserItemLists(userlists);
 
         const fetchedEditorials = await editorialService.fetchEditorialLists();
         setEditorialLists(fetchedEditorials);

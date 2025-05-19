@@ -35,6 +35,54 @@ class ItemService {
     }
   }
 
+  async fetchPublicLists(): Promise<GalleryItem[]> {
+    const token = userService.getToken();
+    const userID = userService.getUserID();
+    if (!token || !userID) throw new Error("Nicht eingeloggt.");
+  
+    const headers = { Authorization: `Bearer ${token}` };
+  
+    const res = await fetch(`${this.baseUrl}/public/item-lists`, {
+      method: "GET",
+      headers,
+    });
+  
+    if (res.status === 401) {
+      userService.logout(); // Perform logout
+      throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+    }
+  
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Fehler beim Laden der eigenen Items: ${errorText}`);
+    }
+    return await res.json();
+  }
+
+  async fetchUserLists(): Promise<GalleryItem[]> {
+    const token = userService.getToken();
+    const userID = userService.getUserID();
+    if (!token || !userID) throw new Error("Nicht eingeloggt.");
+  
+    const headers = { Authorization: `Bearer ${token}` };
+  
+    const res = await fetch(`${this.baseUrl}/me/item-lists`, {
+      method: "GET",
+      headers,
+    });
+  
+    if (res.status === 401) {
+      userService.logout(); // Perform logout
+      throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+    }
+  
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Fehler beim Laden der eigenen Items: ${errorText}`);
+    }
+    return await res.json();
+  }
+
   async fetchAllItemsWithUsers(): Promise<any[]> {
     const token = userService.getToken();
     const userID = userService.getUserID();

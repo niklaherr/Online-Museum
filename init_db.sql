@@ -18,6 +18,7 @@ CREATE TABLE item (
     image BYTEA,
     description TEXT,
     category VARCHAR(100),
+    isprivate BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_user FOREIGN KEY (user_id)
         REFERENCES users(id)
         ON DELETE CASCADE
@@ -29,6 +30,7 @@ CREATE TABLE item_list (
     description TEXT,
     entered_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_id INTEGER NOT NULL,
+    isprivate BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_user FOREIGN KEY (user_id)
         REFERENCES users(id)
         ON DELETE CASCADE

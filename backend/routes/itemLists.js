@@ -220,4 +220,31 @@ router.delete("/item-lists/:id", authenticateJWT, async (req, res) => {
     }
 });
 
+// Fetch public items
+router.get("/public/item-lists", authenticateJWT, async (req, res) => {
+    const pool = req.app.locals.pool;
+    
+    try {
+        const result = await pool.query("SELECT * FROM item_list WHERE isprivate = false",);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching items");
+    }
+});
+
+// Fetch current user's items
+router.get("/me/item-lists", authenticateJWT, async (req, res) => {
+    const userId = req.user.id;
+    const pool = req.app.locals.pool;
+    
+    try {
+        const result = await pool.query("SELECT * FROM item_list WHERE user_id = $1", [userId]);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching items");
+    }
+});
+
 module.exports = router;
