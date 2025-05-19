@@ -12,13 +12,13 @@ function requireAdmin(req, res, next) {
 }
 
 // Search users by username (Admin only, partial match)
-router.get("/admin/search", authenticateJWT, async (req, res) => {
+router.get("/admin/search", authenticateJWT, requireAdmin, async (req, res) => {
     const pool = req.app.locals.pool;
     const { q } = req.query;
 
     try {
         const result = await pool.query(
-            "SELECT * FROM users WHERE username ILIKE $1 ORDER BY username ASC",
+            "SELECT * FROM users WHERE username ILIKE $1 OR id::TEXT ILIKE $1 ORDER BY username ASC",
             [`%${q}%`]
         );
         res.json(result.rows);
@@ -29,7 +29,7 @@ router.get("/admin/search", authenticateJWT, async (req, res) => {
 });
 
 // Set isAdmin for a user (Admin only)
-router.put("/admin/:id", authenticateJWT, async (req, res) => {
+router.put("/admin/:id", authenticateJWT, requireAdmin, async (req, res) => {
     const pool = req.app.locals.pool;
     const { id } = req.params;
     const { isAdmin } = req.body;
@@ -56,7 +56,7 @@ router.put("/admin/:id", authenticateJWT, async (req, res) => {
 });
 
 // Get all admins (Admin only)
-router.get("/admin", authenticateJWT, async (req, res) => {
+router.get("/admin", authenticateJWT, requireAdmin, async (req, res) => {
     const pool = req.app.locals.pool;
 
     try {

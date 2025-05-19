@@ -145,7 +145,7 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
         
         <div className="flex items-center space-x-2 mb-4">
           <TextInput
-            placeholder="Nach Benutzern suchen (Name, Benutzername, E-Mail...)"
+            placeholder="Nach Benutzern suchen"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-grow"
@@ -179,10 +179,12 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
                     <div className="flex items-center space-x-3 min-w-0">
           
                       {/* Text content aligned left */}
-                      <div className="min-w-0 text-left">
-                        <Text className="font-medium">{user.username}</Text>
-          
-                      </div>
+                      <div>
+                      <Text className="font-medium">{user.username}</Text>
+                      <Text className="text-xs text-gray-400">
+                        ID: {user.id}
+                      </Text>
+                    </div>
                     </div>
           
                     {/* Right: Add Button */}
@@ -228,16 +230,18 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
                   </div>
                   
                   {/* Right: Remove button */}
-                  <div>
-                    <Button
-                      size="sm"
-                      variant="light"
-                      color="red"
-                      icon={TrashIcon}
-                      tooltip="Administrator-Status entfernen"
-                      onClick={() => confirmRemoveAdmin(admin.id)}
-                    />
-                  </div>
+                  {userService.getUserID() !== admin.id && (
+                    <div>
+                      <Button
+                        size="sm"
+                        variant="light"
+                        color="red"
+                        icon={TrashIcon}
+                        tooltip="Administrator-Status entfernen"
+                        onClick={() => confirmRemoveAdmin(admin.id)}
+                      />
+                    </div>
+                  )}
                 </div>
               </Card>
             ))}
