@@ -100,8 +100,8 @@ const PrivacyPolicy = () => {
               Wir behalten uns vor, diese Datenschutzerklärung zu aktualisieren, wenn sich rechtliche Vorgaben oder
               unser Angebot ändern. Über wesentliche Änderungen informieren wir Sie auf unserer Website.
             </Text>
-            <Text className="italic">Stand: Mai 2025</Text>
           </div>
+             <Text className="text-sm text-gray-500 mb-6">Stand: 07. Mai 2025</Text>
         </div>
       </Card>
     </div>

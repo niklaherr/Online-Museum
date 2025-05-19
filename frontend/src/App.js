@@ -19,6 +19,7 @@ import Gallery from './pages/gallery/Gallery';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import HelpSupport from 'pages/legal/HelpSupport';
 import TermsOfUse  from 'pages/legal/TermsOfUse';
+import SupportRequests from 'pages/admin/SupportRequests';
 
 import { userService } from './services/UserService';
 import CreateItemList from 'components/itemList/CreateItemList';

@@ -21,19 +21,25 @@ const Sidebar = ({ isOpen, setIsOpen } : SidebarProps ) => {
     ];
 
     if (userService.isAdmin()) {
-      navItems.push(
+  navItems.push(
         {
-          path: '/editorial',
-          label: 'Redaktion',
-          icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h2l2-2h6l2 2h2a2 2 0 012 2v12a2 2 0 01-2 2zM7 10h10M7 14h10M7 18h6'
+      path: '/editorial',
+      label: 'Redaktion',
+      icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h2l2-2h6l2 2h2a2 2 0 012 2v12a2 2 0 01-2 2zM7 10h10M7 14h10M7 18h6'
         },
         {
           path: '/admin',
           label: 'Admin',
           icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h5v-2c0-.66.42-1.25 1-1.45 1.19-.41 2.48-.55 4-.55s2.81.14 4 .55c.58.2 1 .79 1 1.45v2h5v-2c0-2.66-5.33-4-8-4zm5-4v1h2v-1c0-1.1-.9-2-2-2s-2 .9-2 2v1h2z'
-        }
-      );
     }
+      );
+
+  navItems.push({
+    path: '/support-requests',
+    label: 'Support-Anfragen',
+    icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
+  });
+}
 
   return (
     <div 
