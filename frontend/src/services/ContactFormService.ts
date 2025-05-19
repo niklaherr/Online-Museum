@@ -49,7 +49,7 @@ class ContactFormService {
     }
     
     try {
-      const response = await fetch(`${this.baseUrl}/contact-forms`, {
+      const response = await fetch(`${this.baseUrl}/contact-form`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ class ContactFormService {
     }
     
     try {
-      const response = await fetch(`${this.baseUrl}/contact-forms/${id}/status`, {
+      const response = await fetch(`${this.baseUrl}/contact-form/${id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
