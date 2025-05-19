@@ -19,6 +19,7 @@ import Gallery from './pages/gallery/Gallery';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import HelpSupport from 'pages/legal/HelpSupport';
 import TermsOfUse  from 'pages/legal/TermsOfUse';
+import SupportRequests from 'pages/admin/SupportRequests';
 
 import { userService } from './services/UserService';
 import CreateItemList from 'components/itemList/CreateItemList';
@@ -219,32 +220,34 @@ function App() {
             />
 
 ^           {userService.isAdmin() && (
-              <Route
-              path="/editorial"
-              element={
-                <ProtectedRoute>
-                  <EditorialManagement onNavigate={(route) => navigate(route)} />
-                </ProtectedRoute>
-              }
-            />
-            
-              
-
-              
-            )}
-            {userService.isAdmin() && (
-               <Route
-               path="/editorial/:id/edit"
-               element={
-                 <ProtectedRoute>
-                   <EditEditorial onNavigate={(route) => navigate(route)} />
-                 </ProtectedRoute>
-               }
-             />
-            
-              
-
-              
+              <>
+                <Route
+                  path="/editorial"
+                  element={
+                    <ProtectedRoute>
+                      <EditorialManagement onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route
+                  path="/editorial/:id/edit"
+                  element={
+                    <ProtectedRoute>
+                      <EditEditorial onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route
+                  path="/support-requests"
+                  element={
+                    <ProtectedRoute>
+                      <SupportRequests />
+                    </ProtectedRoute>
+                  }
+                />
+              </>
             )}
 
             <Route

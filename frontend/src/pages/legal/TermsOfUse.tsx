@@ -10,7 +10,6 @@ const TermsOfUse = () => {
     <div className="max-w-4xl mx-auto py-8 px-4">
       <Card>
         <Title className="text-2xl mb-6">Nutzungsbedingungen</Title>
-        <Text className="text-sm text-gray-500 mb-6">Stand: 07. Mai 2025</Text>
 
         <div className="space-y-6">
           {/* Abschnitt 1 */}
@@ -118,6 +117,7 @@ const TermsOfUse = () => {
               Diese Nutzungsbedingungen unterliegen dem Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts. Gerichtsstand für alle Streitigkeiten aus oder im Zusammenhang mit diesen Nutzungsbedingungen ist, soweit gesetzlich zulässig, München.
             </Text>
           </div>
+             <Text className="text-sm text-gray-500 mb-6">Stand: 07. Mai 2025</Text>
         </div>
       </Card>
     </div>
