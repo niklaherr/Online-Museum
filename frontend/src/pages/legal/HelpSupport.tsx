@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Title, Text, Divider, Button, TextInput, Textarea } from '@tremor/react';
+import { Link } from 'react-router-dom';
 import NotyfService from '../../services/NotyfService';
 import { contactFormService, ContactFormData } from '../../services/ContactFormService';
+import SnakeGameModal from '../../components/easter-eggs/SnakeGameModal';
 
 const HelpSupport = () => {
   // Scroll to top on component mount
@@ -17,6 +19,7 @@ const HelpSupport = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSnakeGameOpen, setIsSnakeGameOpen] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -62,6 +65,12 @@ const HelpSupport = () => {
     }
   };
 
+  // Handler für Easter Egg
+  const handleOpenSnakeGame = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default anchor behavior
+    setIsSnakeGameOpen(true);
+  };
+
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
       <Card>
@@ -70,7 +79,7 @@ const HelpSupport = () => {
           <Text>Wir sind für Sie da. Finden Sie Antworten auf häufig gestellte Fragen oder kontaktieren Sie uns direkt.</Text>
           
           <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Häufig gestellte Fragen</h2>
+            <h2 id="haeufigGestellteFragen" className="text-xl font-semibold text-gray-900 mb-4">Häufig gestellte Fragen</h2>
             
             <div className="space-y-4">
               <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
@@ -240,7 +249,13 @@ const HelpSupport = () => {
                 </svg>
                 <h3 className="font-medium mb-1">Benutzerhandbuch</h3>
                 <Text className="text-sm text-gray-500 mb-3">Umfassendes Handbuch für alle Funktionen.</Text>
-                <a href="#" className="text-blue-600 text-sm font-medium hover:underline">PDF herunterladen</a>
+                <a 
+                  href="#" 
+                  onClick={handleOpenSnakeGame} 
+                  className="text-blue-600 text-sm font-medium hover:underline"
+                >
+                  PDF herunterladen
+                </a>
               </div>
               
               <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
@@ -248,8 +263,8 @@ const HelpSupport = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
                 <h3 className="font-medium mb-1">Tipps & Tricks</h3>
-                <Text className="text-sm text-gray-500 mb-3">Nützliche Hinweise für fortgeschrittene Benutzer.</Text>
-                <a href="#" className="text-blue-600 text-sm font-medium hover:underline">Artikel lesen</a>
+                <Text className="text-sm text-gray-500 mb-3">Nützliche Hinweise für neue Benutzer.</Text>
+                <a href="#haeufigGestellteFragen" className="text-blue-600 text-sm font-medium hover:underline">Artikel lesen</a>
               </div>
               
               <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
@@ -258,12 +273,18 @@ const HelpSupport = () => {
                 </svg>
                 <h3 className="font-medium mb-1">Roadmap</h3>
                 <Text className="text-sm text-gray-500 mb-3">Erfahren Sie mehr über geplante Funktionen.</Text>
-                <a href="#" className="text-blue-600 text-sm font-medium hover:underline">Roadmap ansehen</a>
+                <Link to="/roadmap" className="text-blue-600 text-sm font-medium hover:underline">Roadmap ansehen</Link>
               </div>
             </div>
           </section>
         </div>
       </Card>
+      
+      {/* Snake Game Easter Egg Modal */}
+      <SnakeGameModal
+        isOpen={isSnakeGameOpen}
+        onClose={() => setIsSnakeGameOpen(false)}
+      />
     </div>
   );
 };
