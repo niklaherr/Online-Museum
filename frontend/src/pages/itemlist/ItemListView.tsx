@@ -5,8 +5,9 @@ import { useState, useEffect } from 'react';
 import { itemService } from 'services/ItemService';
 import { editorialService } from 'services/EditorialService';
 import NotyfService from 'services/NotyfService';
-import { userService } from 'services/UserService';
 import Loading from 'components/helper/Loading';
+import { Badge, Card, Flex, Title, Text } from '@tremor/react';
+import { SparklesIcon } from '@heroicons/react/24/outline';
 
 type ItemListCardProps = {
   list: ItemList | Editorial;
@@ -15,35 +16,44 @@ type ItemListCardProps = {
 
 const ItemListCard = ({ list, onView }: ItemListCardProps) => {
   return (
-    <div 
-      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+    <Card
+      className="cursor-pointer hover:shadow-lg transition-shadow"
       onClick={() => onView(list.id, 'editorial' in list ? 'editorial' : 'item-list')}
     >
-      <div className="h-40 bg-gray-200 relative">
-        <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-500">
-            <svg className="w-16 h-16 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-3">
-          <h3 className="text-white font-medium truncate">{list.title}</h3>
+      <div className="h-40 w-full relative mb-4 rounded-lg bg-blue-100 flex items-center justify-center">
+        <SparklesIcon className="w-16 h-16 text-blue-500 opacity-40" />
+
+        {/* Overlay Title */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 rounded-b-lg">
+          <Title className="text-white truncate">{list.title}</Title>
         </div>
-        <div className="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full px-2 py-1 text-xs font-medium">
-          {!('isprivate' in list)
+
+        {/* Badge Status */}
+        <div className="absolute top-2 right-2">
+          <Badge color={!('isprivate' in list)
+            ? "indigo"
+            : list.isprivate
+              ? "gray"
+              : "amber"}>
+            {!('isprivate' in list)
             ? 'Redaktionell'
             : list.isprivate
               ? 'Privat'
               : 'Öffentlich'}
-
+          </Badge>
         </div>
       </div>
-      <div className="p-4">
-        <p className="text-gray-500 text-sm mb-2">
+
+      <Flex flexDirection="col" alignItems="start" justifyContent="start" className="space-y-1">
+        <Text className="text-gray-500 text-sm">
           Erstellt am {new Date(list.entered_on).toLocaleDateString()}
-        </p>
-        <p className="text-gray-700 line-clamp-2 text-sm">{list.description}</p>
-      </div>
-    </div>
+        </Text>
+        <Text className="text-sm text-gray-700 line-clamp-2">
+          {list.description}
+        </Text>
+      </Flex>
+    </Card>
+
   );
 };
 
