@@ -118,7 +118,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
         </div>
       </div>
       
-      {categories.length > 0 ? (
+      {categories.length > 0 && (
         <div className="space-y-10">
           {categories.map((category) => (
             <div key={category} className="space-y-4">
@@ -177,8 +177,6 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
             </div>
           ))}
         </div>
-      ) : (
-        <NoResults />
       )}
 
       {userItems.length > 0 && (
@@ -237,8 +235,6 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
             </div>
         </div>
       )}
-
-      
     </div>
   );
 };
