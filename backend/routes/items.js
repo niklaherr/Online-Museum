@@ -150,7 +150,7 @@ router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, re
 
     try {
         const fields = ["title", "description", "category"];
-        const values = [title, description || null, category || null, isprivate];
+        const values = [title, description || null, category || null, isprivate === 'true'];
         let query = `UPDATE item SET title = $1, description = $2, category = $3, isprivate = $4`;
         let paramIndex = 5;
 
@@ -160,18 +160,23 @@ router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, re
             paramIndex++;
         }
 
-        
         query += ` WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *`;
         values.push(id, req.user.id);
 
         const result = await pool.query(query, values);
 
-        if (result.rows.length === 0) return res.status(404).send("Item not found or not authorized");
+        if (result.rows.length === 0)
+            return res.status(404).send("Item not found or not authorized");
+
+        // Remove from editorial list if now private
+        if (isprivate === 'true' || isprivate === true) {
+            await pool.query(`DELETE FROM item_editorial WHERE item_id = $1`, [id]);
+        }
 
         await createActivity(pool, {
-            category: "ITEM", 
-            element_id: id, 
-            type: "UPDATE", 
+            category: "ITEM",
+            element_id: id,
+            type: "UPDATE",
             user_id: req.user.id
         });
 
@@ -216,20 +221,6 @@ router.delete("/items/:id", authenticateJWT, async (req, res) => {
     }
 });
 
-// Fetch current user's items
-router.get("/me/items", authenticateJWT, async (req, res) => {
-    const userId = req.user.id;
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query("SELECT * FROM item WHERE user_id = $1", [userId]);
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching items");
-    }
-});
-
 // Search for items across all users
 router.get("/items-search", authenticateJWT, async (req, res) => {
     const query = req.query.q;
@@ -247,11 +238,11 @@ router.get("/items-search", authenticateJWT, async (req, res) => {
         FROM item i
         JOIN users u ON i.user_id = u.id
         WHERE 
-            i.title ILIKE $1 OR 
+            (i.title ILIKE $1 OR 
             i.description ILIKE $1 OR 
             i.category ILIKE $1 OR
             u.username ILIKE $1 OR
-            i.id::TEXT ILIKE $1
+            i.id::TEXT ILIKE $1) AND i.isprivate = false
         ORDER BY i.entered_on DESC
         `;
         

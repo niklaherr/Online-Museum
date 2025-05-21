@@ -569,11 +569,16 @@ class ItemService {
 
   async fetchItemDataCounting(): Promise<DateCount[]> {
     const token = userService.getToken();
-    if (!token) throw new Error("Nicht eingeloggt.");
+    const userID = userService.getUserID();
+    if (!token || !userID) throw new Error("Nicht eingeloggt.");
   
     const headers = { Authorization: `Bearer ${token}` };
     try {
-      const res = await fetch(`${this.baseUrl}/me/items`, {
+
+      const url = new URL(`${this.baseUrl}/items-filter`);
+      url.searchParams.append("user_id", userID.toString());
+
+      const res = await fetch(url.toString(), {
         method: "GET",
         headers,
       });

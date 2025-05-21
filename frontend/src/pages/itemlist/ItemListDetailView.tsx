@@ -11,7 +11,7 @@ import {
   DialogPanel,
   Flex
 } from "@tremor/react";
-import { UserIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { UserIcon, TrashIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import ItemList from "interfaces/ItemList";
 import { itemService } from "services/ItemService";
@@ -79,7 +79,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
             <Title className="text-blue-800">{list?.title}</Title>
             <Subtitle className="text-blue-700 mt-1">{list?.description}</Subtitle>
             <Text className="text-blue-700 mt-2">
-              Erstellt am: {list?.entered_on} • {list?.isprivate ? "Privat" : "Öffentlich"}
+              Erstellt am: {list ? new Date(list?.entered_on).toLocaleDateString() : "/"} • {list?.isprivate ? "Privat" : "Öffentlich"}
             </Text>
           </div>
 
@@ -104,9 +104,18 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
               className="p-4 cursor-pointer hover:shadow-md transition"
               onClick={() => onNavigate(`/items/${item.id}`)}
             >
-              <Text className="text-sm font-semibold text-blue-500 uppercase">
-                {item.category}
-              </Text>
+              <div className="flex justify-between items-center">
+                <Text className="text-sm font-semibold text-blue-500 uppercase">
+                  {item.category}
+                </Text>
+                {item.isprivate && (
+                  <div className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                    <LockClosedIcon className="w-4 h-4" />
+                    Privat
+                  </div>
+                )}
+              </div>
+
               <Title className="mt-2">{item.title}</Title>
               <Text className="text-xs text-gray-500 mt-1">
                 Eingetragen am: {item.entered_on}

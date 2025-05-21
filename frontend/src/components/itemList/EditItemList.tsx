@@ -9,6 +9,7 @@ import {
   Text,
   Dialog,
   DialogPanel,
+  Flex,
 } from "@tremor/react";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import Item from "interfaces/Item";
@@ -33,6 +34,7 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUpdateConfirmOpen, setIsUpdateConfirmOpen] = useState(false);
   const [generatedDescription, setGeneratedDescription] = useState("");
 
   useEffect(() => {
@@ -210,10 +212,11 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
         ))}
       </div>
 
-      <Button color="blue" onClick={handleUpdate}>
+      <Button color="blue" onClick={() => setIsUpdateConfirmOpen(true)}>
         Änderungen speichern
       </Button>
 
+      {/* Dialog: Beschreibungsvorschau */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>
         <DialogPanel>
           <Title className="mb-4">Generierte Beschreibung</Title>
@@ -234,6 +237,31 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
               Übernehmen
             </Button>
           </div>
+        </DialogPanel>
+      </Dialog>
+
+      {/* Dialog: Bestätigung vor Update */}
+      <Dialog open={isUpdateConfirmOpen} onClose={() => setIsUpdateConfirmOpen(false)}>
+        <DialogPanel className="max-w-sm bg-white rounded-xl shadow-md p-6">
+          <Title>Änderungen speichern?</Title>
+          <Text>
+            Bist du sicher, dass du die Änderungen an dieser Liste speichern möchtest?
+          </Text>
+          <Flex justifyContent="end" className="mt-6 space-x-2">
+            <Button variant="secondary" onClick={() => setIsUpdateConfirmOpen(false)}>
+              Abbrechen
+            </Button>
+            <Button
+              color="blue"
+              variant="primary"
+              onClick={() => {
+                setIsUpdateConfirmOpen(false);
+                handleUpdate();
+              }}
+            >
+              Ja, speichern
+            </Button>
+          </Flex>
         </DialogPanel>
       </Dialog>
     </Card>

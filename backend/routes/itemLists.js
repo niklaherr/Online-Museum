@@ -47,39 +47,49 @@ router.get("/me/item-lists", authenticateJWT, async (req, res) => {
     }
 });
 
-// Get items by item_list_id
+// Get items by item_list_id with privacy check
 router.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) => {
-    const { item_list_id } = req.params;
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query(
-            `SELECT item.id, item.title, item.category, item.entered_on, item.description, item.user_id, item.image, users.username
-             FROM item
-             JOIN item_itemlist ON item.id = item_itemlist.item_id
-             JOIN users ON item.user_id = users.id
-             WHERE item_itemlist.item_list_id = $1
-             ORDER BY item.entered_on DESC`,
-            [item_list_id]
-        );
+  const { item_list_id } = req.params;
+  const requestingUserId = req.user.id;
+  const pool = req.app.locals.pool;
 
-        const items = result.rows.map(item => ({
-            id: item.id,
-            user_id: item.user_id,
-            title: item.title,
-            entered_on: item.entered_on,
-            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
-            description: item.description,
-            category: item.category,
-            username: item.username,
-        }));
+  try {
+    const query = `
+      SELECT 
+        item.id, item.title, item.category, item.entered_on, item.description, 
+        item.user_id, item.image, item.isprivate, users.username
+      FROM item
+      JOIN item_itemlist ON item.id = item_itemlist.item_id
+      JOIN users ON item.user_id = users.id
+      WHERE item_itemlist.item_list_id = $1
+      AND (
+        item.user_id = $2 OR
+        item.isprivate = false
+      )
+      ORDER BY item.entered_on DESC
+    `;
 
-        res.json(items);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching items");
-    }
+    const result = await pool.query(query, [item_list_id, requestingUserId]);
+
+    const items = result.rows.map(item => ({
+      id: item.id,
+      user_id: item.user_id,
+      title: item.title,
+      entered_on: item.entered_on,
+      image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
+      description: item.description,
+      category: item.category,
+      username: item.username,
+      isprivate: item.isprivate,
+    }));
+
+    res.json(items);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching items");
+  }
 });
+
 
 // Create a new item list and link items to it
 router.post("/item-lists", authenticateJWT, async (req, res) => {

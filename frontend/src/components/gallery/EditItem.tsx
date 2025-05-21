@@ -9,6 +9,7 @@ import {
   Text,
   Dialog,
   DialogPanel,
+  Flex,
 } from "@tremor/react";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import { itemService } from "../../services/ItemService";
@@ -29,14 +30,13 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [existingImage, setExistingImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPrivate, setIsPrivate] = useState(false);
 
-  // State für KI-Beschreibung
+  // Dialog states
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUpdateConfirmOpen, setIsUpdateConfirmOpen] = useState(false);
   const [generatedDescription, setGeneratedDescription] = useState("");
-
-  //State für Privat-Toggle
-  const [isPrivate, setIsPrivate] = useState(false);
 
   useEffect(() => {
     const loadItem = async () => {
@@ -45,8 +45,8 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
         setTitle(item.title);
         setCategory(item.category);
         setDescription(item.description);
-        setExistingImage(item.image); // assuming image is a URL string
-        setIsPrivate(item.isprivate); // Set private state from item data
+        setExistingImage(item.image);
+        setIsPrivate(item.isprivate);
         setIsLoading(false);
       } catch (error) {
         let errorMessage = "Fehler beim Laden der Item Informationen";
@@ -73,11 +73,11 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
       formData.append("title", title);
       formData.append("category", category);
       formData.append("description", description);
-      formData.append("isprivate", isPrivate.toString()); // Append private flag
+      formData.append("isprivate", isPrivate.toString());
       if (imageFile) formData.append("image", imageFile);
 
       await itemService.updateItem(parseInt(id!), formData);
-      NotyfService.showSuccess("Item successfully updated.");
+      NotyfService.showSuccess("Item erfolgreich aktualisiert.");
       onNavigate("/items");
     } catch (error) {
       let errorMessage = "Fehler beim Aktualisieren des Items";
@@ -88,7 +88,6 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
     }
   };
 
-  // KI-Beschreibung generieren
   const handleGenerateDescription = async () => {
     if (!title.trim()) {
       NotyfService.showError("Bitte gib zuerst einen Titel ein.");
@@ -103,10 +102,7 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
     setIsGenerating(true);
 
     try {
-      const generatedText = await itemAssistantService.generateDescription(
-        title,
-        category
-      );
+      const generatedText = await itemAssistantService.generateDescription(title, category);
       setGeneratedDescription(generatedText);
       setIsDialogOpen(true);
       NotyfService.showSuccess("Beschreibung erfolgreich generiert.");
@@ -118,7 +114,6 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
     }
   };
 
-  // Beschreibung übernehmen
   const handleAcceptDescription = () => {
     setDescription(generatedDescription);
     setIsDialogOpen(false);
@@ -183,7 +178,6 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
           </div>
         )}
 
-        {/* Privat toggle */}
         <div className="flex items-center justify-between">
           <Text>Item privat machen</Text>
           <label className="flex items-center cursor-pointer">
@@ -197,7 +191,7 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
         </div>
       </div>
 
-      <Button color="blue" onClick={handleUpdate} size="lg" className="w-full">
+      <Button color="blue" onClick={() => setIsUpdateConfirmOpen(true)} size="lg" className="w-full">
         Änderungen speichern
       </Button>
 
@@ -205,11 +199,9 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>
         <DialogPanel>
           <Title className="mb-4">Generierte Beschreibung</Title>
-
           <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
             <Text>{generatedDescription}</Text>
           </div>
-
           <div className="flex justify-end space-x-2">
             <Button
               color="gray"
@@ -224,6 +216,31 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
               Übernehmen
             </Button>
           </div>
+        </DialogPanel>
+      </Dialog>
+
+      {/* Dialog für Update-Bestätigung */}
+      <Dialog open={isUpdateConfirmOpen} onClose={() => setIsUpdateConfirmOpen(false)}>
+        <DialogPanel className="max-w-sm bg-white rounded-xl shadow-md p-6">
+          <Title>Änderungen speichern?</Title>
+          <Text>
+            Bist du sicher, dass du die Änderungen an diesem Item speichern möchtest?
+          </Text>
+          <Flex justifyContent="end" className="mt-6 space-x-2">
+            <Button variant="secondary" onClick={() => setIsUpdateConfirmOpen(false)}>
+              Abbrechen
+            </Button>
+            <Button
+              color="blue"
+              variant="primary"
+              onClick={() => {
+                setIsUpdateConfirmOpen(false);
+                handleUpdate();
+              }}
+            >
+              Ja, speichern
+            </Button>
+          </Flex>
         </DialogPanel>
       </Dialog>
     </Card>
