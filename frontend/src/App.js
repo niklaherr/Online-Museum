@@ -33,6 +33,7 @@ import EditorialManagement from 'pages/EditorialManagement';
 import EditEditorial from 'components/editorial/EditEditorial';
 import AdminManagement from 'pages/AdminManagement';
 import EditorialDetailView from 'components/editorial/EditorialDetailView';
+import Impressum from 'pages/legal/Impressum';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -277,7 +278,7 @@ function App() {
             <Route path="/helpsupport" element={<HelpSupport />} />
             <Route path="/termsofuse" element={<TermsOfUse />} />
             <Route path="/roadmap" element={<Roadmap />} />
-
+            <Route path="/impressum" element={<Impressum />} />
             <Route
                path="*"
                element={
