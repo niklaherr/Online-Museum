@@ -117,30 +117,34 @@ class ItemService {
     }
   }
 
-  async fetchOwnItems(): Promise<Item[]> {
+  async fetchOwnItems(): Promise<GalleryItem[]> {
     const token = userService.getToken();
     const userID = userService.getUserID();
     if (!token || !userID) throw new Error("Nicht eingeloggt.");
-  
+
     const headers = { Authorization: `Bearer ${token}` };
-  
-    const res = await fetch(`${this.baseUrl}/items?user_id=${userID}`, {
+
+    const url = new URL(`${this.baseUrl}/items-filter`);
+    url.searchParams.append("user_id", userID.toString());
+
+    const res = await fetch(url.toString(), {
       method: "GET",
       headers,
     });
-  
+
     if (res.status === 401) {
       userService.logout(); // Perform logout
       throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
     }
-  
+
     if (!res.ok) {
       const errorText = await res.text();
       throw new Error(`Fehler beim Laden der eigenen Items: ${errorText}`);
     }
-  
+
     return await res.json();
   }
+
   
 
   async fetchItemById(itemId: number): Promise<GalleryItem> {
@@ -176,6 +180,36 @@ class ItemService {
       throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
     }
   }
+
+  async fetchItemsNotOwnedByUser(): Promise<GalleryItem[]> {
+    const token = userService.getToken();
+    const userID = userService.getUserID();
+    if (!token || !userID) throw new Error("Nicht eingeloggt.");
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const url = new URL(`${this.baseUrl}/items-filter`);
+    url.searchParams.append("exclude_user_id", userID.toString());
+    url.searchParams.append("isprivate", false.toString());
+
+    const res = await fetch(url.toString(), {
+      method: "GET",
+      headers,
+    });
+
+    if (res.status === 401) {
+      userService.logout();
+      throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+    }
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Fehler beim Laden der fremden Items: ${errorText}`);
+    }
+
+    return await res.json();
+  }
+
 
   async fetchItemLists(): Promise<ItemList[]> {
     const token = userService.getToken();

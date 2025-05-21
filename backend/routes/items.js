@@ -276,4 +276,101 @@ router.get("/items-search", authenticateJWT, async (req, res) => {
     }
 });
 
+// GET /items/filter - Flexible filter for any item field
+router.get("/items-filter", authenticateJWT, async (req, res) => {
+    const pool = req.app.locals.pool;
+
+    const {
+        title,
+        description,
+        category,
+        isprivate,
+        username,
+        id,
+        user_id,
+        entered_on,
+        exclude_user_id
+    } = req.query;
+
+    try {
+        const conditions = [];
+        const values = [];
+
+        if (title) {
+            values.push(`%${title}%`);
+            conditions.push(`i.title ILIKE $${values.length}`);
+        }
+
+        if (description) {
+            values.push(`%${description}%`);
+            conditions.push(`i.description ILIKE $${values.length}`);
+        }
+
+        if (category) {
+            values.push(`%${category}%`);
+            conditions.push(`i.category ILIKE $${values.length}`);
+        }
+
+        if (isprivate !== undefined) {
+            values.push(isprivate === "true");
+            conditions.push(`i.isprivate = $${values.length}`);
+        }
+
+        if (username) {
+            values.push(`%${username}%`);
+            conditions.push(`u.username ILIKE $${values.length}`);
+        }
+
+        if (id) {
+            values.push(id);
+            conditions.push(`i.id = $${values.length}`);
+        }
+
+        if (user_id) {
+            values.push(user_id);
+            conditions.push(`i.user_id = $${values.length}`);
+        }
+
+        if (entered_on) {
+            values.push(entered_on);
+            conditions.push(`DATE(i.entered_on) = DATE($${values.length})`);
+        }
+
+        if (exclude_user_id) {
+            values.push(exclude_user_id);
+            conditions.push(`i.user_id != $${values.length}`);
+        }
+
+        const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+        const sqlQuery = `
+            SELECT i.*, u.username
+            FROM item i
+            JOIN users u ON i.user_id = u.id
+            ${whereClause}
+            ORDER BY i.entered_on DESC;
+        `;
+
+        const result = await pool.query(sqlQuery, values);
+
+        const items = result.rows.map(item => ({
+            id: item.id,
+            title: item.title,
+            category: item.category,
+            entered_on: item.entered_on,
+            description: item.description,
+            user_id: item.user_id,
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString("base64")}` : '',
+            username: item.username,
+            isprivate: item.isprivate
+        }));
+
+        res.json(items);
+    } catch (err) {
+        console.error("Error filtering items:", err);
+        res.status(500).send("Error filtering items");
+    }
+});
+
+
 module.exports = router;
