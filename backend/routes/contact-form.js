@@ -34,7 +34,7 @@ router.post("/contact-form", async (req, res) => {
 });
 
 // Get all contact form submissions (admin only)
-router.get("/contact-forms", authenticateJWT, async (req, res) => {
+router.get("/contact-form", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
     
     // Check if user is admin
@@ -56,7 +56,7 @@ router.get("/contact-forms", authenticateJWT, async (req, res) => {
 });
 
 // Update contact form status (admin only)
-router.put("/contact-forms/:id/status", authenticateJWT, async (req, res) => {
+router.put("/contact-form/:id/status", authenticateJWT, async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     const pool = req.app.locals.pool;

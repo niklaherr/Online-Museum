@@ -6,6 +6,7 @@ export default interface Item {
     image: string;
     description: string;
     category: string;
+    isprivate: boolean;
   };  
 
 export interface GalleryItem extends Item {

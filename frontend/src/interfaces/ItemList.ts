@@ -4,4 +4,5 @@ export default interface ItemList {
   description: string;
   entered_on: string;
   user_id: number;
+  isprivate: boolean;
 }

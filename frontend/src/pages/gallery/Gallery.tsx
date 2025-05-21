@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, Text, Title } from "@tremor/react";
-import { UserIcon } from "@heroicons/react/24/outline";
+import { LockClosedIcon, UserIcon } from "@heroicons/react/24/outline";
 import { userService } from "../../services/UserService";
 import Item, { GalleryItem } from "../../interfaces/Item";
 import { itemService } from "../../services/ItemService";
@@ -31,6 +31,7 @@ const groupItemsByCategory = (items: GalleryItem[]) => {
 
 const Gallery = ({ onNavigate }: GalleryProps) => {
   const [museumItems, setMuseumItems] = useState<GalleryItem[]>([]);
+  const [userItems, setUserItems] = useState<GalleryItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams] = useSearchParams();
@@ -38,8 +39,10 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
 
   const loadItems = async () => {
     try {
-      const items = await itemService.fetchAllItemsWithUsers();
+      const items = await itemService.fetchItemsNotOwnedByUser();
       setMuseumItems(items);
+      const userItems = await itemService.fetchOwnItems();
+      setUserItems(userItems);
       setIsLoading(false);
     } catch (error) {
       let errorMessage = "Fehler beim Laden der Items"
@@ -115,8 +118,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
         </div>
       </div>
       
-      {/* Items nach Kategorien gruppiert anzeigen */}
-      {categories.length > 0 ? (
+      {categories.length > 0 && (
         <div className="space-y-10">
           {categories.map((category) => (
             <div key={category} className="space-y-4">
@@ -137,10 +139,13 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
                     onClick={() => onNavigate('/items/' + item.id)}
                   >
                     <div>
-                      <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
-                        {item.category || "Unkategorisiert"}
-                      </Text>
-                      <Text className="mt-2 text-lg font-semibold line-clamp-2">{item.title}</Text>
+                      <div className="flex items-center justify-between">
+                <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
+                          {item.category || "Unkategorisiert"}
+                        </Text>
+              </div>
+
+              <Text className="mt-2 text-lg font-semibold line-clamp-2">{item.title}</Text>
                       <Text className="text-sm text-gray-500 mt-1">
                         {new Date(item.entered_on).toLocaleDateString()}
                       </Text>
@@ -172,8 +177,63 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
             </div>
           ))}
         </div>
-      ) : (
-        <NoResults />
+      )}
+
+      {userItems.length > 0 && (
+        <div className="space-y-10">
+          <div className="space-y-4">
+              <div className="border-b border-gray-200 pb-2 space-y-10">
+                <Title className="text-xl font-bold text-gray-800">
+                  Meine Items
+                </Title>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {userItems.map((item) => (
+                  <Card
+                    key={item.id}
+                    className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
+                    onClick={() => onNavigate('/items/' + item.id)}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
+                          {item.category || "Unkategorisiert"}
+                        </Text>
+                        {item.isprivate && (
+                  <div className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                    <LockClosedIcon className="w-4 h-4" />
+                    Privat
+                  </div>
+                )}
+              </div>
+
+              <Text className="mt-2 text-lg font-semibold line-clamp-2">{item.title}</Text>
+                      <Text className="text-sm text-gray-500 mt-1">
+                        {new Date(item.entered_on).toLocaleDateString()}
+                      </Text>
+                    </div>
+
+                    <div className="mt-2">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-40 object-cover rounded-lg border border-gray-300"
+                        />
+                      ) : (
+                        <div className="w-full h-40 bg-gray-100 rounded-lg border border-gray-300 flex items-center justify-center text-gray-400">
+                          <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+        </div>
       )}
     </div>
   );

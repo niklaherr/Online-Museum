@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
-import { Card, Title, TextInput, Textarea, Button, Text, Dialog, DialogPanel, Flex } from "@tremor/react";
+import {
+  Card,
+  Title,
+  TextInput,
+  Textarea,
+  Button,
+  Text,
+  Dialog,
+  DialogPanel,
+  Flex,
+} from "@tremor/react";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import Item from "interfaces/Item";
 import { itemService } from "services/ItemService";
@@ -15,8 +25,8 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
   const [description, setDescription] = useState("");
   const [userItems, setUserItems] = useState<Item[]>([]);
   const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
-  
-  // Neuer State für KI-Beschreibung
+  const [isPrivate, setIsPrivate] = useState(false);
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [generatedDescription, setGeneratedDescription] = useState("");
@@ -46,57 +56,58 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     }
 
     try {
-      await itemService.createItemList({ 
-        title: title, 
-        description: description, 
-        item_ids: selectedItemIds 
+      await itemService.createItemList({
+        title: title,
+        description: description,
+        item_ids: selectedItemIds,
+        is_private: isPrivate,
       });
       NotyfService.showSuccess("Liste erfolgreich erstellt.");
-      onNavigate('/item-list')
+      onNavigate("/item-list");
       setTitle("");
       setDescription("");
       setSelectedItemIds([]);
+      setIsPrivate(false);
     } catch (err: any) {
       NotyfService.showError(err.message || "Fehler beim Erstellen der Liste.");
     }
   };
-  
-  // KI-Beschreibung generieren basierend auf ausgewählten Items
+
   const handleGenerateDescription = async () => {
     if (!title.trim()) {
       NotyfService.showError("Bitte gib zuerst einen Titel ein.");
       return;
     }
-    
+
     if (selectedItemIds.length === 0) {
       NotyfService.showError("Bitte wähle zuerst mindestens ein Item aus.");
       return;
     }
-    
+
     setIsGenerating(true);
-    
+
     try {
-      // Sammle detaillierte Informationen über die ausgewählten Items
-      const selectedItems = userItems.filter(item => selectedItemIds.includes(item.id));
-      
-      // Erstelle einen umfassenderen Prompt mit Titeln, Kategorien und Beschreibungen
+      const selectedItems = userItems.filter((item) =>
+        selectedItemIds.includes(item.id)
+      );
+
       let promptText = `Erstelle eine ansprechende Beschreibung für eine Sammlung mit dem Titel "${title}". `;
-      
-      // Füge Details zu jedem ausgewählten Item hinzu
       promptText += "Die Sammlung enthält folgende Elemente:\n";
-      
-      selectedItems.forEach(item => {
+
+      selectedItems.forEach((item) => {
         promptText += `- ${item.title}`;
         if (item.category) promptText += ` (Kategorie: ${item.category})`;
         if (item.description) promptText += `: ${item.description}`;
         promptText += "\n";
       });
-      
-      // Füge Anweisungen für die KI hinzu
-      promptText += "\nBitte erstelle basierend auf diesen Informationen eine zusammenfassende Beschreibung, die die Einzigartigkeit dieser Sammlung in 2-3 Sätzen hervorhebt.";
-      
-      // Rufe die KI mit dem Titel und dem umfassenden Prompt auf
-      const generatedText = await itemAssistantService.generateDescription(title, promptText);
+
+      promptText +=
+        "\nBitte erstelle basierend auf diesen Informationen eine zusammenfassende Beschreibung, die die Einzigartigkeit dieser Sammlung in 2-3 Sätzen hervorhebt.";
+
+      const generatedText = await itemAssistantService.generateDescription(
+        title,
+        promptText
+      );
       setGeneratedDescription(generatedText);
       setIsDialogOpen(true);
       NotyfService.showSuccess("Beschreibung erfolgreich generiert.");
@@ -107,8 +118,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
       setIsGenerating(false);
     }
   };
-  
-  // Beschreibung übernehmen
+
   const handleAcceptDescription = () => {
     setDescription(generatedDescription);
     setIsDialogOpen(false);
@@ -146,9 +156,23 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
         />
       </div>
 
+      <div className="flex items-center justify-between">
+        <Text>Liste privat machen</Text>
+        <label className="flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            className="form-checkbox h-5 w-5 text-blue-600"
+            checked={isPrivate}
+            onChange={() => setIsPrivate(!isPrivate)}
+          />
+        </label>
+      </div>
+
       <div className="space-y-2">
         <Title className="text-base">Items auswählen</Title>
-        {userItems.length === 0 && <p className="text-sm text-gray-500">Keine Items vorhanden.</p>}
+        {userItems.length === 0 && (
+          <p className="text-sm text-gray-500">Keine Items vorhanden.</p>
+        )}
         {userItems.map((item) => (
           <div key={item.id} className="flex items-center space-x-2">
             <input
@@ -165,24 +189,19 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
         ))}
       </div>
 
-      <Button 
-        color="blue" 
-        onClick={handleSubmit}
-        size="lg"
-        className="w-full"
-      >
+      <Button color="blue" onClick={handleSubmit} size="lg" className="w-full">
         Liste erstellen
       </Button>
-      
+
       {/* Dialog für Beschreibungsvorschau */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>
         <DialogPanel>
           <Title className="mb-4">Generierte Beschreibung</Title>
-          
+
           <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
             <Text>{generatedDescription}</Text>
           </div>
-          
+
           <div className="flex justify-end space-x-2">
             <Button
               color="gray"
@@ -193,10 +212,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
             >
               Neu generieren
             </Button>
-            <Button
-              color="blue"
-              onClick={handleAcceptDescription}
-            >
+            <Button color="blue" onClick={handleAcceptDescription}>
               Übernehmen
             </Button>
           </div>

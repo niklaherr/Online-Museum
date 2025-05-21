@@ -16,6 +16,7 @@ router.get("/items/no-auth", async (req, res) => {
             SELECT item.*, users.username 
             FROM item
             JOIN users ON item.user_id = users.id
+            WHERE item.isprivate = false
             ORDER BY item.entered_on DESC
             LIMIT 5;
         `;
@@ -29,7 +30,8 @@ router.get("/items/no-auth", async (req, res) => {
             description: item.description,
             user_id: item.user_id,
             image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
-            username: item.username
+            username: item.username,
+            isprivate: item.isprivate
         }));
 
         res.json(items);
@@ -59,7 +61,8 @@ router.get("/items", authenticateJWT, async (req, res) => {
             description: item.description,
             user_id: item.user_id,
             image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
-            username: item.username
+            username: item.username,
+            isprivate: item.isprivate
         }));
 
         res.json(items);
@@ -95,6 +98,7 @@ router.get("/items/:id", authenticateJWT, async (req, res) => {
             description: item.description,
             category: item.category,
             username: item.username,
+            isprivate: item.isprivate
         });
     } catch (err) {
         console.error(err);
@@ -104,7 +108,7 @@ router.get("/items/:id", authenticateJWT, async (req, res) => {
 
 // Create a new item with image upload
 router.post("/items", authenticateJWT, upload.single("image"), async (req, res) => {
-    const { title, description, category } = req.body;
+    const { title, description, category, isprivate } = req.body;
     const image = req.file ? req.file.buffer : null;
     const pool = req.app.locals.pool;
 
@@ -112,10 +116,10 @@ router.post("/items", authenticateJWT, upload.single("image"), async (req, res) 
 
     try {
         const result = await pool.query(
-            `INSERT INTO item (user_id, title, image, description, category)
-             VALUES ($1, $2, $3, $4, $5)
+            `INSERT INTO item (user_id, title, image, description, category, isprivate)
+             VALUES ($1, $2, $3, $4, $5, $6)
              RETURNING *`,
-            [req.user.id, title, image, description || null, category || null]
+            [req.user.id, title, image, description || null, category || null, isprivate]
         );
         
         const newItem = result.rows[0];
@@ -137,7 +141,7 @@ router.post("/items", authenticateJWT, upload.single("image"), async (req, res) 
 
 // Update an existing item, optionally replacing its image
 router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, res) => {
-    const { title, description, category } = req.body;
+    const { title, description, category, isprivate } = req.body;
     const { id } = req.params;
     const image = req.file ? req.file.buffer : null;
     const pool = req.app.locals.pool;
@@ -146,9 +150,9 @@ router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, re
 
     try {
         const fields = ["title", "description", "category"];
-        const values = [title, description || null, category || null];
-        let query = `UPDATE item SET title = $1, description = $2, category = $3`;
-        let paramIndex = 4;
+        const values = [title, description || null, category || null, isprivate === 'true'];
+        let query = `UPDATE item SET title = $1, description = $2, category = $3, isprivate = $4`;
+        let paramIndex = 5;
 
         if (image) {
             query += `, image = $${paramIndex}`;
@@ -161,12 +165,18 @@ router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, re
 
         const result = await pool.query(query, values);
 
-        if (result.rows.length === 0) return res.status(404).send("Item not found or not authorized");
+        if (result.rows.length === 0)
+            return res.status(404).send("Item not found or not authorized");
+
+        // Remove from editorial list if now private
+        if (isprivate === 'true' || isprivate === true) {
+            await pool.query(`DELETE FROM item_editorial WHERE item_id = $1`, [id]);
+        }
 
         await createActivity(pool, {
-            category: "ITEM", 
-            element_id: id, 
-            type: "UPDATE", 
+            category: "ITEM",
+            element_id: id,
+            type: "UPDATE",
             user_id: req.user.id
         });
 
@@ -211,20 +221,6 @@ router.delete("/items/:id", authenticateJWT, async (req, res) => {
     }
 });
 
-// Fetch current user's items
-router.get("/me/items", authenticateJWT, async (req, res) => {
-    const userId = req.user.id;
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query("SELECT * FROM item WHERE user_id = $1", [userId]);
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching items");
-    }
-});
-
 // Search for items across all users
 router.get("/items-search", authenticateJWT, async (req, res) => {
     const query = req.query.q;
@@ -242,11 +238,11 @@ router.get("/items-search", authenticateJWT, async (req, res) => {
         FROM item i
         JOIN users u ON i.user_id = u.id
         WHERE 
-            i.title ILIKE $1 OR 
+            (i.title ILIKE $1 OR 
             i.description ILIKE $1 OR 
             i.category ILIKE $1 OR
             u.username ILIKE $1 OR
-            i.id::TEXT ILIKE $1
+            i.id::TEXT ILIKE $1) AND i.isprivate = false
         ORDER BY i.entered_on DESC
         `;
         
@@ -270,5 +266,102 @@ router.get("/items-search", authenticateJWT, async (req, res) => {
         res.status(500).json({ error: "Fehler bei der Suche nach Items." });
     }
 });
+
+// GET /items/filter - Flexible filter for any item field
+router.get("/items-filter", authenticateJWT, async (req, res) => {
+    const pool = req.app.locals.pool;
+
+    const {
+        title,
+        description,
+        category,
+        isprivate,
+        username,
+        id,
+        user_id,
+        entered_on,
+        exclude_user_id
+    } = req.query;
+
+    try {
+        const conditions = [];
+        const values = [];
+
+        if (title) {
+            values.push(`%${title}%`);
+            conditions.push(`i.title ILIKE $${values.length}`);
+        }
+
+        if (description) {
+            values.push(`%${description}%`);
+            conditions.push(`i.description ILIKE $${values.length}`);
+        }
+
+        if (category) {
+            values.push(`%${category}%`);
+            conditions.push(`i.category ILIKE $${values.length}`);
+        }
+
+        if (isprivate !== undefined) {
+            values.push(isprivate === "true");
+            conditions.push(`i.isprivate = $${values.length}`);
+        }
+
+        if (username) {
+            values.push(`%${username}%`);
+            conditions.push(`u.username ILIKE $${values.length}`);
+        }
+
+        if (id) {
+            values.push(id);
+            conditions.push(`i.id = $${values.length}`);
+        }
+
+        if (user_id) {
+            values.push(user_id);
+            conditions.push(`i.user_id = $${values.length}`);
+        }
+
+        if (entered_on) {
+            values.push(entered_on);
+            conditions.push(`DATE(i.entered_on) = DATE($${values.length})`);
+        }
+
+        if (exclude_user_id) {
+            values.push(exclude_user_id);
+            conditions.push(`i.user_id != $${values.length}`);
+        }
+
+        const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+        const sqlQuery = `
+            SELECT i.*, u.username
+            FROM item i
+            JOIN users u ON i.user_id = u.id
+            ${whereClause}
+            ORDER BY i.entered_on DESC;
+        `;
+
+        const result = await pool.query(sqlQuery, values);
+
+        const items = result.rows.map(item => ({
+            id: item.id,
+            title: item.title,
+            category: item.category,
+            entered_on: item.entered_on,
+            description: item.description,
+            user_id: item.user_id,
+            image: item.image ? `data:image/jpeg;base64,${item.image.toString("base64")}` : '',
+            username: item.username,
+            isprivate: item.isprivate
+        }));
+
+        res.json(items);
+    } catch (err) {
+        console.error("Error filtering items:", err);
+        res.status(500).send("Error filtering items");
+    }
+});
+
 
 module.exports = router;

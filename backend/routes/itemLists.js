@@ -47,43 +47,53 @@ router.get("/me/item-lists", authenticateJWT, async (req, res) => {
     }
 });
 
-// Get items by item_list_id
+// Get items by item_list_id with privacy check
 router.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) => {
-    const { item_list_id } = req.params;
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query(
-            `SELECT item.id, item.title, item.category, item.entered_on, item.description, item.user_id, item.image, users.username
-             FROM item
-             JOIN item_itemlist ON item.id = item_itemlist.item_id
-             JOIN users ON item.user_id = users.id
-             WHERE item_itemlist.item_list_id = $1
-             ORDER BY item.entered_on DESC`,
-            [item_list_id]
-        );
+  const { item_list_id } = req.params;
+  const requestingUserId = req.user.id;
+  const pool = req.app.locals.pool;
 
-        const items = result.rows.map(item => ({
-            id: item.id,
-            user_id: item.user_id,
-            title: item.title,
-            entered_on: item.entered_on,
-            image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
-            description: item.description,
-            category: item.category,
-            username: item.username,
-        }));
+  try {
+    const query = `
+      SELECT 
+        item.id, item.title, item.category, item.entered_on, item.description, 
+        item.user_id, item.image, item.isprivate, users.username
+      FROM item
+      JOIN item_itemlist ON item.id = item_itemlist.item_id
+      JOIN users ON item.user_id = users.id
+      WHERE item_itemlist.item_list_id = $1
+      AND (
+        item.user_id = $2 OR
+        item.isprivate = false
+      )
+      ORDER BY item.entered_on DESC
+    `;
 
-        res.json(items);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching items");
-    }
+    const result = await pool.query(query, [item_list_id, requestingUserId]);
+
+    const items = result.rows.map(item => ({
+      id: item.id,
+      user_id: item.user_id,
+      title: item.title,
+      entered_on: item.entered_on,
+      image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
+      description: item.description,
+      category: item.category,
+      username: item.username,
+      isprivate: item.isprivate,
+    }));
+
+    res.json(items);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching items");
+  }
 });
+
 
 // Create a new item list and link items to it
 router.post("/item-lists", authenticateJWT, async (req, res) => {
-    const { title, description, item_ids } = req.body;
+    const { title, description, item_ids, is_private } = req.body;
     const userId = req.user.id;
     const pool = req.app.locals.pool;
 
@@ -96,8 +106,8 @@ router.post("/item-lists", authenticateJWT, async (req, res) => {
         await pool.query('BEGIN');
 
         const result = await pool.query(
-            "INSERT INTO item_list (title, description, user_id) VALUES ($1, $2, $3) RETURNING id",
-            [title, description || "", userId]
+            "INSERT INTO item_list (title, description, user_id, isprivate) VALUES ($1, $2, $3, $4) RETURNING id",
+            [title, description || "", userId, is_private]
         );
 
         const newItemListId = result.rows[0].id;
@@ -128,7 +138,7 @@ router.post("/item-lists", authenticateJWT, async (req, res) => {
 // Update an item list and its associations
 router.put("/item-lists/:id", authenticateJWT, async (req, res) => {
     const itemListId = parseInt(req.params.id, 10);
-    const { title, description, item_ids } = req.body;
+    const { title, description, item_ids, is_private } = req.body;
     const userId = req.user.id;
     const pool = req.app.locals.pool;
 
@@ -149,8 +159,8 @@ router.put("/item-lists/:id", authenticateJWT, async (req, res) => {
             return res.status(404).send("Item list not found or not authorized.");
         }
 
-        await pool.query("UPDATE item_list SET title = $1, description = $2 WHERE id = $3",
-            [title, description || "", itemListId]);
+        await pool.query("UPDATE item_list SET title = $1, description = $2, isprivate = $3 WHERE id = $4",
+            [title, description || "",is_private, itemListId]);
 
         await pool.query("DELETE FROM item_itemlist WHERE item_list_id = $1", [itemListId]);
 
@@ -217,6 +227,33 @@ router.delete("/item-lists/:id", authenticateJWT, async (req, res) => {
         await pool.query('ROLLBACK');
         console.error("Error deleting item list:", err);
         res.status(500).send("Error deleting item list.");
+    }
+});
+
+// Fetch public items
+router.get("/public/item-lists", authenticateJWT, async (req, res) => {
+    const pool = req.app.locals.pool;
+    
+    try {
+        const result = await pool.query("SELECT * FROM item_list WHERE isprivate = false",);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching items");
+    }
+});
+
+// Fetch current user's items
+router.get("/me/item-lists", authenticateJWT, async (req, res) => {
+    const userId = req.user.id;
+    const pool = req.app.locals.pool;
+    
+    try {
+        const result = await pool.query("SELECT * FROM item_list WHERE user_id = $1", [userId]);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching items");
     }
 });
 

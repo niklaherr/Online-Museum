@@ -60,7 +60,7 @@ const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
             <Title className="text-blue-800">{list?.title}</Title>
             <Subtitle className="text-blue-700 mt-1">{list?.description}</Subtitle>
             <Text className="text-blue-700 mt-2">
-              Erstellt am: {list?.entered_on} • {true ? "Privat" : "Öffentlich"}
+              Erstellt am: {list ? new Date(list?.entered_on).toLocaleDateString() : "/"}
             </Text>
           </div>
         </div>

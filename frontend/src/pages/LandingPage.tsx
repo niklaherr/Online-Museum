@@ -39,7 +39,8 @@ const fadeUp = {
 type LandingPageProps = {
   onNavigate: (route: string) => void;
 };
-const LandingPage = ({onNavigate} : LandingPageProps) => {
+
+const LandingPage = ({ onNavigate }: LandingPageProps) => {
   const [museumItems, setMuseumItems] = useState<GalleryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -49,11 +50,11 @@ const LandingPage = ({onNavigate} : LandingPageProps) => {
       setMuseumItems(items);
       setIsLoading(false);
     } catch (error) {
-      let errorMessage = "Fehler beim Laden der Items"
-      if(error instanceof Error) {
-        errorMessage = error.message
+      let errorMessage = "Fehler beim Laden der Items";
+      if (error instanceof Error) {
+        errorMessage = error.message;
       }
-      NotyfService.showError(errorMessage)
+      NotyfService.showError(errorMessage);
     }
   };
 
@@ -61,9 +62,8 @@ const LandingPage = ({onNavigate} : LandingPageProps) => {
     loadItems();
   }, []);
 
-  if (isLoading) return <Loading />
+  if (isLoading) return <Loading />;
 
-  
   return (
     <div className="px-4 py-10 md:py-16 max-w-7xl mx-auto space-y-16">
       {/* Hero Section */}
@@ -79,19 +79,14 @@ const LandingPage = ({onNavigate} : LandingPageProps) => {
           Interaktive Ausstellungen. Eigene Beiträge. Deine Favoriten. Alles online.
         </Text>
         <div className="mt-6">
-          <Button size="lg" icon={ArrowRightIcon} onClick={() => onNavigate('/register')}>
+          <Button size="lg" icon={ArrowRightIcon} onClick={() => onNavigate("/register")}>
             Jetzt entdecken
           </Button>
         </div>
       </motion.div>
 
       {/* Feature Cards */}
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={fadeUp}
-      >
+      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
         <Grid numItemsSm={2} numItemsMd={3} className="gap-6">
           {[
             {
@@ -153,13 +148,29 @@ const LandingPage = ({onNavigate} : LandingPageProps) => {
         </Grid>
       </motion.div>
 
-      {/* Latest Entries */}
+      {/* Embedded YouTube Video */}
       <motion.div
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeUp}
       >
+        <Card className="p-6 rounded-2xl shadow-md">
+          <Title className="mb-4 text-center">Video: Willkommen im digitalen Museum</Title>
+          <div className="aspect-video w-full overflow-hidden rounded-xl">
+            <iframe
+              className="w-full h-full rounded-xl"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with your actual video
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </Card>
+      </motion.div>
+
+      {/* Latest Entries */}
+      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
         <Flex justifyContent="between" alignItems="center" className="mb-4">
           <Title>Neueste Einträge</Title>
           <ClockIcon className="w-6 h-6 text-gray-500" />
@@ -170,15 +181,15 @@ const LandingPage = ({onNavigate} : LandingPageProps) => {
             {museumItems.map((item, i) => (
               <motion.div key={item.id} custom={i} variants={fadeUp}>
                 <Card
-                key={item.id}
-                className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
+                  key={item.id}
+                  className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
                 >
                   <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
                     {item.category}
                   </Text>
                   <Text className="mt-2 text-lg font-semibold">{item.title}</Text>
                   <Text className="text-sm text-gray-500 mt-1">
-                    Entered on: {item.entered_on}
+                    Erstellt am: {new Date(item.entered_on).toLocaleDateString()}
                   </Text>
 
                   <div className="mt-2">
@@ -188,8 +199,8 @@ const LandingPage = ({onNavigate} : LandingPageProps) => {
                       className="w-full h-48 object-cover rounded-lg border border-gray-300"
                     />
                   </div>
-                  </Card>
-              </motion.div>  
+                </Card>
+              </motion.div>
             ))}
           </div>
         ) : (
@@ -206,7 +217,7 @@ const LandingPage = ({onNavigate} : LandingPageProps) => {
         className="text-center py-12 border-t"
       >
         <Title className="mb-4">Bereit, Teil des Museums zu werden?</Title>
-        <Button size="lg" icon={PlusCircleIcon} onClick={() => onNavigate('/register')}>
+        <Button size="lg" icon={PlusCircleIcon} onClick={() => onNavigate("/register")}>
           Jetzt Beitrag erstellen
         </Button>
       </motion.div>
