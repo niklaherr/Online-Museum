@@ -3,6 +3,7 @@ import { Card, Title, Text, Divider, Button, TextInput, Textarea } from '@tremor
 import { Link } from 'react-router-dom';
 import NotyfService from '../../services/NotyfService';
 import { contactFormService, ContactFormData } from '../../services/ContactFormService';
+import SnakeGameModal from '../../components/easter-eggs/SnakeGameModal';
 
 const HelpSupport = () => {
   // Scroll to top on component mount
@@ -18,6 +19,7 @@ const HelpSupport = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSnakeGameOpen, setIsSnakeGameOpen] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -61,6 +63,12 @@ const HelpSupport = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Handler für Easter Egg
+  const handleOpenSnakeGame = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default anchor behavior
+    setIsSnakeGameOpen(true);
   };
 
   return (
@@ -241,7 +249,13 @@ const HelpSupport = () => {
                 </svg>
                 <h3 className="font-medium mb-1">Benutzerhandbuch</h3>
                 <Text className="text-sm text-gray-500 mb-3">Umfassendes Handbuch für alle Funktionen.</Text>
-                <a href="#" className="text-blue-600 text-sm font-medium hover:underline">PDF herunterladen</a>
+                <a 
+                  href="#" 
+                  onClick={handleOpenSnakeGame} 
+                  className="text-blue-600 text-sm font-medium hover:underline"
+                >
+                  PDF herunterladen
+                </a>
               </div>
               
               <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
@@ -265,6 +279,12 @@ const HelpSupport = () => {
           </section>
         </div>
       </Card>
+      
+      {/* Snake Game Easter Egg Modal */}
+      <SnakeGameModal
+        isOpen={isSnakeGameOpen}
+        onClose={() => setIsSnakeGameOpen(false)}
+      />
     </div>
   );
 };
