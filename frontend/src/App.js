@@ -19,6 +19,7 @@ import Gallery from './pages/gallery/Gallery';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import HelpSupport from 'pages/legal/HelpSupport';
 import TermsOfUse  from 'pages/legal/TermsOfUse';
+import Roadmap from './pages/legal/Roadmap'; // Neue Import-Anweisung
 import SupportRequests from 'pages/admin/SupportRequests';
 
 import { userService } from './services/UserService';
@@ -276,6 +277,7 @@ function App() {
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/helpsupport" element={<HelpSupport />} />
             <Route path="/termsofuse" element={<TermsOfUse />} />
+            <Route path="/roadmap" element={<Roadmap />} />
 
             <Route
                path="*"

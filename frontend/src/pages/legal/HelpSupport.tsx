@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Title, Text, Divider, Button, TextInput, Textarea } from '@tremor/react';
+import { Link } from 'react-router-dom';
 import NotyfService from '../../services/NotyfService';
 import { contactFormService, ContactFormData } from '../../services/ContactFormService';
 
@@ -70,7 +71,7 @@ const HelpSupport = () => {
           <Text>Wir sind für Sie da. Finden Sie Antworten auf häufig gestellte Fragen oder kontaktieren Sie uns direkt.</Text>
           
           <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Häufig gestellte Fragen</h2>
+            <h2 id="haeufigGestellteFragen" className="text-xl font-semibold text-gray-900 mb-4">Häufig gestellte Fragen</h2>
             
             <div className="space-y-4">
               <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
@@ -249,7 +250,7 @@ const HelpSupport = () => {
                 </svg>
                 <h3 className="font-medium mb-1">Tipps & Tricks</h3>
                 <Text className="text-sm text-gray-500 mb-3">Nützliche Hinweise für fortgeschrittene Benutzer.</Text>
-                <a href="#" className="text-blue-600 text-sm font-medium hover:underline">Artikel lesen</a>
+                <a href="#haeufigGestellteFragen" className="text-blue-600 text-sm font-medium hover:underline">Artikel lesen</a>
               </div>
               
               <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
@@ -258,7 +259,7 @@ const HelpSupport = () => {
                 </svg>
                 <h3 className="font-medium mb-1">Roadmap</h3>
                 <Text className="text-sm text-gray-500 mb-3">Erfahren Sie mehr über geplante Funktionen.</Text>
-                <a href="#" className="text-blue-600 text-sm font-medium hover:underline">Roadmap ansehen</a>
+                <Link to="/roadmap" className="text-blue-600 text-sm font-medium hover:underline">Roadmap ansehen</Link>
               </div>
             </div>
           </section>
