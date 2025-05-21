@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, Text } from "@tremor/react";
-import { UserIcon } from "@heroicons/react/24/outline";
+import { LockClosedIcon, UserIcon } from "@heroicons/react/24/outline";
 import { userService } from "../../services/UserService";
 import Item, { GalleryItem } from "../../interfaces/Item";
 import { itemService } from "../../services/ItemService";
@@ -84,9 +84,18 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
               className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
               onClick={() => onNavigate('/items/' + item.id)}
             >
-              <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
-                {item.category}
-              </Text>
+              <div className="flex items-center justify-between">
+                <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
+                  {item.category}
+                </Text>
+                {item.isprivate && (
+                  <div className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                    <LockClosedIcon className="w-4 h-4" />
+                    Privat
+                  </div>
+                )}
+              </div>
+
               <Text className="mt-2 text-lg font-semibold">{item.title}</Text>
               <Text className="text-sm text-gray-500 mt-1">
                 Entered on: {item.entered_on}

@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, TextInput, Textarea, Button, Title, Text, Dialog, DialogPanel } from "@tremor/react";
+import {
+  Card,
+  TextInput,
+  Textarea,
+  Button,
+  Title,
+  Text,
+  Dialog,
+  DialogPanel,
+} from "@tremor/react";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import { itemService } from "../../services/ItemService";
 import { itemAssistantService } from "../../services/ItemAssistantService";
@@ -20,11 +29,14 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [existingImage, setExistingImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Neuer State für KI-Beschreibung
+
+  // State für KI-Beschreibung
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [generatedDescription, setGeneratedDescription] = useState("");
+
+  //State für Privat-Toggle
+  const [isPrivate, setIsPrivate] = useState(false);
 
   useEffect(() => {
     const loadItem = async () => {
@@ -34,6 +46,7 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
         setCategory(item.category);
         setDescription(item.description);
         setExistingImage(item.image); // assuming image is a URL string
+        setIsPrivate(item.isprivate); // Set private state from item data
         setIsLoading(false);
       } catch (error) {
         let errorMessage = "Fehler beim Laden der Item Informationen";
@@ -60,6 +73,7 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
       formData.append("title", title);
       formData.append("category", category);
       formData.append("description", description);
+      formData.append("isprivate", isPrivate.toString()); // Append private flag
       if (imageFile) formData.append("image", imageFile);
 
       await itemService.updateItem(parseInt(id!), formData);
@@ -73,23 +87,26 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
       NotyfService.showError(errorMessage);
     }
   };
-  
+
   // KI-Beschreibung generieren
   const handleGenerateDescription = async () => {
     if (!title.trim()) {
       NotyfService.showError("Bitte gib zuerst einen Titel ein.");
       return;
     }
-    
+
     if (!category.trim()) {
       NotyfService.showError("Bitte gib eine Kategorie ein.");
       return;
     }
-    
+
     setIsGenerating(true);
-    
+
     try {
-      const generatedText = await itemAssistantService.generateDescription(title, category);
+      const generatedText = await itemAssistantService.generateDescription(
+        title,
+        category
+      );
       setGeneratedDescription(generatedText);
       setIsDialogOpen(true);
       NotyfService.showSuccess("Beschreibung erfolgreich generiert.");
@@ -100,22 +117,30 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
       setIsGenerating(false);
     }
   };
-  
+
   // Beschreibung übernehmen
   const handleAcceptDescription = () => {
     setDescription(generatedDescription);
     setIsDialogOpen(false);
   };
 
-  if (isLoading) return <Loading />
+  if (isLoading) return <Loading />;
 
   return (
     <Card className="max-w-2xl mx-auto mt-6 space-y-4">
       <Title>Item bearbeiten</Title>
       <div className="space-y-4">
-        <TextInput placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <TextInput placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
-        
+        <TextInput
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <TextInput
+          placeholder="Category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        />
+
         <div>
           <div className="flex justify-between items-center mb-2">
             <Text>Beschreibung</Text>
@@ -130,7 +155,11 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
               KI-Beschreibung generieren
             </Button>
           </div>
-          <Textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+          <Textarea
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
         </div>
 
         <div className="space-y-2">
@@ -148,31 +177,39 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
             <Text className="text-sm text-gray-600 mb-2">Vorschau:</Text>
             <img
               src={imageFile ? URL.createObjectURL(imageFile) : existingImage!}
-              alt="Vorschau" 
+              alt="Vorschau"
               className="max-h-40 rounded-md"
             />
           </div>
         )}
+
+        {/* Privat toggle */}
+        <div className="flex items-center justify-between">
+          <Text>Item privat machen</Text>
+          <label className="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              className="form-checkbox h-5 w-5 text-blue-600"
+              checked={isPrivate}
+              onChange={() => setIsPrivate(!isPrivate)}
+            />
+          </label>
+        </div>
       </div>
 
-      <Button 
-        color="blue" 
-        onClick={handleUpdate}
-        size="lg"
-        className="w-full"
-      >
+      <Button color="blue" onClick={handleUpdate} size="lg" className="w-full">
         Änderungen speichern
       </Button>
-      
+
       {/* Dialog für Beschreibungsvorschau */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>
         <DialogPanel>
           <Title className="mb-4">Generierte Beschreibung</Title>
-          
+
           <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
             <Text>{generatedDescription}</Text>
           </div>
-          
+
           <div className="flex justify-end space-x-2">
             <Button
               color="gray"
@@ -183,10 +220,7 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
             >
               Neu generieren
             </Button>
-            <Button
-              color="blue"
-              onClick={handleAcceptDescription}
-            >
+            <Button color="blue" onClick={handleAcceptDescription}>
               Übernehmen
             </Button>
           </div>

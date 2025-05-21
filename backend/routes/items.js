@@ -16,6 +16,7 @@ router.get("/items/no-auth", async (req, res) => {
             SELECT item.*, users.username 
             FROM item
             JOIN users ON item.user_id = users.id
+            WHERE item.isprivate = false
             ORDER BY item.entered_on DESC
             LIMIT 5;
         `;
@@ -29,7 +30,8 @@ router.get("/items/no-auth", async (req, res) => {
             description: item.description,
             user_id: item.user_id,
             image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
-            username: item.username
+            username: item.username,
+            isprivate: item.isprivate
         }));
 
         res.json(items);
@@ -59,7 +61,8 @@ router.get("/items", authenticateJWT, async (req, res) => {
             description: item.description,
             user_id: item.user_id,
             image: item.image ? `data:image/jpeg;base64,${item.image.toString('base64')}` : '',
-            username: item.username
+            username: item.username,
+            isprivate: item.isprivate
         }));
 
         res.json(items);
@@ -95,6 +98,7 @@ router.get("/items/:id", authenticateJWT, async (req, res) => {
             description: item.description,
             category: item.category,
             username: item.username,
+            isprivate: item.isprivate
         });
     } catch (err) {
         console.error(err);
@@ -104,7 +108,7 @@ router.get("/items/:id", authenticateJWT, async (req, res) => {
 
 // Create a new item with image upload
 router.post("/items", authenticateJWT, upload.single("image"), async (req, res) => {
-    const { title, description, category } = req.body;
+    const { title, description, category, isprivate } = req.body;
     const image = req.file ? req.file.buffer : null;
     const pool = req.app.locals.pool;
 
@@ -112,10 +116,10 @@ router.post("/items", authenticateJWT, upload.single("image"), async (req, res) 
 
     try {
         const result = await pool.query(
-            `INSERT INTO item (user_id, title, image, description, category)
-             VALUES ($1, $2, $3, $4, $5)
+            `INSERT INTO item (user_id, title, image, description, category, isprivate)
+             VALUES ($1, $2, $3, $4, $5, $6)
              RETURNING *`,
-            [req.user.id, title, image, description || null, category || null]
+            [req.user.id, title, image, description || null, category || null, isprivate]
         );
         
         const newItem = result.rows[0];
@@ -137,7 +141,7 @@ router.post("/items", authenticateJWT, upload.single("image"), async (req, res) 
 
 // Update an existing item, optionally replacing its image
 router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, res) => {
-    const { title, description, category } = req.body;
+    const { title, description, category, isprivate } = req.body;
     const { id } = req.params;
     const image = req.file ? req.file.buffer : null;
     const pool = req.app.locals.pool;
@@ -146,9 +150,9 @@ router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, re
 
     try {
         const fields = ["title", "description", "category"];
-        const values = [title, description || null, category || null];
-        let query = `UPDATE item SET title = $1, description = $2, category = $3`;
-        let paramIndex = 4;
+        const values = [title, description || null, category || null, isprivate];
+        let query = `UPDATE item SET title = $1, description = $2, category = $3, isprivate = $4`;
+        let paramIndex = 5;
 
         if (image) {
             query += `, image = $${paramIndex}`;
@@ -156,6 +160,7 @@ router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, re
             paramIndex++;
         }
 
+        
         query += ` WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *`;
         values.push(id, req.user.id);
 
