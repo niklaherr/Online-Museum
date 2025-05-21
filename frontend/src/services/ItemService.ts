@@ -388,6 +388,7 @@ class ItemService {
     title: string;
     description?: string;
     item_ids: number[];
+    is_private: boolean;
   }): Promise<any> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
@@ -424,6 +425,7 @@ class ItemService {
     title: string;
     description?: string;
     item_ids: number[];
+    is_private: boolean;
   }): Promise<any> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");

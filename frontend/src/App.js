@@ -31,6 +31,7 @@ import LandingPage from 'pages/LandingPage';
 import EditorialManagement from 'pages/EditorialManagement';
 import EditEditorial from 'components/editorial/EditEditorial';
 import AdminManagement from 'pages/AdminManagement';
+import EditorialDetailView from 'components/editorial/EditorialDetailView';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -217,16 +218,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
-           {userService.isAdmin() && (
-              <Route
-              path="/editorial"
-              element={
-                <ProtectedRoute>
-                  <EditorialManagement onNavigate={(route) => navigate(route)} />
-                </ProtectedRoute>
-              }
-            />
-            )}
+
+            <Route
+                  path="/editorial/:id"
+                  element={
+                    <ProtectedRoute>
+                      <EditorialDetailView onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
 
             {userService.isAdmin() && (
               <>

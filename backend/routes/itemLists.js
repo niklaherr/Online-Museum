@@ -83,7 +83,7 @@ router.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) 
 
 // Create a new item list and link items to it
 router.post("/item-lists", authenticateJWT, async (req, res) => {
-    const { title, description, item_ids } = req.body;
+    const { title, description, item_ids, is_private } = req.body;
     const userId = req.user.id;
     const pool = req.app.locals.pool;
 
@@ -96,8 +96,8 @@ router.post("/item-lists", authenticateJWT, async (req, res) => {
         await pool.query('BEGIN');
 
         const result = await pool.query(
-            "INSERT INTO item_list (title, description, user_id) VALUES ($1, $2, $3) RETURNING id",
-            [title, description || "", userId]
+            "INSERT INTO item_list (title, description, user_id, isprivate) VALUES ($1, $2, $3, $4) RETURNING id",
+            [title, description || "", userId, is_private]
         );
 
         const newItemListId = result.rows[0].id;
@@ -128,7 +128,7 @@ router.post("/item-lists", authenticateJWT, async (req, res) => {
 // Update an item list and its associations
 router.put("/item-lists/:id", authenticateJWT, async (req, res) => {
     const itemListId = parseInt(req.params.id, 10);
-    const { title, description, item_ids } = req.body;
+    const { title, description, item_ids, is_private } = req.body;
     const userId = req.user.id;
     const pool = req.app.locals.pool;
 
@@ -149,8 +149,8 @@ router.put("/item-lists/:id", authenticateJWT, async (req, res) => {
             return res.status(404).send("Item list not found or not authorized.");
         }
 
-        await pool.query("UPDATE item_list SET title = $1, description = $2 WHERE id = $3",
-            [title, description || "", itemListId]);
+        await pool.query("UPDATE item_list SET title = $1, description = $2, isprivate = $3 WHERE id = $4",
+            [title, description || "",is_private, itemListId]);
 
         await pool.query("DELETE FROM item_itemlist WHERE item_list_id = $1", [itemListId]);
 

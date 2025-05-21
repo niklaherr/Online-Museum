@@ -79,12 +79,12 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
             <Title className="text-blue-800">{list?.title}</Title>
             <Subtitle className="text-blue-700 mt-1">{list?.description}</Subtitle>
             <Text className="text-blue-700 mt-2">
-              Erstellt am: {list?.entered_on} • {true ? "Privat" : "Öffentlich"}
+              Erstellt am: {list?.entered_on} • {list?.isprivate ? "Privat" : "Öffentlich"}
             </Text>
           </div>
 
           
-          {list?.user_id == userService.getUserID() && (<div className="absolute top-4 right-4">
+          {list?.user_id === userService.getUserID() && (<div className="absolute top-4 right-4">
             <Button
             onClick={() => onNavigate(`/item-list/${id}/edit`)}
           >
@@ -132,7 +132,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
       )}
 
       {/* Centered Delete Button */}
-      {list?.user_id == userService.getUserID() && (
+      {list?.user_id === userService.getUserID() && (
         <div className="mt-auto flex justify-center pb-6">
           <Button
             variant="light"
