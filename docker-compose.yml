@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: online-museum-postgres
+    restart: unless-stopped
+    environment:
+      # Datenbankname
+      POSTGRES_DB: mydatabase
+      # Standardbenutzer
+      POSTGRES_USER: user
+      # Passwort für den Benutzer
+      POSTGRES_PASSWORD: password
+      # Zeitzone setzen
+      TZ: Europe/Berlin
+    ports:
+      # PostgreSQL Port (Host:Container)
+      - "5432:5432"
+    volumes:
+      # Persistente Datenspeicherung
+      - postgres_data:/var/lib/postgresql/data
+      # Initialisierungsskript einbinden
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+      # Optionale zusätzliche Konfiguration
+      - ./postgres.conf:/etc/postgresql/postgresql.conf:ro
+    command: 
+      # Erweiterte Konfiguration
+      - "postgres"
+      - "-c"
+      - "log_statement=all"
+      - "-c"
+      - "log_destination=stderr"
+      - "-c"
+      - "logging_collector=on"
+      - "-c"
+      - "log_directory=/var/log/postgresql"
+      - "-c"
+      - "max_connections=200"
+    networks:
+      - museum-network
+
+  # Optional: pgAdmin für Datenbankverwaltung
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: online-museum-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@museum.local
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - museum-network
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  museum-network:
+    driver: bridge
