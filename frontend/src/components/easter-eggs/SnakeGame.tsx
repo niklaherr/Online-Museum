@@ -1,4 +1,3 @@
-// frontend/src/components/easter-eggs/SnakeGame.tsx
 import React, { useEffect, useRef } from 'react';
 
 const SnakeGame: React.FC = () => {

@@ -1,4 +1,3 @@
-// frontend/src/components/easter-eggs/SnakeGameModal.tsx
 import React from 'react';
 import { Dialog, DialogPanel, Button } from '@tremor/react';
 import SnakeGame from './SnakeGame';
@@ -29,7 +28,7 @@ const SnakeGameModal: React.FC<SnakeGameModalProps> = ({ isOpen, onClose }) => {
         
         <div className="bg-gray-50 p-4 rounded-lg mb-4">
           <p className="text-gray-700">
-            Sie haben ein Easter Egg gefunden! Anstatt des PDF-Handbuchs präsentieren wir Ihnen ein klassisches Snake-Spiel. 
+            Du hast ein Easter Egg gefunden! Anstatt des PDF-Handbuchs haben wir für dich ein Snake Game :D
             Viel Spaß beim Spielen!
           </p>
         </div>
