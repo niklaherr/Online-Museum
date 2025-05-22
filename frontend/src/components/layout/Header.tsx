@@ -1,57 +1,66 @@
-import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { userService } from 'services/UserService';
+import { Flex, Text } from '@tremor/react';
+import { Bars3Icon } from '@heroicons/react/24/outline';
 
 type HeaderProps = {
   onNavigate: (route: string) => void;
   toggleSidebar: (sidebarOpen: boolean) => void;
   sidebarOpen: boolean;
 };
-const Header = ({onNavigate, toggleSidebar, sidebarOpen } : HeaderProps) => {
+
+const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
+  const isLoggedIn = userService.isLoggedIn();
+  const userName = userService.getUserName();
 
   return (
-    <header className="bg-white shadow px-4 py-2 flex items-center justify-between">
-      <div className="flex items-center">
-        {userService.isLoggedIn() && (
-          <button
-            onClick={() => toggleSidebar(!sidebarOpen)}
-            className="mr-2 text-gray-600 hover:text-gray-900"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        )}
-        
-        <Link to="/dashboard" className="flex items-center">
-          <span className="text-xl font-semibold text-blue-600">Online-Museum</span>
-        </Link>
-      </div>
+    <header className="bg-white shadow px-4 py-3">
+      <Flex justifyContent="between" alignItems="center">
+        <Flex alignItems="center" className="gap-3">
+          {isLoggedIn && (
+            <button
+              onClick={() => toggleSidebar(!sidebarOpen)}
+              className="text-gray-600 hover:text-gray-900 md:hidden"
+              aria-label="Toggle sidebar"
+            >
+              <Bars3Icon className="w-6 h-6" />
+            </button>
+          )}
 
-      <div className="flex items-center">
-        {userService.isLoggedIn() ? (
-          <div className="flex items-center space-x-3">
+          <Link to="/dashboard" className="text-xl font-semibold text-blue-600">
+            Online-Museum
+          </Link>
+        </Flex>
+
+        <div className="flex items-center space-x-4">
+          {isLoggedIn ? (
             <Link
               to="/profile"
-              className="flex items-center space-x-2 transition-colors hover:text-blue-600 group"
+              className="flex items-center space-x-2 group"
             >
-              <span className="hidden md:block">{userService.getUserName()}</span>
+              <Text className="hidden md:block">{userName}</Text>
               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 group-hover:bg-blue-100">
-                {userService.getUserName()?.charAt(0)}
+                {userName?.charAt(0)}
               </div>
             </Link>
-          </div>
-        ) : (
-          <div className="space-x-2">
-            <Link to="/login" className="px-3 py-1 text-blue-600 hover:text-blue-800">
-              Anmelden
-            </Link>
-            <Link to="/register" className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-              Registrieren
-            </Link>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="space-x-2">
+              <Link
+                to="/login"
+                className="px-3 py-1 text-blue-600 hover:text-blue-800 transition"
+              >
+                Anmelden
+              </Link>
+              <Link
+                to="/register"
+                className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              >
+                Registrieren
+              </Link>
+            </div>
+          )}
+        </div>
+      </Flex>
     </header>
   );
 };
