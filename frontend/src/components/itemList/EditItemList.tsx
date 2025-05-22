@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Title, TextInput, Textarea, Button, Text, Dialog, DialogPanel, Flex } from "@tremor/react";
+import {
+  Card,
+  Title,
+  TextInput,
+  Textarea,
+  Button,
+  Text,
+  Dialog,
+  DialogPanel,
+  Flex,
+} from "@tremor/react";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import Item from "interfaces/Item";
 import { itemService } from "services/ItemService";
 import { itemAssistantService } from "services/ItemAssistantService";
 import NotyfService from "services/NotyfService";
-import { userService } from "services/UserService";
 import Loading from "components/helper/Loading";
 
 type EditItemListProps = {
@@ -20,11 +29,12 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
   const [description, setDescription] = useState("");
   const [userItems, setUserItems] = useState<Item[]>([]);
   const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
+  const [isPrivate, setIsPrivate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Neuer State für KI-Beschreibung
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUpdateConfirmOpen, setIsUpdateConfirmOpen] = useState(false);
   const [generatedDescription, setGeneratedDescription] = useState("");
 
   useEffect(() => {
@@ -33,11 +43,12 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
         const [listDetails, listItems, allUserItems] = await Promise.all([
           itemService.fetchItemListById(id!),
           itemService.fetchItemsByItemListId(parseInt(id!)),
-          itemService.fetchOwnItems()
+          itemService.fetchOwnItems(),
         ]);
 
         setTitle(listDetails.title);
         setDescription(listDetails.description || "");
+        setIsPrivate(listDetails.isprivate ?? false);
         setSelectedItemIds(listItems.map((item: Item) => item.id));
         setUserItems(allUserItems);
         setIsLoading(false);
@@ -55,7 +66,9 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
 
   const toggleItemSelection = (itemId: number) => {
     setSelectedItemIds((prev) =>
-      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+      prev.includes(itemId)
+        ? prev.filter((id) => id !== itemId)
+        : [...prev, itemId]
     );
   };
 
@@ -69,51 +82,53 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
       await itemService.editItemList(parseInt(id!), {
         title,
         description,
-        item_ids: selectedItemIds
+        item_ids: selectedItemIds,
+        is_private: isPrivate,
       });
       NotyfService.showSuccess("Liste erfolgreich aktualisiert.");
       onNavigate("/item-list");
     } catch (error: any) {
-      NotyfService.showError(error.message || "Fehler beim Aktualisieren der Liste.");
+      NotyfService.showError(
+        error.message || "Fehler beim Aktualisieren der Liste."
+      );
     }
   };
-  
-  // KI-Beschreibung generieren basierend auf ausgewählten Items
+
   const handleGenerateDescription = async () => {
     if (!title.trim()) {
       NotyfService.showError("Bitte gib zuerst einen Titel ein.");
       return;
     }
-    
+
     if (selectedItemIds.length === 0) {
       NotyfService.showError("Bitte wähle zuerst mindestens ein Item aus.");
       return;
     }
-    
+
     setIsGenerating(true);
-    
+
     try {
-      // Sammle detaillierte Informationen über die ausgewählten Items
-      const selectedItems = userItems.filter(item => selectedItemIds.includes(item.id));
-      
-      // Erstelle einen umfassenderen Prompt mit Titeln, Kategorien und Beschreibungen
+      const selectedItems = userItems.filter((item) =>
+        selectedItemIds.includes(item.id)
+      );
+
       let promptText = `Erstelle eine ansprechende Beschreibung für eine Sammlung mit dem Titel "${title}". `;
-      
-      // Füge Details zu jedem ausgewählten Item hinzu
       promptText += "Die Sammlung enthält folgende Elemente:\n";
-      
-      selectedItems.forEach(item => {
+
+      selectedItems.forEach((item) => {
         promptText += `- ${item.title}`;
         if (item.category) promptText += ` (Kategorie: ${item.category})`;
         if (item.description) promptText += `: ${item.description}`;
         promptText += "\n";
       });
-      
-      // Füge Anweisungen für die KI hinzu
-      promptText += "\nBitte erstelle basierend auf diesen Informationen eine zusammenfassende Beschreibung, die die Einzigartigkeit dieser Sammlung in 2-3 Sätzen hervorhebt.";
-      
-      // Rufe die KI mit dem Titel und dem umfassenden Prompt auf
-      const generatedText = await itemAssistantService.generateDescription(title, promptText);
+
+      promptText +=
+        "\nBitte erstelle basierend auf diesen Informationen eine zusammenfassende Beschreibung, die die Einzigartigkeit dieser Sammlung in 2-3 Sätzen hervorhebt.";
+
+      const generatedText = await itemAssistantService.generateDescription(
+        title,
+        promptText
+      );
       setGeneratedDescription(generatedText);
       setIsDialogOpen(true);
       NotyfService.showSuccess("Beschreibung erfolgreich generiert.");
@@ -124,14 +139,13 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
       setIsGenerating(false);
     }
   };
-  
-  // Beschreibung übernehmen
+
   const handleAcceptDescription = () => {
     setDescription(generatedDescription);
     setIsDialogOpen(false);
   };
 
-  if (isLoading) return <Loading />
+  if (isLoading) return <Loading />;
 
   return (
     <Card className="max-w-2xl mx-auto mt-6 space-y-4">
@@ -165,6 +179,18 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
         />
       </div>
 
+      <div className="flex items-center justify-between">
+        <Text>Liste privat machen</Text>
+        <label className="flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            className="form-checkbox h-5 w-5 text-blue-600"
+            checked={isPrivate}
+            onChange={() => setIsPrivate(!isPrivate)}
+          />
+        </label>
+      </div>
+
       <div className="space-y-2">
         <Title className="text-base">Items auswählen</Title>
         {userItems.length === 0 && (
@@ -186,19 +212,17 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
         ))}
       </div>
 
-      <Button color="blue" onClick={handleUpdate}>
+      <Button color="blue" onClick={() => setIsUpdateConfirmOpen(true)}>
         Änderungen speichern
       </Button>
-      
-      {/* Dialog für Beschreibungsvorschau */}
+
+      {/* Dialog: Beschreibungsvorschau */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>
         <DialogPanel>
           <Title className="mb-4">Generierte Beschreibung</Title>
-          
           <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
             <Text>{generatedDescription}</Text>
           </div>
-          
           <div className="flex justify-end space-x-2">
             <Button
               color="gray"
@@ -209,13 +233,35 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
             >
               Neu generieren
             </Button>
-            <Button
-              color="blue"
-              onClick={handleAcceptDescription}
-            >
+            <Button color="blue" onClick={handleAcceptDescription}>
               Übernehmen
             </Button>
           </div>
+        </DialogPanel>
+      </Dialog>
+
+      {/* Dialog: Bestätigung vor Update */}
+      <Dialog open={isUpdateConfirmOpen} onClose={() => setIsUpdateConfirmOpen(false)}>
+        <DialogPanel className="max-w-sm bg-white rounded-xl shadow-md p-6">
+          <Title>Änderungen speichern?</Title>
+          <Text>
+            Bist du sicher, dass du die Änderungen an dieser Liste speichern möchtest?
+          </Text>
+          <Flex justifyContent="end" className="mt-6 space-x-2">
+            <Button variant="secondary" onClick={() => setIsUpdateConfirmOpen(false)}>
+              Abbrechen
+            </Button>
+            <Button
+              color="blue"
+              variant="primary"
+              onClick={() => {
+                setIsUpdateConfirmOpen(false);
+                handleUpdate();
+              }}
+            >
+              Ja, speichern
+            </Button>
+          </Flex>
         </DialogPanel>
       </Dialog>
     </Card>

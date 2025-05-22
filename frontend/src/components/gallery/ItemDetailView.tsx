@@ -76,7 +76,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
       <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
         {item.category}
       </Text>
-      <Text className="text-sm text-gray-500">Entered on: {item.entered_on}</Text>
+      <Text className="text-sm text-gray-500">Erstellt am: {new Date(item.entered_on).toLocaleDateString()} • {item.isprivate ? "Privat" : "Öffentlich"}</Text>
       <Text className="text-sm tracking-wide text-blue-500 font-medium">
         Description
       </Text>
