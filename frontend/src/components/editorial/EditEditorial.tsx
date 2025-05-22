@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Title, TextInput, Textarea, Button, Flex, Grid, Text } from "@tremor/react";
+import { Card, Title, TextInput, Textarea, Button, Flex, Grid, Text, Dialog, DialogPanel } from "@tremor/react";
 import { GalleryItem } from "interfaces/Item";
 import NotyfService from "services/NotyfService";
 import { editorialService } from "services/EditorialService";
-import { MagnifyingGlassIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { itemAssistantService } from "services/ItemAssistantService";
+import { MagnifyingGlassIcon, PlusIcon, XMarkIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import Loading from "components/helper/Loading";
 
 type EditEditorialProps = {
@@ -26,6 +27,10 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
     
     const [isLoading, setIsLoading] = useState(true);
 
+    // State for AI description generation
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [generatedDescription, setGeneratedDescription] = useState("");
 
   useEffect(() => {
     const loadEditorial = async () => {
@@ -85,8 +90,55 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
   const removeItem = (itemId: number) => {
     setSelectedItems(prev => prev.filter(item => item.id !== itemId));
   };
+
+  // Generate AI description for editorial list
+  const handleGenerateDescription = async () => {
+    if (!title.trim()) {
+      NotyfService.showError("Bitte geben Sie zuerst einen Titel ein.");
+      return;
+    }
+
+    if (selectedItems.length === 0) {
+      NotyfService.showError("Bitte wählen Sie zuerst mindestens ein Item aus.");
+      return;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      // Create a comprehensive prompt with title and selected items info
+      let promptText = `Erstelle eine ansprechende Beschreibung für eine redaktionelle Sammlung mit dem Titel "${title}". `;
+      promptText += "Die Sammlung enthält folgende kuratierte Elemente:\n";
+
+      selectedItems.forEach((item, index) => {
+        promptText += `${index + 1}. "${item.title}"`;
+        if (item.category) promptText += ` (Kategorie: ${item.category})`;
+        if (item.description) promptText += ` - ${item.description}`;
+        promptText += `\n`;
+      });
+
+      promptText += `\nBitte erstelle basierend auf dem Titel "${title}" und diesen ${selectedItems.length} kuratierten Inhalten eine professionelle, `;
+      promptText += "zusammenfassende Beschreibung, die die thematische Verbindung und Einzigartigkeit dieser redaktionellen Sammlung in 2-3 Sätzen hervorhebt.";
+
+      const generatedText = await itemAssistantService.generateDescription(title, promptText);
+      setGeneratedDescription(generatedText);
+      setIsDialogOpen(true);
+      NotyfService.showSuccess("Beschreibung erfolgreich generiert.");
+    } catch (err) {
+      console.error("Fehler bei der Generierung:", err);
+      NotyfService.showError("Fehler bei der Generierung der Beschreibung.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Accept generated description
+  const handleAcceptDescription = () => {
+    setDescription(generatedDescription);
+    setIsDialogOpen(false);
+  };
   
-  // Create a new editorial list
+  // Update a editorial list
   const handleUpdateList = async () => {
     if (!title.trim()) {
       NotyfService.showError("Bitte geben Sie einen Titel ein");
@@ -134,12 +186,27 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
             required
           />
           
-          <Textarea
-            placeholder="Beschreibung (optional)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-          />
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <Text>Beschreibung</Text>
+              <Button
+                icon={SparklesIcon}
+                size="xs"
+                color="blue"
+                onClick={handleGenerateDescription}
+                loading={isGenerating}
+                disabled={selectedItems.length === 0 || !title.trim()}
+              >
+                KI-Beschreibung generieren
+              </Button>
+            </div>
+            <Textarea
+              placeholder="Beschreibung (optional)"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+            />
+          </div>
         </div>
         
         {/* Search for items */}
@@ -290,6 +357,32 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
           </Button>
         </div>
       </Card>
+
+      {/* AI Description Generation Dialog */}
+      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>
+        <DialogPanel>
+          <Title className="mb-4">Generierte Beschreibung</Title>
+
+          <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
+            <Text>{generatedDescription}</Text>
+          </div>
+
+          <div className="flex justify-end space-x-2">
+            <Button
+              color="gray"
+              onClick={() => {
+                setIsDialogOpen(false);
+                handleGenerateDescription();
+              }}
+            >
+              Neu generieren
+            </Button>
+            <Button color="blue" onClick={handleAcceptDescription}>
+              Übernehmen
+            </Button>
+          </div>
+        </DialogPanel>
+      </Dialog>
     </div>
   );
 };
