@@ -4,6 +4,17 @@ FROM node:18-slim
 # Install curl for health checks
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
+#set envs
+# Set environment variables
+# Set environment variables
+ENV NODE_ENV=production \
+    PORT=3001 \
+    DB_USER=user \
+    DB_HOST=my-postgres \
+    DB_NAME=mydatabase \
+    DB_PASSWORD=password \
+    DB_PORT=5432
+
 # Set working directory
 WORKDIR /app
 

@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 // PostgreSQL connection pool setup - exported so routes can use it
 const pool = new Pool({
     user: process.env.DB_USER || "user",
-    host: process.env.DB_HOST || "my-postgres",
+    host: process.env.DB_HOST || "localhost",
     database: process.env.DB_NAME || "mydatabase",
     password: process.env.DB_PASSWORD || "password",
     port: process.env.DB_PORT || 5432,
