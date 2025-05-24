@@ -2,6 +2,7 @@
 # frontend/Dockerfile
 FROM node:18-slim
 
+ENV REACT_APP_BACKEND_API_URL=http://localhost:3001
 # Set working directory
 WORKDIR /app
 
