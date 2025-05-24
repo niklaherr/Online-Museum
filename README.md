@@ -218,7 +218,7 @@ init-db.sql Skript bei der Datenbank ausführen
 ### Admin-Zugang aktivieren
 
 ```sql
-UPDATE users SET "isAdmin" = true WHERE id = 1;
+UPDATE users SET "isadmin" = true WHERE id = 1;
 ```
 
 ### KI-Funktionen nutzen

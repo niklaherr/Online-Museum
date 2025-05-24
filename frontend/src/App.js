@@ -230,7 +230,7 @@ function App() {
                   }
                 />
 
-            {userService.isAdmin() && (
+            {userService.isadmin() && (
               <>
                 <Route
                   path="/editorial"

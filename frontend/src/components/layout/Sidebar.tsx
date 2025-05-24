@@ -27,7 +27,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     { path: '/items', label: 'Meine Galerie', icon: PhotoIcon },
   ];
 
-  if (userService.isAdmin()) {
+  if (userService.isadmin()) {
     navItems.push(
       { path: '/editorial', label: 'Redaktion', icon: NewspaperIcon },
       { path: '/admin', label: 'Admin', icon: UserGroupIcon },

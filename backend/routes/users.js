@@ -40,7 +40,7 @@ router.delete("/me", authenticateJWT, async (req, res) => {
 router.get("/me/permissions", authenticateJWT, async (req, res) => {
     try {
         res.json({ 
-            isAdmin: req.user.isAdmin === true 
+            isadmin: req.user.isadmin === true 
         });
     } catch (err) {
         console.error(err);

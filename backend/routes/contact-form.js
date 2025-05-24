@@ -38,7 +38,7 @@ router.get("/contact-form", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
     
     // Check if user is admin
-    if (!req.user.isAdmin) {
+    if (!req.user.isadmin) {
         return res.status(403).json({ error: "Nur Administratoren haben Zugriff auf diese Ressource." });
     }
     
@@ -62,7 +62,7 @@ router.put("/contact-form/:id/status", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
     
     // Check if user is admin
-    if (!req.user.isAdmin) {
+    if (!req.user.isadmin) {
         return res.status(403).json({ error: "Nur Administratoren haben Zugriff auf diese Ressource." });
     }
     

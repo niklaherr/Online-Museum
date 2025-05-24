@@ -17,7 +17,7 @@ class AdminService {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${userService.getToken()}`
                 },
-                body: JSON.stringify({ isAdmin: true }),
+                body: JSON.stringify({ isadmin: true }),
             });
 
             if (!response.ok) throw new Error("Failed to assign admin");
@@ -36,7 +36,7 @@ class AdminService {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${userService.getToken()}`
                 },
-                body: JSON.stringify({ isAdmin: false }),
+                body: JSON.stringify({ isadmin: false }),
             });
 
             if (!response.ok) throw new Error("Failed to remove admin");
