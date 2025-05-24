@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    build: ./db
+    image: museum-db:latest
+    container_name: museum-db
+    ports:
+      - "5432:5432" 
+    networks:
+      - backend-db
+
+  backend:
+    build: ./backend
+    image: museum-backend:latest
+    container_name: museum-backend
+    ports:
+      - "3001:3001" 
+    networks:
+      - backend-db
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    image: museum-frontend:latest
+    container_name: museum-frontend
+    ports:
+      - "3000:3000"
+
+networks:
+  backend-db:
+
