@@ -82,7 +82,7 @@ function App() {
 
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="h-screen bg-gray-100 flex">
       {currentUser && (
         <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
       )}
@@ -94,8 +94,10 @@ function App() {
           sidebarOpen={sidebarOpen}
         />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          <Routes>
+        <div className="flex-1 overflow-y-auto">
+          <div className="min-h-full flex flex-col">
+            <main className="flex-1 p-4 md:p-6">
+              <Routes>
           <Route
               path="/"
               element={
@@ -287,10 +289,12 @@ function App() {
                  </ProtectedRoute>
                }
              />
-          </Routes>
-        </main>
-        
-        <Footer />
+              </Routes>
+            </main>
+            
+            <Footer />
+          </div>
+        </div>
       </div>
     </div>
   );
