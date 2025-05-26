@@ -1,5 +1,5 @@
 // frontend/src/pages/Dashboard.tsx (Erweiterte Version mit redaktionellen Listen)
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Tremor-Komponenten importieren
 import {
@@ -17,7 +17,13 @@ import {
   SparklesIcon, 
   ClockIcon,
   UserIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  ChartBarIcon,
+  DocumentTextIcon,
+  PhotoIcon,
+  RectangleStackIcon,
+  CalendarIcon,
+  ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 import { userService } from 'services/UserService';
 import Activity from 'interfaces/Activity';
@@ -33,9 +39,8 @@ type ActivityItemProps = {
   activity: Activity
 }
 
-// Aktivitäts-Element mit Tremor
+// Modern Activity Card Component
 const ActivityItem = ({ activity } : ActivityItemProps) => {
-  // Formatierung der Zeit als "vor x Minuten/Stunden/Tagen"
   const formatTime = (timeString: string) => {
     const now = new Date();
     const time = new Date(timeString);
@@ -45,53 +50,83 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
     const diffDays = Math.floor(diffHours / 24);
     
     if (diffMins < 60) {
-      return `vor ${diffMins} Minuten`;
+      return `vor ${diffMins} Min.`;
     } else if (diffHours < 24) {
-      return `vor ${diffHours} Stunden`;
+      return `vor ${diffHours} Std.`;
     } else {
-      return `vor ${diffDays} Tagen`;
+      return `vor ${diffDays} Tag${diffDays === 1 ? '' : 'en'}`;
     }
   };
   
-  // Badge-Farbe basierend auf Aktivitätstyp
   const getBadgeColor = () => {
     switch(activity.type) {
       case 'CREATE': return 'emerald';
       case 'UPDATE': return 'blue';
-      case 'DELETE': return 'purple';
+      case 'DELETE': return 'red';
       default: return 'gray';
     }
   };
 
+  const getIcon = () => {
+    switch(activity.type) {
+      case 'CREATE': return <SparklesIcon className="w-4 h-4" />;
+      case 'UPDATE': return <DocumentTextIcon className="w-4 h-4" />;
+      case 'DELETE': return <PhotoIcon className="w-4 h-4" />;
+      default: return <ClockIcon className="w-4 h-4" />;
+    }
+  };
+
   const getMessage = () => {
+    const baseMessage = activity.category === 'ITEM' ? 'Item' : 
+                       activity.category === 'ITEM_LIST' ? 'Liste' : 'Element';
+    
     switch (activity.type) {
       case 'CREATE':
-        return `Element with ID ${activity.element_id} has been created.`;
+        return `${baseMessage} erstellt`;
       case 'UPDATE':
-        return `Element with ID ${activity.element_id} has been updated.`;
+        return `${baseMessage} bearbeitet`;
       case 'DELETE':
-        return `Element with ID ${activity.element_id} has been deleted.`;
+        return `${baseMessage} gelöscht`;
       default:
-        return `Activity on element ID ${activity.element_id}.`;
+        return `${baseMessage} verändert`;
     }
   };
   
   return (
-    <Flex className="py-2">
-      <div>
-        <Badge color={getBadgeColor()} size="xs">
-          {activity.category.toUpperCase()}
-        </Badge>
-        <Text className="mt-1">
-          {getMessage()}
-        </Text>
-      </div>
-      <Text>{formatTime(activity.entered_on)}</Text>
-    </Flex>
+    <Card className="group hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500">
+      <Flex className="py-3" justifyContent="between" alignItems="center">
+        <div className="flex items-center space-x-3">
+          <div className={`p-2 rounded-lg bg-${getBadgeColor()}-50`}>
+            {getIcon()}
+          </div>
+          
+          <div>
+            <div className="flex items-center space-x-2 mb-1">
+              <Badge color={getBadgeColor()} size="xs">
+                {getMessage()}
+              </Badge>
+              <Text className="text-xs text-gray-500">
+                ID: {activity.element_id}
+              </Text>
+            </div>
+            <Text className="text-sm font-medium text-gray-700">
+              {activity.category.toLowerCase().replace('_', ' ')} Aktivität
+            </Text>
+          </div>
+        </div>
+        
+        <div className="text-right">
+          <Text className="text-xs text-gray-500 flex items-center">
+            <ClockIcon className="w-3 h-3 mr-1" />
+            {formatTime(activity.entered_on)}
+          </Text>
+        </div>
+      </Flex>
+    </Card>
   );
 };
 
-// Editorial-Listen Komponente für Dashboard
+// Editorial-Listen Komponente für Dashboard (behalten das coole Banner!)
 type EditorialItemProps = {
   editorial: Editorial;
   onNavigate: (route: string) => void;
@@ -152,6 +187,51 @@ const EditorialItem = ({ editorial, onNavigate }: EditorialItemProps) => {
   );
 };
 
+// Modern Stats Card Component
+const StatsCard = ({ 
+  title, 
+  value, 
+  icon: Icon, 
+  color = "blue",
+  trend 
+}: {
+  title: string;
+  value: number | string;
+  icon: any;
+  color?: string;
+  trend?: string;
+}) => {
+  return (
+    <Card className="relative overflow-hidden hover:shadow-lg transition-all duration-300 group">
+      {/* Background gradient */}
+      <div className={`absolute inset-0 bg-gradient-to-br from-${color}-50 to-${color}-100 opacity-50`}></div>
+      
+      <div className="relative p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <Text className={`text-${color}-600 text-sm font-medium mb-1`}>
+              {title}
+            </Text>
+            <Metric className={`text-2xl font-bold text-${color}-800`}>
+              {value}
+            </Metric>
+            {trend && (
+              <div className="flex items-center mt-2">
+                <ArrowTrendingUpIcon className={`w-4 h-4 text-${color}-500 mr-1`} />
+                <Text className={`text-xs text-${color}-600`}>{trend}</Text>
+              </div>
+            )}
+          </div>
+          
+          <div className={`p-3 bg-${color}-100 rounded-xl group-hover:scale-110 transition-transform duration-300`}>
+            <Icon className={`w-8 h-8 text-${color}-600`} />
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
 // Hauptkomponente für das Dashboard
 const Dashboard = () => {
   
@@ -201,21 +281,61 @@ const Dashboard = () => {
   }, []);
 
   const handleNavigate = (route: string) => {
-    // Hier können Sie die Navigation implementieren
-    // z.B. window.location.href = route oder Ihre Router-Navigation
     window.location.href = route;
   };
 
   if (isLoading) return <Loading />
 
+  // Calculate stats
+  const totalItems = itemDataCount.reduce((sum, item) => sum + item.count, 0);
+  const totalLists = itemListDateCount.reduce((sum, item) => sum + item.count, 0);
+  const recentActivities = activities.length;
+
   return (
-    <div className="space-y-6">
-      <div>
-        <Title>Dashboard</Title>
-        <Text>Willkommen zurück, {userService.getUserName() || 'Gast'}!</Text>
+    <div className="space-y-8">
+      {/* Welcome Header */}
+      <div className="space-y-2">
+        <Title className="text-3xl font-bold text-gray-900">
+          Dashboard
+        </Title>
+        <Text className="text-lg text-gray-600">
+          Willkommen zurück, {userService.getUserName() || 'Gast'}! 👋
+        </Text>
       </div>
 
-      {/* Redaktionelle Listen Section */}
+      {/* Stats Cards */}
+      <Grid numItemsSm={2} numItemsMd={4} className="gap-6">
+        <StatsCard
+          title="Meine Items"
+          value={totalItems}
+          icon={PhotoIcon}
+          color="blue"
+          trend="Aktiv erstellt"
+        />
+        <StatsCard
+          title="Meine Listen"
+          value={totalLists}
+          icon={RectangleStackIcon}
+          color="green"
+          trend="Organisiert"
+        />
+        <StatsCard
+          title="Aktivitäten"
+          value={recentActivities}
+          icon={ChartBarIcon}
+          color="purple"
+          trend="Letzte Aktionen"
+        />
+        <StatsCard
+          title="Redaktionell"
+          value={editorialLists.length}
+          icon={SparklesIcon}
+          color="indigo"
+          trend="Kuratiert"
+        />
+      </Grid>
+
+      {/* Redaktionelle Listen Section (behält das coole Banner!) */}
       {editorialLists.length > 0 && (
         <Card className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border-0 shadow-2xl overflow-hidden">
           <div className="relative p-8">
@@ -268,45 +388,137 @@ const Dashboard = () => {
         </Card>
       )}
 
-      {/* Bestehende Charts */}
-      <Card>
-        <Title>Itemlisten über die Zeit</Title>
-        <BarChart
-          className="h-80"
-          data={itemListDateCount}
-          index="date"
-          categories={['count']}
-          colors={['blue']}
-          showLegend={false}
-          yAxisWidth={60}
-        />
-      </Card>
+      {/* Charts Section */}
+      <Grid numItemsSm={1} numItemsMd={2} className="gap-6">
+        <Card className="p-6 hover:shadow-lg transition-shadow duration-300">
+          <div className="flex items-center mb-4">
+            <div className="p-2 bg-blue-100 rounded-lg mr-3">
+              <RectangleStackIcon className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <Title>Item-Listen Entwicklung</Title>
+              <Text className="text-gray-600">Ihre Listen über die Zeit</Text>
+            </div>
+          </div>
+          <BarChart
+            className="h-80"
+            data={itemListDateCount}
+            index="date"
+            categories={['count']}
+            colors={['blue']}
+            showLegend={false}
+            yAxisWidth={60}
+          />
+        </Card>
 
-      <Card>
-        <Title>Items über die Zeit</Title>
-        <BarChart
-          className="h-80"
-          data={itemDataCount}
-          index="date"
-          categories={['count']}
-          colors={['indigo']}
-          yAxisWidth={60}
-        />
-      </Card>
+        <Card className="p-6 hover:shadow-lg transition-shadow duration-300">
+          <div className="flex items-center mb-4">
+            <div className="p-2 bg-indigo-100 rounded-lg mr-3">
+              <PhotoIcon className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div>
+              <Title>Items Entwicklung</Title>
+              <Text className="text-gray-600">Ihre Items über die Zeit</Text>
+            </div>
+          </div>
+          <BarChart
+            className="h-80"
+            data={itemDataCount}
+            index="date"
+            categories={['count']}
+            colors={['indigo']}
+            yAxisWidth={60}
+          />
+        </Card>
+      </Grid>
 
-      {/* Aktivitäten */}
-      {activities.length == 0 ? (
-        <NoResults/>
-      ) : (
-        <Card>
-          <Title>Letzte Aktivitäten</Title>
-          <div className="divide-y divide-gray-200">
+      {/* Activities Section */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-purple-100 rounded-lg mr-3">
+              <ClockIcon className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <Title>Letzte Aktivitäten</Title>
+              <Text className="text-gray-600">Ihre neuesten Aktionen im Überblick</Text>
+            </div>
+          </div>
+          <Badge color="purple">
+            {activities.length} Aktivitäten
+          </Badge>
+        </div>
+        
+        {activities.length === 0 ? (
+          <div className="text-center py-12">
+            <ClockIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Title className="text-gray-500 mb-2">Noch keine Aktivitäten</Title>
+            <Text className="text-gray-400">
+              Erstellen Sie Items oder Listen, um Ihre Aktivitäten hier zu sehen.
+            </Text>
+          </div>
+        ) : (
+          <div className="space-y-3">
             {activities.map(activity => (
               <ActivityItem key={activity.id} activity={activity} />
             ))}
           </div>
-        </Card>
-      )}
+        )}
+      </Card>
+
+      {/* Quick Actions */}
+      <Card className="p-6 bg-gradient-to-r from-gray-50 to-blue-50">
+        <Title className="mb-4">Schnellaktionen</Title>
+        <Grid numItemsSm={2} numItemsMd={4} className="gap-4">
+          <button 
+            className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group border border-gray-200"
+            onClick={() => handleNavigate('/items/create')}
+          >
+            <div className="flex items-center">
+              <div className="p-2 bg-blue-100 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-200">
+                <PhotoIcon className="w-5 h-5 text-blue-600" />
+              </div>
+              <Text className="font-medium">Neues Item</Text>
+            </div>
+          </button>
+          
+          <button 
+            className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group border border-gray-200"
+            onClick={() => handleNavigate('/item-list/create')}
+          >
+            <div className="flex items-center">
+              <div className="p-2 bg-green-100 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-200">
+                <RectangleStackIcon className="w-5 h-5 text-green-600" />
+              </div>
+              <Text className="font-medium">Neue Liste</Text>
+            </div>
+          </button>
+          
+          <button 
+            className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group border border-gray-200"
+            onClick={() => handleNavigate('/items')}
+          >
+            <div className="flex items-center">
+              <div className="p-2 bg-purple-100 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-200">
+                <ChartBarIcon className="w-5 h-5 text-purple-600" />
+              </div>
+              <Text className="font-medium">Galerie</Text>
+            </div>
+          </button>
+          
+          <button 
+            className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group border border-gray-200"
+            onClick={() => handleNavigate('/item-list')}
+          >
+            <div className="flex items-center">
+              <div className="p-2 bg-indigo-100 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-200">
+                <SparklesIcon className="w-5 h-5 text-indigo-600" />
+              </div>
+              <Text className="font-medium">Listen</Text>
+            </div>
+          </button>
+        </Grid>
+      </Card>
     </div>
   );
 };
