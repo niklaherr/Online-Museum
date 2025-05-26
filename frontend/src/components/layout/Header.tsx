@@ -5,8 +5,7 @@ import {
   Bars3Icon, 
   SparklesIcon, 
   UserCircleIcon,
-  ChevronDownIcon,
-  BellIcon
+  ChevronDownIcon
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
@@ -62,13 +61,6 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
           <div className="flex items-center space-x-4">
             {isLoggedIn ? (
               <>
-                {/* Notifications */}
-                <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200">
-                  <BellIcon className="w-5 h-5" />
-                  {/* Notification Dot */}
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
-
                 {/* User Menu */}
                 <div className="relative">
                   <button
