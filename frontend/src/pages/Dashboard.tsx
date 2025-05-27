@@ -295,7 +295,6 @@ const Dashboard = () => {
       </Card>
 
       {/* Aktivitäten */}
-      if (activities.length === 0)
       {activities.length == 0 ? (
         <NoResults/>
       ) : (
