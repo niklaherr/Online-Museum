@@ -21,21 +21,69 @@ const { authenticateJWT } = require("./middleware/auth");
 const app = express();
 const port = process.env.PORT || 3001;
 
+console.log('Starting server...');
+console.log('Port:', port);
+console.log('Environment:', process.env.NODE_ENV || 'development');
+
 // Middleware setup
-app.use(cors());
+app.use(cors({
+    origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'],
+    credentials: true
+}));
 app.use(bodyParser.json());
 
-// PostgreSQL connection pool setup - exported so routes can use it
+// PostgreSQL connection pool setup
 const pool = new Pool({
     user: process.env.DB_USER || "user",
-    host: process.env.DB_HOST || "localhost",
+    host: process.env.DB_HOST || "localhost", 
     database: process.env.DB_NAME || "mydatabase",
     password: process.env.DB_PASSWORD || "password",
-    port: process.env.DB_PORT || 5432,
+    port: parseInt(process.env.DB_PORT) || 5432,
+    // Railway spezifische Konfiguration
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
+
+// Test database connection
+pool.connect((err, client, release) => {
+    if (err) {
+        console.error('Error connecting to database:', err);
+    } else {
+        console.log('Successfully connected to database');
+        release();
+    }
 });
 
 // Make the pool available to all route modules
 app.locals.pool = pool;
+
+// Health check route
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        port: port,
+        env: process.env.NODE_ENV || 'development'
+    });
+});
+
+// Test route für DB-Verbindung
+app.get('/db-test', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT NOW() as current_time, version() as postgres_version');
+        res.json({
+            message: 'Database connection successful',
+            timestamp: result.rows[0].current_time,
+            version: result.rows[0].postgres_version,
+            tables: 'Using existing tables'
+        });
+    } catch (error) {
+        console.error('Database test error:', error);
+        res.status(500).json({
+            error: 'Database connection failed',
+            details: error.message
+        });
+    }
+});
 
 // Register routes
 app.use("/", authRoutes);
@@ -55,7 +103,8 @@ app.use((err, req, res, next) => {
 
 // Start the server
 app.listen(port, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running on http://0.0.0.0:${port}`);
+    console.log(`Health check available at: http://0.0.0.0:${port}/health`);
 });
 
 module.exports = app;
