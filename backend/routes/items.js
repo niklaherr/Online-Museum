@@ -76,6 +76,7 @@ router.get("/items", authenticateJWT, async (req, res) => {
 router.get("/items/:id", authenticateJWT, async (req, res) => {
     const { id } = req.params;
     const pool = req.app.locals.pool;
+    const userId = req.user.id;
     
     try {
         const query = `
@@ -83,8 +84,9 @@ router.get("/items/:id", authenticateJWT, async (req, res) => {
             FROM item 
             JOIN users ON item.user_id = users.id
             WHERE item.id = $1
+            AND (item.isPrivate = false OR item.user_id = $2)
         `;
-        const result = await pool.query(query, [id]);
+        const result = await pool.query(query, [id, userId]);
 
         if (result.rows.length === 0) return res.status(404).send("Item not found");
 
@@ -270,6 +272,7 @@ router.get("/items-search", authenticateJWT, async (req, res) => {
 // GET /items/filter - Flexible filter for any item field
 router.get("/items-filter", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
+    const userId = req.user.id;
 
     const {
         title,
@@ -331,6 +334,9 @@ router.get("/items-filter", authenticateJWT, async (req, res) => {
             values.push(exclude_user_id);
             conditions.push(`i.user_id != $${values.length}`);
         }
+
+        values.push(userId);
+        conditions.push(`(i.isPrivate = false OR i.user_id = $${values.length})`);
 
         const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
