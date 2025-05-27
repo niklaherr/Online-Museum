@@ -6,7 +6,6 @@
     "@headlessui/react": "^2.2.2",
     "@heroicons/react": "^2.2.0",
     "@remixicon/react": "^4.6.0",
-    "@testing-library/react": "^13.4.0",
     "@tremor/react": "^3.18.7",
     "axios": "^1.9.0",
     "date-fns": "^3.6.0",
@@ -16,12 +15,11 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.5.3",
     "react-scripts": "^5.0.1",
-    "serve": "^14.2.1"
+    "serve": "^14.2.4"
   },
   "scripts": {
-    "start": "serve -s build -l $PORT",
+    "start": "react-scripts start",
     "build": "react-scripts build",
-    "dev": "react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
