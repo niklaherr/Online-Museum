@@ -62,6 +62,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
   return (
     <div className="relative p-4">
       {/* Edit Button */}
+      if (item.user_id === userService.getUserID())
       {item.user_id == userService.getUserID() && (<div className="absolute top-4 right-4">
         <Button
           icon={PencilIcon}
