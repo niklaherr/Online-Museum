@@ -177,10 +177,6 @@ const EditorialItem = ({ editorial, onNavigate }: EditorialItemProps) => {
             <ClockIcon className="w-4 h-4 mr-2" />
             <span className="font-medium">Erstellt am {formatDate(editorial.entered_on)}</span>
           </div>
-          
-          <div className="text-xs text-blue-500 group-hover:text-blue-700 transition-colors duration-300 font-medium">
-            Jetzt ansehen →
-          </div>
         </div>
       </div>
     </Card>
@@ -289,7 +285,6 @@ const Dashboard = () => {
   // Calculate stats
   const totalItems = itemDataCount.reduce((sum, item) => sum + item.count, 0);
   const totalLists = itemListDateCount.reduce((sum, item) => sum + item.count, 0);
-  const recentActivities = activities.length;
 
   return (
     <div className="space-y-8">
@@ -304,14 +299,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <Grid numItemsSm={2} numItemsMd={4} className="gap-6">
-        <StatsCard
-          title="Meine Items"
-          value={totalItems}
-          icon={PhotoIcon}
-          color="blue"
-          trend="Aktiv erstellt"
-        />
+      <Grid numItemsSm={1} numItemsMd={2} className="gap-6">
         <StatsCard
           title="Meine Listen"
           value={totalLists}
@@ -320,18 +308,11 @@ const Dashboard = () => {
           trend="Organisiert"
         />
         <StatsCard
-          title="Aktivitäten"
-          value={recentActivities}
-          icon={ChartBarIcon}
-          color="purple"
-          trend="Letzte Aktionen"
-        />
-        <StatsCard
-          title="Redaktionell"
-          value={editorialLists.length}
-          icon={SparklesIcon}
-          color="indigo"
-          trend="Kuratiert"
+          title="Meine Items"
+          value={totalItems}
+          icon={PhotoIcon}
+          color="blue"
+          trend="Aktiv erstellt"
         />
       </Grid>
 
@@ -404,7 +385,6 @@ const Dashboard = () => {
             index="date"
             categories={['count']}
             colors={['blue']}
-            showLegend={false}
             yAxisWidth={60}
           />
         </Card>
@@ -442,9 +422,6 @@ const Dashboard = () => {
               <Text className="text-gray-600">Ihre neuesten Aktionen im Überblick</Text>
             </div>
           </div>
-          <Badge color="purple">
-            {activities.length} Aktivitäten
-          </Badge>
         </div>
         
         {activities.length === 0 ? (
