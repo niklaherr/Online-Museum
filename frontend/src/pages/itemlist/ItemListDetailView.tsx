@@ -276,50 +276,6 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
         </Card>
       )}
 
-      {/* List Statistics Card */}
-      <Card>
-        <div className="p-6">
-          <Title className="text-lg mb-4">Listen-Statistiken</Title>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-blue-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600 mb-1">
-                {items.length}
-              </div>
-              <Text className="text-blue-800 text-sm font-medium">
-                {items.length === 1 ? "Item" : "Items"}
-              </Text>
-            </div>
-            
-            <div className="bg-green-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-green-600 mb-1">
-                {new Set(items.map(item => item.category)).size}
-              </div>
-              <Text className="text-green-800 text-sm font-medium">
-                Kategorien
-              </Text>
-            </div>
-            
-            <div className="bg-purple-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-purple-600 mb-1">
-                {new Set(items.map(item => item.username)).size}
-              </div>
-              <Text className="text-purple-800 text-sm font-medium">
-                Autoren
-              </Text>
-            </div>
-            
-            <div className="bg-orange-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600 mb-1">
-                {list?.isprivate ? "Privat" : "Öffentlich"}
-              </div>
-              <Text className="text-orange-800 text-sm font-medium">
-                Sichtbarkeit
-              </Text>
-            </div>
-          </div>
-        </div>
-      </Card>
-
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
         <DialogPanel className="max-w-md bg-white rounded-xl shadow-xl p-6">
