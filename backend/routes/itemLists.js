@@ -5,19 +5,6 @@ const { createActivity } = require("../services/activityService");
 
 const router = express.Router();
 
-// Fetch all item lists
-router.get("/item-lists", authenticateJWT, async (req, res) => {
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query("SELECT * FROM item_list ORDER BY id ASC");
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching item lists");
-    }
-});
-
 // Get one item list by ID
 router.get("/item-lists/:id", authenticateJWT, async (req, res) => {
     const { id } = req.params;
@@ -28,20 +15,6 @@ router.get("/item-lists/:id", authenticateJWT, async (req, res) => {
         const result = await pool.query("SELECT * FROM item_list WHERE id = $1 AND (isPrivate = false OR user_id = $2)", [id, userId]);
         if (result.rows.length === 0) return res.status(404).send("Item list not found");
         res.json(result.rows[0]);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching item list");
-    }
-});
-
-// Fetch the authenticated user's item lists
-router.get("/me/item-lists", authenticateJWT, async (req, res) => {
-    const userId = req.user.id;
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query("SELECT * FROM item_list WHERE user_id = $1", [userId]);
-        res.json(result.rows);
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching item list");
@@ -231,31 +204,92 @@ router.delete("/item-lists/:id", authenticateJWT, async (req, res) => {
     }
 });
 
-// Fetch public items
-router.get("/public/item-lists", authenticateJWT, async (req, res) => {
+
+router.get("/item-lists", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
-    
+    const userId = req.user.id;
+
+    const {
+        title,
+        description,
+        username,
+        id,
+        user_id,
+        entered_on,
+        exclude_user_id
+    } = req.query;
+
     try {
-        const result = await pool.query("SELECT * FROM item_list WHERE isprivate = false",);
-        res.json(result.rows);
+        const conditions = [];
+        const values = [];
+
+        if (title) {
+            values.push(`%${title}%`);
+            conditions.push(`il.title ILIKE $${values.length}`);
+        }
+
+        if (description) {
+            values.push(`%${description}%`);
+            conditions.push(`il.description ILIKE $${values.length}`);
+        }
+
+        if (username) {
+            values.push(`%${username}%`);
+            conditions.push(`u.username ILIKE $${values.length}`);
+        }
+
+        if (id) {
+            values.push(id);
+            conditions.push(`il.id = $${values.length}`);
+        }
+
+        if (user_id) {
+            values.push(user_id);
+            conditions.push(`il.user_id = $${values.length}`);
+        }
+
+        if (entered_on) {
+            values.push(entered_on);
+            conditions.push(`DATE(il.entered_on) = DATE($${values.length})`);
+        }
+
+        if (exclude_user_id) {
+            values.push(exclude_user_id);
+            conditions.push(`il.user_id != $${values.length}`);
+        }
+
+        // Visibility constraint
+        values.push(userId);
+        conditions.push(`(il.isprivate = false OR il.user_id = $${values.length})`);
+
+        const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+        const sqlQuery = `
+            SELECT il.*, u.username
+            FROM item_list il
+            JOIN users u ON il.user_id = u.id
+            ${whereClause}
+            ORDER BY il.entered_on DESC;
+        `;
+
+        const result = await pool.query(sqlQuery, values);
+
+        const itemLists = result.rows.map(list => ({
+            id: list.id,
+            title: list.title,
+            description: list.description,
+            entered_on: list.entered_on,
+            user_id: list.user_id,
+            username: list.username,
+            isprivate: list.isprivate
+        }));
+
+        res.json(itemLists);
     } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching items");
+        console.error("Error filtering item lists:", err);
+        res.status(500).send("Error filtering item lists");
     }
 });
 
-// Fetch current user's items
-router.get("/me/item-lists", authenticateJWT, async (req, res) => {
-    const userId = req.user.id;
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query("SELECT * FROM item_list WHERE user_id = $1", [userId]);
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching items");
-    }
-});
 
 module.exports = router;
