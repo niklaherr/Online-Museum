@@ -4,21 +4,8 @@ const { authenticateJWT } = require("../middleware/auth");
 
 const router = express.Router();
 
-// Fetch all users (requires authentication)
-router.get("/", authenticateJWT, async (req, res) => {
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query("SELECT * FROM users ORDER BY username DESC");
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching users");
-    }
-});
-
 // Delete the authenticated user
-router.delete("/me", authenticateJWT, async (req, res) => {
+router.delete("/users", authenticateJWT, async (req, res) => {
     const userId = req.user.id;
     const pool = req.app.locals.pool;
     
@@ -33,18 +20,6 @@ router.delete("/me", authenticateJWT, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "User deletion failed" });
-    }
-});
-
-// Check user permissions
-router.get("/me/permissions", authenticateJWT, async (req, res) => {
-    try {
-        res.json({ 
-            isadmin: req.user.isadmin === true 
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Fehler beim Prüfen der Benutzerberechtigungen." });
     }
 });
 
