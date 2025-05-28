@@ -95,50 +95,6 @@ const Footer = () => {
           ))}
         </div>
       </div>
-
-      {/* Bottom Bar */}
-      <div className="border-t border-gray-100 bg-gray-50/50">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            {/* Copyright */}
-            <div className="flex items-center space-x-4">
-              <Link to="/impressum" className="group">
-                <div className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
-                  © {currentYear} Online-Museum
-                </div>
-              </Link>
-              <span className="text-gray-300">|</span>
-              <div className="text-sm text-gray-500">
-                Alle Rechte vorbehalten
-              </div>
-            </div>
-            
-            {/* Quick Links */}
-            <div className="flex items-center space-x-6">
-              {['Datenschutz', 'Nutzungsbedingungen', 'Hilfe & Support'].map((link, index) => (
-                <Link 
-                  key={index}
-                  to={
-                    link === 'Datenschutz' ? '/privacy' :
-                    link === 'Nutzungsbedingungen' ? '/termsofuse' :
-                    '/helfsupport'
-                  }
-                  className="text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200"
-                >
-                  {link}
-                </Link>
-              ))}
-            </div>
-          </div>
-          
-          {/* Tagline */}
-          <div className="mt-4 text-center">
-            <div className="text-xs text-gray-500 italic">
-              "Bewahren Sie Ihre wertvollsten Erinnerungen für die Ewigkeit"
-            </div>
-          </div>
-        </div>
-      </div>
     </footer>
   );
 };

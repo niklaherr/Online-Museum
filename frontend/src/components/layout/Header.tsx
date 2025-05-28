@@ -37,24 +37,6 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
                 <Bars3Icon className="w-6 h-6" />
               </button>
             )}
-
-            {/* Logo */}
-            <Link 
-              to={isLoggedIn ? "/dashboard" : "/"} 
-              className="flex items-center space-x-3 group"
-            >
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-105">
-                <SparklesIcon className="w-6 h-6 text-white" />
-              </div>
-              <div className="hidden sm:block">
-                <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Online-Museum
-                </div>
-                <div className="text-xs text-gray-500 font-medium">
-                  Digitale Erinnerungsräume
-                </div>
-              </div>
-            </Link>
           </Flex>
 
           {/* Right Side */}

@@ -53,12 +53,6 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       >
         {/* Header */}
         <div className="relative p-6 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-2 right-2 w-16 h-16 bg-white rounded-full"></div>
-            <div className="absolute bottom-2 left-2 w-12 h-12 bg-white rounded-full"></div>
-          </div>
-          
           <div className="relative flex justify-between items-center">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-white/20 backdrop-blur-sm rounded-xl">
