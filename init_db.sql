@@ -4,7 +4,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    isAdmin BOOLEAN DEFAULT FALSE,
+    isadmin BOOLEAN DEFAULT FALSE,
     security_question VARCHAR(255),
     security_answer TEXT
 );

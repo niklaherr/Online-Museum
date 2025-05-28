@@ -21,10 +21,11 @@ router.get("/item-lists", authenticateJWT, async (req, res) => {
 // Get one item list by ID
 router.get("/item-lists/:id", authenticateJWT, async (req, res) => {
     const { id } = req.params;
+    const userId = req.user.id
     const pool = req.app.locals.pool;
     
     try {
-        const result = await pool.query("SELECT * FROM item_list WHERE id = $1", [id]);
+        const result = await pool.query("SELECT * FROM item_list WHERE id = $1 AND (isPrivate = false OR user_id = $2)", [id, userId]);
         if (result.rows.length === 0) return res.status(404).send("Item list not found");
         res.json(result.rows[0]);
     } catch (err) {
