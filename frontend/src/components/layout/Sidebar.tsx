@@ -117,7 +117,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
           </div>
 
           {/* Admin Section */}
-          {userService.isAdmin() && (
+          {userService.isadmin() && (
             <div>
               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
                 Administration
@@ -168,7 +168,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             <div className="text-sm font-medium text-gray-900">
               {userService.getUserName()}
             </div>
-            {userService.isAdmin() && (
+            {userService.isadmin() && (
               <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 mt-2">
                 Administrator
               </div>

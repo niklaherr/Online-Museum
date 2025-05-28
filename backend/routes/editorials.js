@@ -74,7 +74,7 @@ router.post("/editorial-lists", authenticateJWT, async (req, res) => {
     }
 
     // Check if user is admin
-    if (!req.user.isAdmin) {
+    if (!req.user.isadmin) {
         return res.status(403).json({ error: "Sie haben keine Berechtigung, redaktionelle Listen zu erstellen." });
     }
 
@@ -137,7 +137,7 @@ router.put("/editorial-lists/:id", authenticateJWT, async (req, res) => {
     }
 
     // Check if user is admin
-    if (!req.user.isAdmin) {
+    if (!req.user.isadmin) {
         return res.status(403).json({ error: "Sie haben keine Berechtigung, redaktionelle Listen zu bearbeiten." });
     }
 
@@ -208,7 +208,7 @@ router.delete("/editorial-lists/:id", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
 
     // Check if user is admin
-    if (!req.user.isAdmin) {
+    if (!req.user.isadmin) {
         return res.status(403).json({ error: "Sie haben keine Berechtigung, redaktionelle Listen zu löschen." });
     }
 

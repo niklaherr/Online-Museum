@@ -18,7 +18,7 @@ type HeaderProps = {
 const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
   const isLoggedIn = userService.isLoggedIn();
   const userName = userService.getUserName();
-  const isAdmin = userService.isAdmin();
+  const isadmin = userService.isadmin();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
@@ -54,7 +54,7 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
                       <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm shadow-md">
                         {userName?.charAt(0).toUpperCase()}
                       </div>
-                      {isAdmin && (
+                      {isadmin && (
                         <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>
                       )}
                     </div>
@@ -64,7 +64,7 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
                       <div className="text-sm font-medium text-gray-900">
                         {userName}
                       </div>
-                      {isAdmin && (
+                      {isadmin && (
                         <div className="text-xs text-red-600 font-medium">
                           Administrator
                         </div>
@@ -96,7 +96,7 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
                             <div>
                               <div className="font-medium text-gray-900">{userName}</div>
                               <div className="text-sm text-gray-500">
-                                {isAdmin ? 'Administrator' : 'Benutzer'}
+                                {isadmin ? 'Administrator' : 'Benutzer'}
                               </div>
                             </div>
                           </div>
