@@ -359,50 +359,6 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
       {!searchQuery && categories.length === 0 && filteredUserItems.length === 0 && (
         <NoResults />
       )}
-
-      {/* Statistics Footer */}
-      <Card>
-        <div className="p-6">
-          <Title className="text-lg mb-4 text-center">Galerie-Übersicht</Title>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600 mb-1">
-                {totalPublicItems}
-              </div>
-              <Text className="text-blue-800 text-sm font-medium">
-                Öffentliche Items
-              </Text>
-            </div>
-            
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600 mb-1">
-                {totalUserItems}
-              </div>
-              <Text className="text-green-800 text-sm font-medium">
-                Eigene Items
-              </Text>
-            </div>
-            
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600 mb-1">
-                {totalCategories}
-              </div>
-              <Text className="text-purple-800 text-sm font-medium">
-                Kategorien
-              </Text>
-            </div>
-            
-            <div className="text-center p-4 bg-indigo-50 rounded-lg">
-              <div className="text-2xl font-bold text-indigo-600 mb-1">
-                {totalPublicItems + totalUserItems}
-              </div>
-              <Text className="text-indigo-800 text-sm font-medium">
-                Gesamt
-              </Text>
-            </div>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 };
