@@ -1,17 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Text, Title, Badge } from "@tremor/react";
-import { 
-  LockClosedIcon, 
-  UserIcon, 
-  MagnifyingGlassIcon,
-  PlusIcon,
-  TagIcon,
-  CalendarIcon,
-  EyeIcon,
-  PhotoIcon,
-  SparklesIcon,
-  RectangleGroupIcon
-} from "@heroicons/react/24/outline";
+import { Button, Card, Text, Title } from "@tremor/react";
+import { LockClosedIcon, UserIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { userService } from "../../services/UserService";
 import Item, { GalleryItem } from "../../interfaces/Item";
 import { itemService } from "../../services/ItemService";
@@ -28,6 +17,7 @@ type GalleryProps = {
 const groupItemsByCategory = (items: GalleryItem[]) => {
   const groupedItems: { [key: string]: GalleryItem[] } = {};
   
+  // Füge "Unkategorisiert" für Items ohne Kategorie hinzu
   items.forEach((item) => {
     const category = item.category || "Unkategorisiert";
     if (!groupedItems[category]) {
@@ -37,125 +27,6 @@ const groupItemsByCategory = (items: GalleryItem[]) => {
   });
   
   return groupedItems;
-};
-
-// Modern Item Card Component
-const ItemCard = ({ item, onClick }: { item: GalleryItem; onClick: () => void }) => {
-  return (
-    <Card
-      className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden bg-white border-0 shadow-lg"
-      onClick={onClick}
-    >
-      {/* Image Section */}
-      <div className="relative aspect-square w-full overflow-hidden bg-gray-100">
-        {item.image ? (
-          <img
-            src={item.image}
-            alt={item.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-            <PhotoIcon className="w-16 h-16 text-gray-400 opacity-50" />
-          </div>
-        )}
-        
-        {/* Overlay with badges */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
-        {/* Status badges */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2">
-          {item.isprivate && (
-            <Badge color="red" icon={LockClosedIcon} size="xs">
-              Privat
-            </Badge>
-          )}
-        </div>
-
-        {/* Category badge */}
-        {item.category && (
-          <div className="absolute top-3 left-3">
-            <Badge color="blue" icon={TagIcon} size="xs">
-              {item.category}
-            </Badge>
-          </div>
-        )}
-      </div>
-
-      {/* Content Section */}
-      <div className="p-4 space-y-3">
-        {/* Title */}
-        <Title className="text-lg line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 leading-tight">
-          {item.title}
-        </Title>
-
-        {/* Date */}
-        <div className="flex items-center text-xs text-gray-500">
-          <CalendarIcon className="w-4 h-4 mr-1" />
-          <span>{new Date(item.entered_on).toLocaleDateString('de-DE')}</span>
-        </div>
-
-        {/* Author */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-          <div className="flex items-center">
-            <UserIcon className="w-4 h-4 text-gray-400 mr-2" />
-            <Text className="text-sm text-gray-600 font-medium">
-              {item.username}
-            </Text>
-          </div>
-          
-          {/* View indicator */}
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <EyeIcon className="w-4 h-4 text-blue-500" />
-          </div>
-        </div>
-      </div>
-    </Card>
-  );
-};
-
-// Category Section Component
-const CategorySection = ({ 
-  category, 
-  items, 
-  onNavigate 
-}: { 
-  category: string; 
-  items: GalleryItem[]; 
-  onNavigate: (route: string) => void;
-}) => {
-  return (
-    <div className="space-y-6">
-      {/* Category Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <TagIcon className="w-6 h-6 text-blue-600" />
-          </div>
-          <div>
-            <Title className="text-2xl text-gray-900">{category}</Title>
-            <Text className="text-gray-600">
-              {items.length} {items.length === 1 ? "Item" : "Items"}
-            </Text>
-          </div>
-        </div>
-        <Badge color="blue" size="lg">
-          {items.length}
-        </Badge>
-      </div>
-
-      {/* Items Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {items.map((item) => (
-          <ItemCard
-            key={item.id}
-            item={item}
-            onClick={() => onNavigate('/items/' + item.id)}
-          />
-        ))}
-      </div>
-    </div>
-  );
 };
 
 const Gallery = ({ onNavigate }: GalleryProps) => {
@@ -194,6 +65,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
       item.username.toLowerCase().includes(query) ||
       (item.category && item.category.toLowerCase().includes(query));
     
+    // Wenn ein Kategorie-Filter gesetzt ist, filtere entsprechend
     if (categoryFilter) {
       const itemCategory = item.category || "Unkategorisiert";
       return matchesSearch && itemCategory === categoryFilter;
@@ -202,168 +74,210 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     return matchesSearch;
   });
 
+  // Filtere User Items basierend auf der Suche
+  const filteredUserItems = userItems.filter((item) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      item.title.toLowerCase().includes(query) ||
+      (item.category && item.category.toLowerCase().includes(query))
+    );
+  });
+
   // Gruppiere die gefilterten Items nach Kategorien
   const groupedItems = groupItemsByCategory(filteredItems);
   const categories = Object.keys(groupedItems).sort();
 
-  const totalPublicItems = filteredItems.length;
-  const totalUserItems = userItems.length;
-  const totalCategories = categories.length;
+  const clearSearch = () => {
+    setSearchQuery('');
+  };
 
   if (isLoading) return <Loading />
 
   return (
     <div className="space-y-8">
-      {/* Hero Header */}
-      <div className="relative bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="relative p-8 text-white">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div>
-              <Title className="text-3xl font-bold text-white mb-2">
-                {categoryFilter ? `Kategorie: ${categoryFilter}` : 'Meine Galerie'}
-              </Title>
-              <Text className="text-blue-100 text-lg">
-                {categoryFilter 
-                  ? `${totalPublicItems} Items in dieser Kategorie entdecken`
-                  : 'Entdecken Sie Kunstwerke und Sammlungen aus der Community'
-                }
-              </Text>
-              <div className="flex items-center space-x-6 mt-4 text-blue-100">
-                <div className="flex items-center">
-                  <PhotoIcon className="w-5 h-5 mr-2" />
-                  <span>{totalPublicItems} öffentliche Items</span>
-                </div>
-                <div className="flex items-center">
-                  <RectangleGroupIcon className="w-5 h-5 mr-2" />
-                  <span>{totalCategories} Kategorien</span>
-                </div>
-                <div className="flex items-center">
-                  <SparklesIcon className="w-5 h-5 mr-2" />
-                  <span>{totalUserItems} eigene Items</span>
-                </div>
-              </div>
-            </div>
-            
-            <Button
-              icon={PlusIcon}
-              onClick={() => onNavigate('/items/create')}
-              className="bg-white text-blue-600 hover:bg-blue-50 border-0 shadow-lg"
-              size="lg"
-            >
-              Neues Item
-            </Button>
+      {/* Header Section */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {categoryFilter ? `Kategorie: ${categoryFilter}` : 'Meine Galerie'}
+          </h1>
+          {categoryFilter && (
+            <p className="text-sm text-gray-500">
+              {groupedItems[categoryFilter]?.length || 0} Items in dieser Kategorie
+            </p>
+          )}
+        </div>
+        <button 
+          onClick={() => onNavigate('/items/create')}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          + Neues Item
+        </button>
+      </div>
+      
+      {/* Search Section */}
+      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="relative flex-1 max-w-md">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
           </div>
+          <input
+            type="text"
+            placeholder="Suchen..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+          />
+          {searchQuery && (
+            <button
+              onClick={clearSearch}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              <XMarkIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Search Bar */}
-      <Card>
-        <div className="p-6">
-          <div className="relative max-w-md mx-auto">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Items durchsuchen..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
-            />
-          </div>
+      {/* No Results */}
+      {searchQuery && categories.length === 0 && filteredUserItems.length === 0 && (
+        <div className="text-center py-8">
+          <MagnifyingGlassIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Keine Ergebnisse gefunden</h3>
+          <p className="text-gray-600 mb-4">
+            Wir konnten keine Items finden, die zu "{searchQuery}" passen.
+          </p>
+          <button 
+            onClick={clearSearch}
+            className="text-blue-600 hover:text-blue-800 font-medium"
+          >
+            Suche zurücksetzen
+          </button>
         </div>
-      </Card>
-
-      {/* Public Items by Category */}
+      )}
+      
       {categories.length > 0 && (
-        <div className="space-y-12">
+        <div className="space-y-10">
           {categories.map((category) => (
-            <CategorySection
-              key={category}
-              category={category}
-              items={groupedItems[category]}
-              onNavigate={onNavigate}
-            />
+            <div key={category} className="space-y-4">
+              <div className="border-b border-gray-200 pb-2">
+                <Title className="text-xl font-bold text-gray-800">
+                  {category}
+                </Title>
+                <Text className="text-sm text-gray-500">
+                  {groupedItems[category].length} {groupedItems[category].length === 1 ? "Item" : "Items"}
+                </Text>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {groupedItems[category].map((item) => (
+                  <Card
+                    key={item.id}
+                    className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
+                    onClick={() => onNavigate('/items/' + item.id)}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
+                          {item.category || "Unkategorisiert"}
+                        </Text>
+                      </div>
+
+                      <Text className="mt-2 text-lg font-semibold line-clamp-2">{item.title}</Text>
+                      <Text className="text-sm text-gray-500 mt-1">
+                        {new Date(item.entered_on).toLocaleDateString()}
+                      </Text>
+                    </div>
+
+                    <div className="mt-2">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-40 object-cover rounded-lg border border-gray-300"
+                        />
+                      ) : (
+                        <div className="w-full h-40 bg-gray-100 rounded-lg border border-gray-300 flex items-center justify-center text-gray-400">
+                          <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-4 flex items-center space-x-2">
+                      <UserIcon className="w-5 h-5 text-gray-500" />
+                      <Text className="text-sm text-gray-700">{item.username}</Text>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       )}
 
-      {/* User's Items Section */}
-      {userItems.length > 0 && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <SparklesIcon className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <Title className="text-2xl text-gray-900">Meine Items</Title>
-                <Text className="text-gray-600">Ihre persönlichen Kunstwerke und Sammlungen</Text>
-              </div>
+      {filteredUserItems.length > 0 && (
+        <div className="space-y-10">
+          <div className="space-y-4">
+            <div className="border-b border-gray-200 pb-2 space-y-10">
+              <Title className="text-xl font-bold text-gray-800">
+                Meine Items
+              </Title>
             </div>
-            <Badge color="green" size="lg">
-              {userItems.length}
-            </Badge>
-          </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              {filteredUserItems.map((item) => (
+                <Card
+                  key={item.id}
+                  className="p-4 flex flex-col justify-between shadow-md h-full cursor-pointer"
+                  onClick={() => onNavigate('/items/' + item.id)}
+                >
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <Text className="text-sm uppercase tracking-wide text-blue-500 font-medium">
+                        {item.category || "Unkategorisiert"}
+                      </Text>
+                      {item.isprivate && (
+                        <div className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
+                          <LockClosedIcon className="w-4 h-4" />
+                          Privat
+                        </div>
+                      )}
+                    </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {userItems.map((item) => (
-              <ItemCard
-                key={item.id}
-                item={item}
-                onClick={() => onNavigate('/items/' + item.id)}
-              />
-            ))}
+                    <Text className="mt-2 text-lg font-semibold line-clamp-2">{item.title}</Text>
+                    <Text className="text-sm text-gray-500 mt-1">
+                      {new Date(item.entered_on).toLocaleDateString()}
+                    </Text>
+                  </div>
+
+                  <div className="mt-2">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-full h-40 object-cover rounded-lg border border-gray-300"
+                      />
+                    ) : (
+                      <div className="w-full h-40 bg-gray-100 rounded-lg border border-gray-300 flex items-center justify-center text-gray-400">
+                        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
-      {/* No Results */}
-      {categories.length === 0 && userItems.length === 0 && <NoResults />}
-
-      {/* Statistics Footer */}
-      <Card>
-        <div className="p-6">
-          <Title className="text-lg mb-4 text-center">Galerie-Übersicht</Title>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600 mb-1">
-                {totalPublicItems}
-              </div>
-              <Text className="text-blue-800 text-sm font-medium">
-                Öffentliche Items
-              </Text>
-            </div>
-            
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600 mb-1">
-                {totalUserItems}
-              </div>
-              <Text className="text-green-800 text-sm font-medium">
-                Eigene Items
-              </Text>
-            </div>
-            
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600 mb-1">
-                {totalCategories}
-              </div>
-              <Text className="text-purple-800 text-sm font-medium">
-                Kategorien
-              </Text>
-            </div>
-            
-            <div className="text-center p-4 bg-indigo-50 rounded-lg">
-              <div className="text-2xl font-bold text-indigo-600 mb-1">
-                {totalPublicItems + totalUserItems}
-              </div>
-              <Text className="text-indigo-800 text-sm font-medium">
-                Gesamt
-              </Text>
-            </div>
-          </div>
-        </div>
-      </Card>
+      {/* Show NoResults only when no search is active and no items exist */}
+      {!searchQuery && categories.length === 0 && filteredUserItems.length === 0 && (
+        <NoResults />
+      )}
     </div>
   );
 };
