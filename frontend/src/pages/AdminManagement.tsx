@@ -29,7 +29,7 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
   // Load existing admins
   useEffect(() => {
     // Check if user is admin before loading
-    if (!userService.isAdmin()) {
+    if (!userService.isadmin()) {
       NotyfService.showError("Sie haben keine Berechtigung, diese Seite zu sehen");
       if (onNavigate) {
         onNavigate("/");
@@ -85,8 +85,8 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
     try {
       await adminService.addAdmin(user.id);
       
-      // Add user to admins list with isAdmin set to true
-      const updatedUser = { ...user, isAdmin: true };
+      // Add user to admins list with isadmin set to true
+      const updatedUser = { ...user, isadmin: true };
       setAdmins(prev => [...prev, updatedUser]);
       
       // Remove user from search results

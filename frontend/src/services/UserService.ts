@@ -5,7 +5,7 @@ export type AuthResponse = {
     id: number;
     username: string;
     token: string;
-    isAdmin: boolean;
+    isadmin: boolean;
 };
 
 export type Credentials = {
@@ -147,8 +147,8 @@ class UserService {
         return this.currentUser?.username;
     }
 
-    isAdmin(): boolean | undefined {
-        return this.currentUser?.isAdmin;
+    isadmin(): boolean | undefined {
+        return this.currentUser?.isadmin;
     }
 
     setCurrentUser(user: User) {

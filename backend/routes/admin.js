@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Middleware to ensure user is an admin
 function requireAdmin(req, res, next) {
-    if (!req.user || req.user.isAdmin !== true) {
+    if (!req.user || req.user.isadmin !== true) {
         return res.status(403).json({ error: "Admin privileges required." });
     }
     next();
@@ -28,20 +28,20 @@ router.get("/admin/search", authenticateJWT, requireAdmin, async (req, res) => {
     }
 });
 
-// Set isAdmin for a user (Admin only)
+// Set isadmin for a user (Admin only)
 router.put("/admin/:id", authenticateJWT, requireAdmin, async (req, res) => {
     const pool = req.app.locals.pool;
     const { id } = req.params;
-    const { isAdmin } = req.body;
+    const { isadmin } = req.body;
 
-    if (typeof isAdmin !== "boolean") {
-        return res.status(400).json({ error: "Invalid 'isAdmin' value. Must be true or false." });
+    if (typeof isadmin !== "boolean") {
+        return res.status(400).json({ error: "Invalid 'isadmin' value. Must be true or false." });
     }
 
     try {
         const result = await pool.query(
-            'UPDATE users SET "isAdmin" = $1 WHERE id = $2 RETURNING id, username, "isAdmin"',
-            [isAdmin, id]
+            'UPDATE users SET "isadmin" = $1 WHERE id = $2 RETURNING id, username, "isadmin"',
+            [isadmin, id]
         );
 
         if (result.rowCount === 0) {
@@ -60,7 +60,7 @@ router.get("/admin", authenticateJWT, requireAdmin, async (req, res) => {
     const pool = req.app.locals.pool;
 
     try {
-        const result = await pool.query('SELECT * FROM users WHERE "isAdmin" = true ORDER BY username ASC');
+        const result = await pool.query('SELECT * FROM users WHERE "isadmin" = true ORDER BY username ASC');
         res.json(result.rows);
     } catch (err) {
         console.error(err);

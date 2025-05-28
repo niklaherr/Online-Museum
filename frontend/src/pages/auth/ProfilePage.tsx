@@ -13,6 +13,7 @@ import {
   CogIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
+  ArrowRightCircleIcon,
 } from '@heroicons/react/24/outline';
 import { ResetPasswordWithOldPasswordCredentials, userService } from 'services/UserService';
 import NotyfService from 'services/NotyfService';
@@ -109,7 +110,7 @@ const ProfilePage = () => {
   }
 
   const userName = userService.getUserName();
-  const isAdmin = userService.isAdmin();
+  const isadmin = userService.isadmin();
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -117,8 +118,6 @@ const ProfilePage = () => {
       <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl overflow-hidden shadow-2xl">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-32 h-32 bg-white rounded-full"></div>
-          <div className="absolute bottom-10 left-10 w-24 h-24 bg-white rounded-full"></div>
         </div>
         
         <div className="relative p-8 text-white">
@@ -130,38 +129,23 @@ const ProfilePage = () => {
                   {userName?.charAt(0).toUpperCase()}
                 </span>
               </div>
-              {isAdmin && (
-                <div className="absolute -bottom-2 -right-2 bg-red-500 text-white rounded-full p-1">
-                  <ShieldCheckIcon className="w-4 h-4" />
-                </div>
-              )}
             </div>
             
             {/* User Info */}
             <div className="flex-1">
               <div className="flex items-center space-x-3 mb-2">
                 <Title className="text-3xl font-bold text-white">{userName}</Title>
-                {isAdmin && (
-                  <Badge color="red" icon={ShieldCheckIcon} size="lg">
-                    Administrator
-                  </Badge>
-                )}
               </div>
               <Text className="text-blue-100 text-lg">
                 Willkommen in Ihrem persönlichen Bereich
               </Text>
-              <div className="flex items-center mt-4 text-blue-100">
-                <SparklesIcon className="w-5 h-5 mr-2" />
-                <span>Mitglied seit der Registrierung</span>
-              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-4 space-y-6">
           {isEditing ? (
             /* Password Change Form */
             <Card className="p-6">
@@ -277,7 +261,7 @@ const ProfilePage = () => {
                     <div>
                       <Text className="text-sm font-medium text-gray-500 mb-1">Rolle</Text>
                       <div className="flex items-center">
-                        {isAdmin ? (
+                        {isadmin ? (
                           <Badge color="red" icon={ShieldCheckIcon} size="sm">
                             Administrator
                           </Badge>
@@ -290,33 +274,23 @@ const ProfilePage = () => {
                     </div>
                   </div>
                 </div>
-
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-center">
-                    <CheckCircleIcon className="w-5 h-5 text-blue-600 mr-2" />
-                    <Text className="text-blue-800 font-medium">Konto ist aktiv und verifiziert</Text>
-                  </div>
-                </div>
               </div>
             </Card>
           )}
         </div>
 
-        {/* Sidebar Actions */}
-        <div className="space-y-6">
-          {/* Quick Actions */}
-          <Card className="p-6">
+        <Card className="lg:col-span-2 p-6">
             <Title className="text-lg mb-4 flex items-center">
               <CogIcon className="w-5 h-5 mr-2 text-gray-600" />
-              Schnellaktionen
+              Aktionen
             </Title>
             
             <div className="space-y-3">
               <Button
-                variant="light"
+                variant="secondary"
                 color="blue"
                 icon={KeyIcon}
-                className="w-full justify-start bg-blue-50 hover:bg-blue-100 text-blue-700"
+                className="w-full justify-start bg-blue-50 hover:bg-blue-100 text-blue-700 mb-4"
                 onClick={() => setIsEditing(true)}
                 disabled={isEditing}
               >
@@ -324,9 +298,9 @@ const ProfilePage = () => {
               </Button>
 
               <Button
-                variant="light"
+                variant="secondary"
                 color="red"
-                icon={ArrowRightOnRectangleIcon}
+                icon={ArrowRightCircleIcon}
                 className="w-full justify-start bg-red-50 hover:bg-red-100 text-red-700"
                 onClick={() => userService.logout()}
               >
@@ -334,9 +308,7 @@ const ProfilePage = () => {
               </Button>
             </div>
           </Card>
-
-          {/* Danger Zone */}
-          <Card className="p-6 border-red-200">
+        <Card className="lg:col-span-2 w-full p-6">
             <Title className="text-lg mb-4 flex items-center text-red-700">
               <ExclamationTriangleIcon className="w-5 h-5 mr-2" />
               Gefahrenbereich
@@ -348,33 +320,18 @@ const ProfilePage = () => {
               </Text>
               
               <Button
-                variant="light"
+                variant="secondary"
                 color="red"
                 icon={TrashIcon}
-                className="w-full justify-start border-red-200 hover:bg-red-50"
+                className="w-full justify-start bg-red-50 hover:bg-red-100 text-red-700"
                 onClick={() => setIsDeleteModalOpen(true)}
               >
                 Konto löschen
               </Button>
             </div>
           </Card>
-
-          {/* Stats Card */}
-          <Card className="p-6 bg-gradient-to-br from-purple-50 to-indigo-50">
-            <Title className="text-lg mb-4 text-purple-800">Ihr Profil</Title>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <Text className="text-purple-700">Status</Text>
-                <Badge color="green" size="sm">Aktiv</Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <Text className="text-purple-700">Sicherheit</Text>
-                <Badge color="blue" size="sm">Hoch</Badge>
-              </div>
-            </div>
-          </Card>
-        </div>
       </div>
+      
 
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>

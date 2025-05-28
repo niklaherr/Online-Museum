@@ -40,7 +40,7 @@ const SupportRequests = () => {
 
   useEffect(() => {
     // Check if user is admin
-    if (!userService.isAdmin()) {
+    if (!userService.isadmin()) {
       NotyfService.showError('Sie haben keine Berechtigung, auf diese Seite zuzugreifen.');
       return;
     }
