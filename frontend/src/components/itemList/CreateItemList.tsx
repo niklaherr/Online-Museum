@@ -9,9 +9,24 @@ import {
   Dialog,
   DialogPanel,
   Flex,
+  Grid,
+  Badge,
 } from "@tremor/react";
-import { SparklesIcon } from "@heroicons/react/24/outline";
-import Item from "interfaces/Item";
+import { 
+  SparklesIcon,
+  ArrowLeftIcon,
+  RectangleStackIcon,
+  DocumentTextIcon,
+  EyeIcon,
+  LockClosedIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  UserIcon,
+  CalendarIcon,
+  TagIcon,
+  XMarkIcon
+} from "@heroicons/react/24/outline";
+import Item, { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
 import { itemAssistantService } from "services/ItemAssistantService";
 import NotyfService from "services/NotyfService";
@@ -24,11 +39,12 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [userItems, setUserItems] = useState<Item[]>([]);
-  const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
+  const [selectedItems, setSelectedItems] = useState<GalleryItem[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateConfirmOpen, setIsCreateConfirmOpen] = useState(false);
   const [generatedDescription, setGeneratedDescription] = useState("");
 
   useEffect(() => {
@@ -43,10 +59,26 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     fetchUserItems();
   }, []);
 
-  const toggleItemSelection = (id: number) => {
-    setSelectedItemIds((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
-    );
+  // Remove item from selection
+  const removeItem = (itemId: number) => {
+    setSelectedItems(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const toggleItemSelection = (itemId: number) => {
+    const item = userItems.find(i => i.id === itemId);
+    if (!item) return;
+
+    const isSelected = selectedItems.some(selected => selected.id === itemId);
+    if (isSelected) {
+      removeItem(itemId);
+    } else {
+      // Convert Item to GalleryItem format
+      const galleryItem: GalleryItem = {
+        ...item,
+        username: "You" // Since it's user's own item
+      };
+      setSelectedItems(prev => [...prev, galleryItem]);
+    }
   };
 
   const handleSubmit = async () => {
@@ -55,18 +87,23 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
       return;
     }
 
+    if (selectedItems.length === 0) {
+      NotyfService.showError("Bitte wählen Sie mindestens ein Item aus.");
+      return;
+    }
+
     try {
       await itemService.createItemList({
         title: title,
         description: description,
-        item_ids: selectedItemIds,
+        item_ids: selectedItems.map(item => item.id),
         is_private: isPrivate,
       });
       NotyfService.showSuccess("Liste erfolgreich erstellt.");
       onNavigate("/item-list");
       setTitle("");
       setDescription("");
-      setSelectedItemIds([]);
+      setSelectedItems([]);
       setIsPrivate(false);
     } catch (err: any) {
       NotyfService.showError(err.message || "Fehler beim Erstellen der Liste.");
@@ -79,7 +116,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
       return;
     }
 
-    if (selectedItemIds.length === 0) {
+    if (selectedItems.length === 0) {
       NotyfService.showError("Bitte wähle zuerst mindestens ein Item aus.");
       return;
     }
@@ -87,10 +124,6 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     setIsGenerating(true);
 
     try {
-      const selectedItems = userItems.filter((item) =>
-        selectedItemIds.includes(item.id)
-      );
-
       let promptText = `Erstelle eine ansprechende Beschreibung für eine Sammlung mit dem Titel "${title}". `;
       promptText += "Die Sammlung enthält folgende Elemente:\n";
 
@@ -124,100 +157,409 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     setIsDialogOpen(false);
   };
 
+  const hasChanges = title.trim() && selectedItems.length > 0;
+
   return (
-    <Card className="max-w-2xl mx-auto mt-6 space-y-4">
-      <Title>Neue Item-Liste erstellen</Title>
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Back Button */}
+      <div className="flex items-center mb-6">
+        <Button
+          variant="light"
+          icon={ArrowLeftIcon}
+          onClick={() => onNavigate("/item-list")}
+          className="mr-4"
+        >
+          Zurück zu den Listen
+        </Button>
+      </div>
 
-      <TextInput
-        placeholder="Listentitel"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <Text>Beschreibung</Text>
-          <Button
-            icon={SparklesIcon}
-            size="xs"
-            color="blue"
-            onClick={handleGenerateDescription}
-            loading={isGenerating}
-            disabled={selectedItemIds.length === 0 || !title.trim()}
-          >
-            KI-Beschreibung generieren
-          </Button>
+      {/* Hero Header */}
+      <div className="relative bg-gradient-to-r from-green-600 via-blue-600 to-indigo-600 rounded-2xl overflow-hidden shadow-2xl">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-8 right-8 w-24 h-24 bg-white rounded-full"></div>
+          <div className="absolute bottom-4 left-8 w-16 h-16 bg-white rounded-full"></div>
+          <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-white rounded-full"></div>
         </div>
-        <Textarea
-          placeholder="Beschreibung (optional)"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-        />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <Text>Liste privat machen</Text>
-        <label className="flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            className="form-checkbox h-5 w-5 text-blue-600"
-            checked={isPrivate}
-            onChange={() => setIsPrivate(!isPrivate)}
-          />
-        </label>
-      </div>
-
-      <div className="space-y-2">
-        <Title className="text-base">Items auswählen</Title>
-        {userItems.length === 0 && (
-          <p className="text-sm text-gray-500">Keine Items vorhanden.</p>
-        )}
-        {userItems.map((item) => (
-          <div key={item.id} className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id={`item-${item.id}`}
-              checked={selectedItemIds.includes(item.id)}
-              onChange={() => toggleItemSelection(item.id)}
-              className="rounded text-blue-500 focus:ring-blue-500"
-            />
-            <label htmlFor={`item-${item.id}`} className="text-sm">
-              {item.title}
-            </label>
+        
+        <div className="relative p-8 text-white">
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
+              <RectangleStackIcon className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <Title className="text-3xl font-bold text-white">Neue Item-Liste erstellen</Title>
+              <Text className="text-blue-100 text-lg">
+                Erstellen Sie Ihre persönliche Sammlung aus Ihren eigenen Items
+              </Text>
+            </div>
           </div>
-        ))}
+        </div>
       </div>
 
-      <Button color="blue" onClick={handleSubmit} size="lg" className="w-full">
-        Liste erstellen
-      </Button>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Form Section */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Basic Information Card */}
+          <Card>
+            <div className="p-6 space-y-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <DocumentTextIcon className="w-6 h-6 text-blue-600" />
+                <Title className="text-xl">Grundinformationen</Title>
+              </div>
 
-      {/* Dialog für Beschreibungsvorschau */}
-      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>
-        <DialogPanel>
-          <Title className="mb-4">Generierte Beschreibung</Title>
+              <div className="space-y-4">
+                <div>
+                  <Text className="font-medium mb-2 text-gray-700">Listentitel *</Text>
+                  <TextInput
+                    placeholder="Geben Sie einen aussagekräftigen Titel ein"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
 
-          <div className="mb-6 p-4 bg-gray-50 rounded-md border border-gray-200">
-            <Text>{generatedDescription}</Text>
-          </div>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Text className="font-medium text-gray-700">Beschreibung</Text>
+                    <Button
+                      icon={SparklesIcon}
+                      size="xs"
+                      color="blue"
+                      onClick={handleGenerateDescription}
+                      loading={isGenerating}
+                      disabled={selectedItems.length === 0 || !title.trim()}
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
+                    >
+                      KI-Beschreibung
+                    </Button>
+                  </div>
+                  <Textarea
+                    placeholder="Beschreibung (optional)"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={4}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            </div>
+          </Card>
 
-          <div className="flex justify-end space-x-2">
-            <Button
-              color="gray"
-              onClick={() => {
-                setIsDialogOpen(false);
-                handleGenerateDescription();
-              }}
+          {/* Privacy Settings Card */}
+          <Card>
+            <div className="p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                {isPrivate ? (
+                  <LockClosedIcon className="w-6 h-6 text-red-600" />
+                ) : (
+                  <EyeIcon className="w-6 h-6 text-green-600" />
+                )}
+                <Title className="text-xl">Sichtbarkeitseinstellungen</Title>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className={`p-2 rounded-lg ${isPrivate ? 'bg-red-100' : 'bg-green-100'}`}>
+                    {isPrivate ? (
+                      <LockClosedIcon className="w-5 h-5 text-red-600" />
+                    ) : (
+                      <EyeIcon className="w-5 h-5 text-green-600" />
+                    )}
+                  </div>
+                  <div>
+                    <Text className="font-medium">
+                      {isPrivate ? "Private Liste" : "Öffentliche Liste"}
+                    </Text>
+                    <Text className="text-sm text-gray-600">
+                      {isPrivate 
+                        ? "Nur Sie können diese Liste sehen" 
+                        : "Alle Benutzer können diese Liste sehen"
+                      }
+                    </Text>
+                  </div>
+                </div>
+                
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={isPrivate}
+                    onChange={() => setIsPrivate(!isPrivate)}
+                  />
+                  <div className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
+                    isPrivate ? 'bg-red-500' : 'bg-green-500'
+                  }`}>
+                    <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-200 ${
+                      isPrivate ? 'translate-x-6' : 'translate-x-0'
+                    }`} />
+                  </div>
+                </label>
+              </div>
+            </div>
+          </Card>
+
+          {/* Own Items Selection Card */}
+          <Card>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center space-x-3">
+                <RectangleStackIcon className="w-6 h-6 text-green-600" />
+                <div>
+                  <Title className="text-xl">Ihre Items auswählen</Title>
+                  <Text className="text-gray-600">Wählen Sie aus Ihren eigenen Items für diese Liste</Text>
+                </div>
+              </div>
+
+              {userItems.length === 0 ? (
+                <div className="text-center py-8">
+                  <RectangleStackIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <Text className="text-gray-500 font-medium mb-2">Keine eigenen Items vorhanden</Text>
+                  <Text className="text-gray-400 mb-4">
+                    Sie müssen zuerst Items erstellen, bevor Sie eine Liste erstellen können.
+                  </Text>
+                  <Button
+                    onClick={() => onNavigate('/items/create')}
+                    color="blue"
+                  >
+                    Erstes Item erstellen
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {userItems.map((item) => {
+                    const isSelected = selectedItems.some(selected => selected.id === item.id);
+                    return (
+                      <div key={item.id} className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg border border-gray-100">
+                        <input
+                          type="checkbox"
+                          id={`item-${item.id}`}
+                          checked={isSelected}
+                          onChange={() => toggleItemSelection(item.id)}
+                          className="rounded text-blue-500 focus:ring-blue-500"
+                        />
+                        
+                        {/* Item Image */}
+                        <div className="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                          {item.image && (
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
+                        
+                        {/* Item Details */}
+                        <label htmlFor={`item-${item.id}`} className="flex-1 cursor-pointer">
+                          <Text className="font-medium">{item.title}</Text>
+                          <div className="flex items-center space-x-2 text-xs text-gray-500">
+                            {item.category && (
+                              <>
+                                <TagIcon className="w-3 h-3" />
+                                <span>{item.category}</span>
+                                <span>•</span>
+                              </>
+                            )}
+                            <CalendarIcon className="w-3 h-3" />
+                            <span>{new Date(item.entered_on).toLocaleDateString()}</span>
+                          </div>
+                        </label>
+                        
+                        {/* Privacy Badge */}
+                        <div className="flex-shrink-0">
+                          {item.isprivate ? (
+                            <Badge color="red" icon={LockClosedIcon} size="xs">
+                              Privat
+                            </Badge>
+                          ) : (
+                            <Badge color="green" icon={EyeIcon} size="xs">
+                              Öffentlich
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+
+        {/* Status/Preview Section */}
+        <div className="space-y-6">
+          {/* Status Card */}
+          <Card>
+            <div className="p-6 space-y-4">
+              <Title className="text-lg">Status</Title>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Text className="text-sm">Titel ausgefüllt</Text>
+                  {title.trim() ? (
+                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <XCircleIcon className="w-5 h-5 text-red-500" />
+                  )}
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Text className="text-sm">Items ausgewählt</Text>
+                  {selectedItems.length > 0 ? (
+                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <XCircleIcon className="w-5 h-5 text-red-500" />
+                  )}
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Text className="text-sm">Beschreibung vorhanden</Text>
+                  {description.trim() ? (
+                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <XCircleIcon className="w-5 h-5 text-gray-400" />
+                  )}
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Selected Items Preview */}
+          <Card>
+            <div className="p-6 space-y-4">
+              <Title className="text-lg">Ausgewählte Items ({selectedItems.length})</Title>
+              
+              {selectedItems.length === 0 ? (
+                <Text className="text-gray-500 italic text-center py-4">
+                  Keine Items ausgewählt
+                </Text>
+              ) : (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {selectedItems.map(item => (
+                    <div key={item.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <div className="w-8 h-8 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                          {item.image && (
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <Text className="text-sm font-medium truncate">{item.title}</Text>
+                          <Text className="text-xs text-gray-500 truncate">
+                            {item.category}
+                          </Text>
+                        </div>
+                      </div>
+                      <Button
+                        icon={XMarkIcon}
+                        variant="light"
+                        color="red"
+                        size="xs"
+                        onClick={() => removeItem(item.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <Button 
+              color="blue" 
+              onClick={() => setIsCreateConfirmOpen(true)} 
+              size="lg" 
+              className="w-full bg-gradient-to-r from-green-600 to-blue-600 border-0"
+              disabled={!hasChanges}
             >
-              Neu generieren
+              Liste erstellen
             </Button>
-            <Button color="blue" onClick={handleAcceptDescription}>
-              Übernehmen
+            
+            <Button
+              variant="light"
+              onClick={() => onNavigate("/item-list")}
+              className="w-full"
+            >
+              Abbrechen
             </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* AI Description Dialog */}
+      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>
+        <DialogPanel className="max-w-2xl">
+          <div className="p-6 space-y-6">
+            <div className="flex items-center space-x-3">
+              <SparklesIcon className="w-8 h-8 text-blue-600" />
+              <Title className="text-xl">KI-generierte Beschreibung</Title>
+            </div>
+
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+              <Text className="leading-relaxed">{generatedDescription}</Text>
+            </div>
+
+            <Flex justifyContent="end" className="space-x-3">
+              <Button
+                color="gray"
+                onClick={() => {
+                  setIsDialogOpen(false);
+                  handleGenerateDescription();
+                }}
+              >
+                Neu generieren
+              </Button>
+              <Button 
+                color="blue" 
+                onClick={handleAcceptDescription}
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 border-0"
+              >
+                Übernehmen
+              </Button>
+            </Flex>
           </div>
         </DialogPanel>
       </Dialog>
-    </Card>
+
+      {/* Create Confirmation Dialog */}
+      <Dialog open={isCreateConfirmOpen} onClose={() => setIsCreateConfirmOpen(false)}>
+        <DialogPanel className="max-w-md bg-white rounded-xl shadow-xl p-6">
+          <div className="text-center space-y-4">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+              <CheckCircleIcon className="h-6 w-6 text-green-600" />
+            </div>
+            
+            <Title className="text-lg font-semibold text-gray-900">
+              Liste erstellen?
+            </Title>
+            
+            <Text className="text-gray-500">
+              Bist du sicher, dass du diese neue Liste mit {selectedItems.length} eigenen Items erstellen möchtest?
+            </Text>
+            
+            <Flex justifyContent="end" className="space-x-3 pt-4">
+              <Button variant="secondary" onClick={() => setIsCreateConfirmOpen(false)}>
+                Abbrechen
+              </Button>
+              <Button
+                color="blue"
+                onClick={() => {
+                  setIsCreateConfirmOpen(false);
+                  handleSubmit();
+                }}
+                className="bg-gradient-to-r from-green-600 to-blue-600 border-0"
+              >
+                Ja, erstellen
+              </Button>
+            </Flex>
+          </div>
+        </DialogPanel>
+      </Dialog>
+    </div>
   );
 }

@@ -44,7 +44,7 @@ class ContactFormService {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
     
-    if (!userService.isAdmin()) {
+    if (!userService.isadmin()) {
       throw new Error("Keine Administratorrechte.");
     }
     
@@ -84,7 +84,7 @@ class ContactFormService {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
     
-    if (!userService.isAdmin()) {
+    if (!userService.isadmin()) {
       throw new Error("Keine Administratorrechte.");
     }
     
