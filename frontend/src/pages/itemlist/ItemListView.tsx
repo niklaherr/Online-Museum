@@ -374,50 +374,6 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
           </div>
         </div>
       )}
-
-      {/* Statistics Footer */}
-      <Card>
-        <div className="p-6">
-          <Title className="text-lg mb-4 text-center">Übersicht</Title>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-indigo-50 rounded-lg">
-              <div className="text-2xl font-bold text-indigo-600 mb-1">
-                {filteredEditorials.length}
-              </div>
-              <Text className="text-indigo-800 text-sm font-medium">
-                Redaktionelle Listen
-              </Text>
-            </div>
-            
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600 mb-1">
-                {filteredItemLists.length}
-              </div>
-              <Text className="text-green-800 text-sm font-medium">
-                Öffentliche Listen
-              </Text>
-            </div>
-            
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600 mb-1">
-                {filteredUserItemLists.length}
-              </div>
-              <Text className="text-blue-800 text-sm font-medium">
-                Ihre Listen
-              </Text>
-            </div>
-            
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600 mb-1">
-                {totalLists}
-              </div>
-              <Text className="text-purple-800 text-sm font-medium">
-                Gesamt
-              </Text>
-            </div>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 };
