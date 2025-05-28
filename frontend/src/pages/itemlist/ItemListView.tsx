@@ -206,10 +206,6 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
       {/* Hero Header */}
       <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl overflow-hidden shadow-2xl">
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-32 h-32 bg-white rounded-full"></div>
-          <div className="absolute bottom-10 left-10 w-24 h-24 bg-white rounded-full"></div>
-        </div>
         
         <div className="relative p-8 text-white">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">

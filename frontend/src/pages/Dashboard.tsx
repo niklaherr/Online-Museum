@@ -340,8 +340,6 @@ const Dashboard = () => {
         <Card className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border-0 shadow-2xl overflow-hidden">
           <div className="relative p-8">
             {/* Decorative background elements */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
             
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-6">

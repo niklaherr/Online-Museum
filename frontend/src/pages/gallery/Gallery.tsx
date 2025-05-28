@@ -216,13 +216,6 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     <div className="space-y-8">
       {/* Hero Header */}
       <div className="relative bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-2xl overflow-hidden shadow-2xl">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-32 h-32 bg-white rounded-full"></div>
-          <div className="absolute bottom-10 left-10 w-24 h-24 bg-white rounded-full"></div>
-          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full"></div>
-        </div>
-        
         <div className="relative p-8 text-white">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
