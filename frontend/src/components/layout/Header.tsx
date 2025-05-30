@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
 import { userService } from 'services/UserService';
-import { Flex, Text } from '@tremor/react';
+import { Flex } from '@tremor/react';
 import { 
   Bars3Icon, 
-  SparklesIcon, 
   UserCircleIcon,
   ChevronDownIcon
 } from '@heroicons/react/24/outline';

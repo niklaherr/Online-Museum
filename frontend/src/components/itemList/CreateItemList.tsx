@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogPanel,
   Flex,
-  Grid,
   Badge,
 } from "@tremor/react";
 import { 
@@ -21,7 +20,6 @@ import {
   LockClosedIcon,
   CheckCircleIcon,
   XCircleIcon,
-  UserIcon,
   CalendarIcon,
   TagIcon,
   XMarkIcon

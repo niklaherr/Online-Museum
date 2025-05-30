@@ -10,7 +10,6 @@ import {
   EnvelopeIcon,
   XMarkIcon,
   SparklesIcon,
-  ChevronRightIcon,
 } from '@heroicons/react/24/outline';
 
 type SidebarProps = {

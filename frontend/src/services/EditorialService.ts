@@ -1,4 +1,3 @@
-import NotyfService from "./NotyfService";
 import { userService } from "./UserService";
 import { GalleryItem } from "../interfaces/Item";
 import Editorial from "interfaces/Editorial";

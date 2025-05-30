@@ -6,7 +6,7 @@ import { itemService } from 'services/ItemService';
 import { editorialService } from 'services/EditorialService';
 import NotyfService from 'services/NotyfService';
 import Loading from 'components/helper/Loading';
-import { Badge, Card, Flex, Title, Text, Button } from '@tremor/react';
+import { Badge, Card, Title, Text, Button } from '@tremor/react';
 import { 
   SparklesIcon, 
   MagnifyingGlassIcon,

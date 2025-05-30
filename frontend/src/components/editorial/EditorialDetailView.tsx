@@ -4,14 +4,10 @@ import {
   Card,
   Title,
   Text,
-  Button,
   Subtitle,
   Grid,
-  Dialog,
-  DialogPanel,
-  Flex
 } from "@tremor/react";
-import { UserIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { UserIcon } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import NotyfService from "services/NotyfService";
 import NoResults from "components/helper/NoResults";

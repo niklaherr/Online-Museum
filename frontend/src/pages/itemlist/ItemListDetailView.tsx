@@ -28,7 +28,6 @@ import ItemList from "interfaces/ItemList";
 import { itemService } from "services/ItemService";
 import NotyfService from "services/NotyfService";
 import { userService } from "services/UserService";
-import NoResults from "components/helper/NoResults";
 import Loading from "components/helper/Loading";
 
 type ItemListDetailViewProps = {

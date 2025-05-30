@@ -64,10 +64,6 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
     setIsSearching(true);
     try {
       const results = await adminService.searchUsers(searchQuery);
-      
-      // Filter out users that are already admins
-      const adminIds = admins.map(admin => admin.id);
-      
       setSearchResults(results);
     } catch (error) {
       let errorMessage = "Fehler bei der Suche nach Benutzern";

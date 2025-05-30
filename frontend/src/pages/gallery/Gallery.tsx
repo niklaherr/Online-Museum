@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Card, Text, Title, Badge } from "@tremor/react";
 import { 
   LockClosedIcon, 
@@ -13,8 +13,7 @@ import {
   SparklesIcon,
   RectangleGroupIcon
 } from "@heroicons/react/24/outline";
-import { userService } from "../../services/UserService";
-import Item, { GalleryItem } from "../../interfaces/Item";
+import { GalleryItem } from "../../interfaces/Item";
 import { itemService } from "../../services/ItemService";
 import NotyfService from "services/NotyfService";
 import NoResults from "components/helper/NoResults";

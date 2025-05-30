@@ -68,7 +68,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
 
   if (!item) return <NoResults />;
 
-  const isOwner = item.user_id == userService.getUserID();
+  const isOwner = item.user_id === userService.getUserID();
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">

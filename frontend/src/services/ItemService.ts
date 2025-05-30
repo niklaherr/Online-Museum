@@ -1,6 +1,4 @@
-import NotyfService from "./NotyfService";
 import { userService } from "./UserService";
-import User from "../interfaces/User";
 import Item, { GalleryItem } from "../interfaces/Item";
 import ItemList from "interfaces/ItemList";
 import Activity from "interfaces/Activity";
