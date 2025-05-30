@@ -29,7 +29,7 @@ class ItemService {
       const item: GalleryItem[] = await res.json();
       return item;
     } catch (error) {
-      throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
+      throw new Error("Fehler beim Laden der Items");
     }
   }
 

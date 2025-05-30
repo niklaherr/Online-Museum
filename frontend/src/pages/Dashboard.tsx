@@ -254,7 +254,6 @@ const Dashboard = () => {
             setEditorialLists(editorialData);
           } catch (editorialError) {
             console.log("Redaktionelle Listen konnten nicht geladen werden:", editorialError);
-            // Fehler beim Laden der redaktionellen Listen ist nicht kritisch
           }
         }
         
