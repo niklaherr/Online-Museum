@@ -17,9 +17,6 @@ import {
   SparklesIcon,
   ArrowLeftIcon,
   RectangleStackIcon,
-  MagnifyingGlassIcon,
-  PlusIcon,
-  XMarkIcon,
   DocumentTextIcon,
   EyeIcon,
   LockClosedIcon,
@@ -27,7 +24,8 @@ import {
   XCircleIcon,
   UserIcon,
   CalendarIcon,
-  TagIcon
+  TagIcon,
+  XMarkIcon
 } from "@heroicons/react/24/outline";
 import Item, { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
@@ -48,11 +46,6 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
   const [selectedItems, setSelectedItems] = useState<GalleryItem[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Search functionality
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<GalleryItem[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -86,45 +79,6 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
     loadItemList();
   }, [id]);
 
-  // Search for items (including other users' public items)
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    
-    setIsSearching(true);
-    try {
-      // Get all public items from other users
-      const allPublicItems = await itemService.fetchItemsNotOwnedByUser();
-      
-      // Filter based on search query
-      const filteredResults = allPublicItems.filter(item => 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      
-      // Filter out items that are already selected
-      const selectedItemIds = selectedItems.map(item => item.id);
-      const finalResults = filteredResults.filter(item => !selectedItemIds.includes(item.id));
-      
-      setSearchResults(finalResults);
-    } catch (error) {
-      let errorMessage = "Fehler bei der Suche nach Items";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      NotyfService.showError(errorMessage);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  // Add item to selection
-  const addItem = (item: GalleryItem) => {
-    setSelectedItems(prev => [...prev, item]);
-    setSearchResults(prev => prev.filter(i => i.id !== item.id));
-  };
-
   // Remove item from selection
   const removeItem = (itemId: number) => {
     setSelectedItems(prev => prev.filter(item => item.id !== itemId));
@@ -143,13 +97,18 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
         ...item,
         username: "You" // Since it's user's own item
       };
-      addItem(galleryItem);
+      setSelectedItems(prev => [...prev, galleryItem]);
     }
   };
 
   const handleUpdate = async () => {
     if (!title.trim()) {
       NotyfService.showError("Listentitel ist erforderlich.");
+      return;
+    }
+
+    if (selectedItems.length === 0) {
+      NotyfService.showError("Bitte wählen Sie mindestens ein Item aus.");
       return;
     }
 
@@ -251,7 +210,7 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
             <div>
               <Title className="text-3xl font-bold text-white">Item-Liste bearbeiten</Title>
               <Text className="text-blue-100 text-lg">
-                Aktualisieren Sie Ihre persönliche Sammlung
+                Aktualisieren Sie Ihre persönliche Sammlung aus Ihren eigenen Items
               </Text>
             </div>
           </div>
@@ -360,98 +319,37 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
             </div>
           </Card>
 
-          {/* Item Search Card */}
-          <Card>
-            <div className="p-6 space-y-4">
-              <div className="flex items-center space-x-3">
-                <MagnifyingGlassIcon className="w-6 h-6 text-blue-600" />
-                <Title className="text-xl">Items finden und hinzufügen</Title>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <TextInput
-                  placeholder="Nach Items suchen (Titel, Kategorie, Benutzer...)"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-grow"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearch();
-                    }
-                  }}
-                />
-                <Button
-                  icon={MagnifyingGlassIcon}
-                  onClick={handleSearch}
-                  loading={isSearching}
-                  color="blue"
-                >
-                  Suchen
-                </Button>
-              </div>
-              
-              {/* Search Results */}
-              {searchResults.length > 0 && (
-                <div className="space-y-3">
-                  <Text className="font-medium text-gray-700">Suchergebnisse</Text>
-                  <div className="max-h-64 overflow-y-auto space-y-2">
-                    {searchResults.map(item => (
-                      <Card
-                        key={item.id}
-                        className="!p-3 cursor-pointer hover:bg-gray-50 transition-colors"
-                        onClick={() => addItem(item)}
-                      >
-                        <Flex alignItems="center" justifyContent="between">
-                          <div className="flex items-center space-x-3 min-w-0">
-                            <div className="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                              {item.image && (
-                                <img
-                                  src={item.image}
-                                  alt={item.title}
-                                  className="w-full h-full object-cover"
-                                />
-                              )}
-                            </div>
-                            <div className="min-w-0 text-left">
-                              <Text className="font-medium truncate">{item.title}</Text>
-                              <div className="text-xs text-gray-500 truncate">
-                                {item.category && `${item.category} • `}von {item.username}
-                              </div>
-                            </div>
-                          </div>
-                          <Button
-                            icon={PlusIcon}
-                            variant="light"
-                            color="blue"
-                            size="xs"
-                          >
-                            Hinzufügen
-                          </Button>
-                        </Flex>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </Card>
-
           {/* Own Items Selection Card */}
           <Card>
             <div className="p-6 space-y-4">
               <div className="flex items-center space-x-3">
                 <RectangleStackIcon className="w-6 h-6 text-green-600" />
-                <Title className="text-xl">Eigene Items auswählen</Title>
+                <div>
+                  <Title className="text-xl">Ihre Items auswählen</Title>
+                  <Text className="text-gray-600">Wählen Sie aus Ihren eigenen Items für diese Liste</Text>
+                </div>
               </div>
 
               {userItems.length === 0 ? (
-                <Text className="text-gray-500 italic">Keine eigenen Items vorhanden.</Text>
+                <div className="text-center py-8">
+                  <RectangleStackIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <Text className="text-gray-500 font-medium mb-2">Keine eigenen Items vorhanden</Text>
+                  <Text className="text-gray-400 mb-4">
+                    Sie müssen zuerst Items erstellen, bevor Sie sie zu Listen hinzufügen können.
+                  </Text>
+                  <Button
+                    onClick={() => onNavigate('/items/create')}
+                    color="blue"
+                  >
+                    Neues Item erstellen
+                  </Button>
+                </div>
               ) : (
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {userItems.map((item) => {
                     const isSelected = selectedItems.some(selected => selected.id === item.id);
                     return (
-                      <div key={item.id} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg">
+                      <div key={item.id} className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg border border-gray-100">
                         <input
                           type="checkbox"
                           id={`item-${item.id}`}
@@ -459,13 +357,46 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
                           onChange={() => toggleItemSelection(item.id)}
                           className="rounded text-blue-500 focus:ring-blue-500"
                         />
+                        
+                        {/* Item Image */}
+                        <div className="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                          {item.image && (
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
+                        
+                        {/* Item Details */}
                         <label htmlFor={`item-${item.id}`} className="flex-1 cursor-pointer">
                           <Text className="font-medium">{item.title}</Text>
-                          <Text className="text-xs text-gray-500">
-                            {item.category && `${item.category} • `}
-                            {new Date(item.entered_on).toLocaleDateString()}
-                          </Text>
+                          <div className="flex items-center space-x-2 text-xs text-gray-500">
+                            {item.category && (
+                              <>
+                                <TagIcon className="w-3 h-3" />
+                                <span>{item.category}</span>
+                                <span>•</span>
+                              </>
+                            )}
+                            <CalendarIcon className="w-3 h-3" />
+                            <span>{new Date(item.entered_on).toLocaleDateString()}</span>
+                          </div>
                         </label>
+                        
+                        {/* Privacy Badge */}
+                        <div className="flex-shrink-0">
+                          {item.isprivate ? (
+                            <Badge color="red" icon={LockClosedIcon} size="xs">
+                              Privat
+                            </Badge>
+                          ) : (
+                            <Badge color="green" icon={EyeIcon} size="xs">
+                              Öffentlich
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -628,7 +559,7 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
             </Title>
             
             <Text className="text-gray-500">
-              Bist du sicher, dass du die Änderungen an dieser Liste speichern möchtest?
+              Bist du sicher, dass du die Änderungen an dieser Liste mit {selectedItems.length} eigenen Items speichern möchtest?
             </Text>
             
             <Flex justifyContent="end" className="space-x-3 pt-4">

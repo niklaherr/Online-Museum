@@ -235,7 +235,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
               className="bg-white text-blue-600 hover:bg-blue-50 border-0 shadow-lg"
               size="lg"
             >
-              Neuer Raum
+              Neue Item-Liste
             </Button>
           </div>
         </div>
