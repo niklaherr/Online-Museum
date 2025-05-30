@@ -39,7 +39,7 @@ app.locals.pool = pool;
 
 // Register routes
 app.use("/", authRoutes);
-app.use("/users", userRoutes);
+app.use("/", userRoutes);
 app.use("/", itemRoutes);
 app.use("/", itemListRoutes);
 app.use("/", editorialRoutes);

@@ -104,7 +104,7 @@ class UserService {
     }
 
     async deleteUser(): Promise<boolean> {
-        const response = await fetch(`${this.baseUrl}/users/me`, {
+        const response = await fetch(`${this.baseUrl}/users`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
