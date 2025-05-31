@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogPanel,
   Flex,
-  Grid,
   Badge,
 } from "@tremor/react";
 import { 
@@ -24,7 +23,9 @@ import {
   UserIcon,
   CalendarIcon,
   TagIcon,
-  XMarkIcon
+  XMarkIcon,
+  PhotoIcon,
+  CloudArrowUpIcon
 } from "@heroicons/react/24/outline";
 import Item, { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
@@ -42,6 +43,11 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
   const [selectedItems, setSelectedItems] = useState<GalleryItem[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
 
+  // Hero Image States
+  const [heroImage, setHeroImage] = useState<File | null>(null);
+  const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
+  const [isHeroImageModalOpen, setIsHeroImageModalOpen] = useState(false);
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCreateConfirmOpen, setIsCreateConfirmOpen] = useState(false);
@@ -58,6 +64,24 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     };
     fetchUserItems();
   }, []);
+
+  // Hero Image Handlers
+  const handleHeroImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setHeroImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setHeroImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveHeroImage = () => {
+    setHeroImage(null);
+    setHeroImagePreview(null);
+  };
 
   // Remove item from selection
   const removeItem = (itemId: number) => {
@@ -93,18 +117,34 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     }
 
     try {
-      await itemService.createItemList({
+      // First create the item list
+      const newItemList = await itemService.createItemList({
         title: title,
         description: description,
         item_ids: selectedItems.map(item => item.id),
         is_private: isPrivate,
       });
+
+      // If there's a hero image, upload it
+      if (heroImage && newItemList.id) {
+        try {
+          await itemService.uploadHeroImage(newItemList.id, heroImage);
+        } catch (heroError) {
+          console.warn("Fehler beim Hochladen des Hauptbildes:", heroError);
+          // Don't fail the whole process if hero image upload fails
+        }
+      }
+
       NotyfService.showSuccess("Liste erfolgreich erstellt.");
       onNavigate("/item-list");
+      
+      // Reset form
       setTitle("");
       setDescription("");
       setSelectedItems([]);
       setIsPrivate(false);
+      setHeroImage(null);
+      setHeroImagePreview(null);
     } catch (err: any) {
       NotyfService.showError(err.message || "Fehler beim Erstellen der Liste.");
     }
@@ -173,29 +213,70 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
         </Button>
       </div>
 
-      {/* Hero Header */}
-      <div className="relative bg-gradient-to-r from-green-600 via-blue-600 to-indigo-600 rounded-2xl overflow-hidden shadow-2xl">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-8 right-8 w-24 h-24 bg-white rounded-full"></div>
-          <div className="absolute bottom-4 left-8 w-16 h-16 bg-white rounded-full"></div>
-          <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-white rounded-full"></div>
-        </div>
-        
-        <div className="relative p-8 text-white">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
-              <RectangleStackIcon className="w-8 h-8 text-white" />
+      {/* Hero Header with Hero Image Preview */}
+      <Card className="relative overflow-hidden">
+        <div className="relative h-64 w-full overflow-hidden">
+          {heroImagePreview ? (
+            <>
+              <img
+                src={heroImagePreview}
+                alt={title || "Hauptbild Vorschau"}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+            </>
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-green-600 via-blue-600 to-indigo-600 relative">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-8 right-8 w-24 h-24 bg-white rounded-full"></div>
+                <div className="absolute bottom-4 left-8 w-16 h-16 bg-white rounded-full"></div>
+                <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-white rounded-full"></div>
+              </div>
             </div>
-            <div>
-              <Title className="text-3xl font-bold text-white">Neue Item-Liste erstellen</Title>
-              <Text className="text-blue-100 text-lg">
-                Erstellen Sie Ihre persönliche Sammlung aus Ihren eigenen Items
-              </Text>
+          )}
+          
+          {/* Content and Buttons Overlay */}
+          <div className="absolute inset-0 flex flex-col justify-between p-6">
+            {/* Header with Action Buttons */}
+            <div className="flex justify-between items-start">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
+                  <RectangleStackIcon className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <Title className="text-2xl font-bold text-white">Neue Item-Liste erstellen</Title>
+                  <Text className="text-white/90">
+                    Erstellen Sie Ihre persönliche Sammlung aus Ihren eigenen Items
+                  </Text>
+                </div>
+              </div>
+              
+              {/* Hero Image Management Buttons */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setIsHeroImageModalOpen(true)}
+                  className="flex items-center gap-2 px-3 py-2 bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 rounded-lg transition-colors border border-white/20"
+                >
+                  <PhotoIcon className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {heroImagePreview ? 'Bild ändern' : 'Hauptbild hinzufügen'}
+                  </span>
+                </button>
+                {heroImagePreview && (
+                  <button
+                    onClick={handleRemoveHeroImage}
+                    className="flex items-center gap-2 px-3 py-2 bg-red-500/20 backdrop-blur-sm text-white hover:bg-red-500/30 rounded-lg transition-colors border border-red-300/30"
+                  >
+                    <XMarkIcon className="w-4 h-4" />
+                    <span className="text-sm font-medium">Entfernen</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Form Section */}
@@ -388,6 +469,42 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
 
         {/* Status/Preview Section */}
         <div className="space-y-6">
+          {/* Hero Image Preview */}
+          {heroImagePreview && (
+            <Card>
+              <div className="p-6 space-y-4">
+                <Title className="text-lg">Hauptbild Vorschau</Title>
+                <div className="relative aspect-video w-full overflow-hidden rounded-lg border-2 border-green-200 shadow-lg">
+                  <img
+                    src={heroImagePreview}
+                    alt="Hauptbild Vorschau"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex space-x-2">
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="blue"
+                    onClick={() => setIsHeroImageModalOpen(true)}
+                    className="flex-1"
+                  >
+                    Ändern
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="red"
+                    onClick={handleRemoveHeroImage}
+                    className="flex-1"
+                  >
+                    Entfernen
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )}
+
           {/* Status Card */}
           <Card>
             <div className="p-6 space-y-4">
@@ -415,6 +532,15 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Beschreibung vorhanden</Text>
                   {description.trim() ? (
+                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <XCircleIcon className="w-5 h-5 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Text className="text-sm">Hauptbild vorhanden</Text>
+                  {heroImagePreview ? (
                     <CheckCircleIcon className="w-5 h-5 text-green-500" />
                   ) : (
                     <XCircleIcon className="w-5 h-5 text-gray-400" />
@@ -490,6 +616,76 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
           </div>
         </div>
       </div>
+
+      {/* Hero Image Upload Modal */}
+      <Dialog open={isHeroImageModalOpen} onClose={() => setIsHeroImageModalOpen(false)} static={true}>
+        <DialogPanel className="max-w-2xl">
+          <div className="p-6 space-y-6">
+            <div className="flex items-center space-x-3">
+              <PhotoIcon className="w-8 h-8 text-blue-600" />
+              <Title className="text-xl">Hauptbild {heroImagePreview ? 'ändern' : 'hinzufügen'}</Title>
+            </div>
+
+            <div className="space-y-4">
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleHeroImageChange}
+                  className="hidden"
+                  id="hero-image-upload"
+                />
+                <label
+                  htmlFor="hero-image-upload"
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors duration-200"
+                >
+                  <CloudArrowUpIcon className="w-12 h-12 text-gray-400 mb-3" />
+                  <Text className="text-sm text-gray-600 text-center font-medium">
+                    {heroImage ? "Bild erfolgreich ausgewählt!" : "Klicken oder Dateien hierher ziehen"}
+                  </Text>
+                  <Text className="text-xs text-gray-500 mt-1">
+                    PNG, JPG, GIF bis 10MB
+                  </Text>
+                </label>
+              </div>
+
+              {/* Image Preview */}
+              {heroImagePreview && (
+                <div className="space-y-2">
+                  <Text className="text-sm font-medium text-gray-700">Vorschau:</Text>
+                  <div className="relative aspect-video w-full overflow-hidden rounded-lg border-2 border-green-200 shadow-lg">
+                    <img
+                      src={heroImagePreview}
+                      alt="Vorschau"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Flex justifyContent="end" className="space-x-3">
+              <Button 
+                variant="secondary" 
+                onClick={() => {
+                  setIsHeroImageModalOpen(false);
+                }}
+              >
+                {heroImagePreview ? 'Behalten' : 'Abbrechen'}
+              </Button>
+              {!heroImagePreview && (
+                <Button 
+                  color="blue" 
+                  onClick={() => setIsHeroImageModalOpen(false)}
+                  disabled={!heroImage}
+                >
+                  Bild hinzufügen
+                </Button>
+              )}
+            </Flex>
+          </div>
+        </DialogPanel>
+      </Dialog>
 
       {/* AI Description Dialog */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>

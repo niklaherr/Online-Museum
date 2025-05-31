@@ -17,7 +17,8 @@ import {
   EyeIcon,
   RectangleStackIcon,
   UserGroupIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 
 type ItemListCardProps = {
@@ -27,52 +28,95 @@ type ItemListCardProps = {
 
 const ItemListCard = ({ list, onView }: ItemListCardProps) => {
   const isEditorial = !('isprivate' in list);
+  const hasHeroImage = 'hero_image' in list && list.hero_image;
   
   return (
     <Card
       className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden bg-white border-0 shadow-lg"
       onClick={() => onView(list.id, isEditorial ? 'editorial' : 'item-list')}
     >
-      {/* Header Image/Icon Area */}
-      <div className="relative h-48 w-full bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 right-4 w-16 h-16 bg-blue-300 rounded-full"></div>
-          <div className="absolute bottom-4 left-4 w-12 h-12 bg-purple-300 rounded-full"></div>
-          <div className="absolute top-1/2 left-1/2 w-20 h-20 bg-indigo-200 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
-        </div>
+      {/* Hero Image/Header Area */}
+      <div className="relative h-48 w-full overflow-hidden">
+        {hasHeroImage ? (
+          <>
+            {/* Hero Image */}
+            <img
+              src={list.hero_image}
+              alt={list.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+          </>
+        ) : (
+          <>
+            {/* Fallback Gradient Background */}
+            <div className="w-full h-full bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-4 right-4 w-16 h-16 bg-blue-300 rounded-full"></div>
+                <div className="absolute bottom-4 left-4 w-12 h-12 bg-purple-300 rounded-full"></div>
+                <div className="absolute top-1/2 left-1/2 w-20 h-20 bg-indigo-200 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+              </div>
 
-        {/* Center Icon */}
-        <div className="relative z-10 p-4 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-          {isEditorial ? (
-            <SparklesIcon className="w-12 h-12 text-blue-600" />
-          ) : (
-            <RectangleStackIcon className="w-12 h-12 text-indigo-600" />
-          )}
-        </div>
+              {/* Center Icon */}
+              <div className="relative z-10 flex items-center justify-center h-full">
+                <div className="p-4 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  {isEditorial ? (
+                    <SparklesIcon className="w-12 h-12 text-blue-600" />
+                  ) : (
+                    <RectangleStackIcon className="w-12 h-12 text-indigo-600" />
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+          </>
+        )}
 
         {/* Status Badge */}
         <div className="absolute top-4 right-4">
-          <Badge color={isEditorial ? "indigo" : 
-            ('isprivate' in list && list.isprivate) ? "red" : "green"} 
-            size="sm">
+          <Badge 
+            color={isEditorial ? "indigo" : 
+              ('isprivate' in list && list.isprivate) ? "red" : "green"} 
+            size="sm"
+            className="bg-white/90 backdrop-blur-sm shadow-lg"
+          >
             {isEditorial ? 'Redaktionell' : 
              ('isprivate' in list && list.isprivate) ? 'Privat' : 'Öffentlich'}
           </Badge>
         </div>
 
-        {/* Overlay Gradient */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/20 to-transparent h-16"></div>
+        {/* Image Badge (wenn kein Hauptbild vorhanden) */}
+        {!hasHeroImage && !isEditorial && (
+          <div className="absolute top-4 left-4">
+            <Badge color="gray" size="xs" className="bg-white/70 backdrop-blur-sm">
+              <PhotoIcon className="w-3 h-3 mr-1" />
+              Kein Bild
+            </Badge>
+          </div>
+        )}
+
+        {/* Title Overlay (wenn Hauptbild vorhanden) */}
+        {hasHeroImage && (
+          <div className="absolute bottom-4 left-4 right-4">
+            <Title className="text-xl font-bold text-white leading-tight drop-shadow-lg group-hover:text-blue-200 transition-colors duration-300 line-clamp-2">
+              {list.title}
+            </Title>
+          </div>
+        )}
       </div>
 
-      {/* Content */}
+      {/* Content Section */}
       <div className="p-6 space-y-4">
-        {/* Title */}
-        <div>
-          <Title className="text-xl mb-2 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2 leading-tight">
-            {list.title}
-          </Title>
-        </div>
+        {/* Title (wenn kein Hauptbild) */}
+        {!hasHeroImage && (
+          <div>
+            <Title className="text-xl mb-2 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2 leading-tight">
+              {list.title}
+            </Title>
+          </div>
+        )}
 
         {/* Description */}
         {list.description && (
@@ -129,11 +173,11 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load regular item lists
+        // Load regular item lists (now with hero images)
         const fetchedItemLists = await itemService.fetchPublicLists();
         setItemLists(fetchedItemLists);
         
-        // Filter for user's own item lists
+        // Filter for user's own item lists (now with hero images)
         const userlists = await itemService.fetchUserLists();
         setUserItemLists(userlists);
 
@@ -241,7 +285,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
         </div>
       </div>
 
-      {/* Simple Search Section - Same as Gallery */}
+      {/* Search Section */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="relative flex-1 max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

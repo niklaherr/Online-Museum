@@ -35,7 +35,7 @@ class ItemService {
     }
   }
 
-  async fetchPublicLists(): Promise<GalleryItem[]> {
+  async fetchPublicLists(): Promise<ItemList[]> {
     const token = userService.getToken();
     const userID = userService.getUserID();
     if (!token || !userID) throw new Error("Nicht eingeloggt.");
@@ -59,14 +59,14 @@ class ItemService {
     return await res.json();
   }
 
-  async fetchUserLists(): Promise<GalleryItem[]> {
+  async fetchUserLists(): Promise<ItemList[]> {
     const token = userService.getToken();
     const userID = userService.getUserID();
     if (!token || !userID) throw new Error("Nicht eingeloggt.");
   
     const headers = { Authorization: `Bearer ${token}` };
   
-    const url = new URL(`${this.baseUrl}/items`);
+    const url = new URL(`${this.baseUrl}/item-lists`);
     url.searchParams.append("user_id", userID.toString());
 
     const res = await fetch(url.toString(), {
@@ -456,6 +456,68 @@ class ItemService {
       return await res; // Optional: Handle the response if you need any confirmation message from the backend
     } catch (err: any) {
       throw new Error(err.message || "Unbekannter Fehler beim Löschen der Item-Liste.");
+    }
+  }
+
+  // Upload hero image for item list
+  async uploadHeroImage(itemListId: number, imageFile: File): Promise<any> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+
+    const formData = new FormData();
+    formData.append("heroImage", imageFile);
+
+    try {
+      const res = await fetch(`${this.baseUrl}/item-lists/${itemListId}/hero-image`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (res.status === 401) {
+        userService.logout();
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Hochladen des Hauptbildes: ${errorMessage}`);
+      }
+
+      return await res.json();
+    } catch (err: any) {
+      throw new Error(err.message || "Unbekannter Fehler beim Hochladen des Hauptbildes.");
+    }
+  }
+
+  // Delete hero image for item list
+  async deleteHeroImage(itemListId: number): Promise<any> {
+    const token = userService.getToken();
+    if (!token) throw new Error("Nicht eingeloggt.");
+
+    try {
+      const res = await fetch(`${this.baseUrl}/item-lists/${itemListId}/hero-image`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 401) {
+        userService.logout();
+        throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
+      }
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Fehler beim Löschen des Hauptbildes: ${errorMessage}`);
+      }
+
+      return await res.json();
+    } catch (err: any) {
+      throw new Error(err.message || "Unbekannter Fehler beim Löschen des Hauptbildes.");
     }
   }
 

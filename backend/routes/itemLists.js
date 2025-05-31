@@ -1,9 +1,11 @@
 // routes/itemLists.js
 const express = require("express");
+const multer = require("multer");
 const { authenticateJWT } = require("../middleware/auth");
 const { createActivity } = require("../services/activityService");
 
 const router = express.Router();
+const upload = multer(); // Files will be stored as Buffer in memory
 
 // Get one item list by ID
 router.get("/item-lists/:id", authenticateJWT, async (req, res) => {
@@ -12,9 +14,15 @@ router.get("/item-lists/:id", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
     
     try {
-        const result = await pool.query("SELECT * FROM item_list WHERE id = $1 AND (isPrivate = false OR user_id = $2)", [id, userId]);
+        const result = await pool.query("SELECT * FROM item_list WHERE id = $1 AND (isprivate = false OR user_id = $2)", [id, userId]);
         if (result.rows.length === 0) return res.status(404).send("Item list not found");
-        res.json(result.rows[0]);
+        
+        const itemList = result.rows[0];
+        // Convert hero_image buffer to base64 if it exists
+        if (itemList.hero_image) {
+            itemList.hero_image = `data:image/jpeg;base64,${itemList.hero_image.toString('base64')}`;
+        }
+        res.json(itemList);
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching item list");
@@ -80,7 +88,7 @@ router.post("/item-lists", authenticateJWT, async (req, res) => {
         await pool.query('BEGIN');
 
         const result = await pool.query(
-            "INSERT INTO item_list (title, description, user_id, isprivate) VALUES ($1, $2, $3, $4) RETURNING id",
+            "INSERT INTO item_list (title, description, user_id, isprivate) VALUES ($1, $2, $3, $4) RETURNING *",
             [title, description || "", userId, is_private]
         );
 
@@ -100,7 +108,18 @@ router.post("/item-lists", authenticateJWT, async (req, res) => {
         // Commit the transaction
         await pool.query('COMMIT');
 
-        res.status(201).json({ id: newItemListId, title, description, user_id: userId, item_ids });
+        // Return the complete record including hero_image field
+        const createdList = result.rows[0];
+        res.status(201).json({ 
+            id: createdList.id, 
+            title: createdList.title, 
+            description: createdList.description, 
+            user_id: createdList.user_id, 
+            isprivate: createdList.isprivate,
+            entered_on: createdList.entered_on,
+            hero_image: null, // Initially no hero image
+            item_ids 
+        });
     } catch (err) {
         // Rollback in case of error
         await pool.query('ROLLBACK');
@@ -133,8 +152,10 @@ router.put("/item-lists/:id", authenticateJWT, async (req, res) => {
             return res.status(404).send("Item list not found or not authorized.");
         }
 
-        await pool.query("UPDATE item_list SET title = $1, description = $2, isprivate = $3 WHERE id = $4",
-            [title, description || "",is_private, itemListId]);
+        const updateResult = await pool.query(
+            "UPDATE item_list SET title = $1, description = $2, isprivate = $3 WHERE id = $4 RETURNING *",
+            [title, description || "", is_private, itemListId]
+        );
 
         await pool.query("DELETE FROM item_itemlist WHERE item_list_id = $1", [itemListId]);
 
@@ -152,7 +173,16 @@ router.put("/item-lists/:id", authenticateJWT, async (req, res) => {
         // Commit the transaction
         await pool.query('COMMIT');
 
-        res.status(200).json({ id: itemListId, title, description, user_id: userId, item_ids });
+        // Return updated record with hero_image converted if exists
+        const updatedList = updateResult.rows[0];
+        if (updatedList.hero_image) {
+            updatedList.hero_image = `data:image/jpeg;base64,${updatedList.hero_image.toString('base64')}`;
+        }
+        
+        res.status(200).json({ 
+            ...updatedList,
+            item_ids 
+        });
     } catch (err) {
         // Rollback in case of error
         await pool.query('ROLLBACK');
@@ -281,7 +311,8 @@ router.get("/item-lists", authenticateJWT, async (req, res) => {
             entered_on: list.entered_on,
             user_id: list.user_id,
             username: list.username,
-            isprivate: list.isprivate
+            isprivate: list.isprivate,
+            hero_image: list.hero_image ? `data:image/jpeg;base64,${list.hero_image.toString('base64')}` : null
         }));
 
         res.json(itemLists);
@@ -291,5 +322,89 @@ router.get("/item-lists", authenticateJWT, async (req, res) => {
     }
 });
 
+// Upload hero image for item list
+router.put("/item-lists/:id/hero-image", authenticateJWT, upload.single("heroImage"), async (req, res) => {
+    const itemListId = parseInt(req.params.id);
+    const heroImage = req.file ? req.file.buffer : null;
+    const userId = req.user.id;
+    const pool = req.app.locals.pool;
+
+    if (!heroImage) {
+        return res.status(400).send("No image provided");
+    }
+
+    try {
+        // Ensure the item list exists and belongs to the current user
+        const itemListResult = await pool.query(
+            "SELECT * FROM item_list WHERE id = $1 AND user_id = $2",
+            [itemListId, userId]
+        );
+
+        if (itemListResult.rows.length === 0) {
+            return res.status(404).send("Item list not found or not authorized");
+        }
+
+        // Update the hero image
+        const result = await pool.query(
+            "UPDATE item_list SET hero_image = $1 WHERE id = $2 AND user_id = $3 RETURNING *",
+            [heroImage, itemListId, userId]
+        );
+
+        await createActivity(pool, {
+            category: "ITEM_LIST", 
+            element_id: itemListId, 
+            type: "UPDATE_HERO", 
+            user_id: userId
+        });
+
+        // Convert hero_image buffer to base64 for response
+        const updatedList = result.rows[0];
+        if (updatedList.hero_image) {
+            updatedList.hero_image = `data:image/jpeg;base64,${updatedList.hero_image.toString('base64')}`;
+        }
+
+        res.json(updatedList);
+    } catch (err) {
+        console.error("Error updating hero image:", err);
+        res.status(500).send("Error updating hero image");
+    }
+});
+
+// Delete hero image for item list
+router.delete("/item-lists/:id/hero-image", authenticateJWT, async (req, res) => {
+    const itemListId = parseInt(req.params.id);
+    const userId = req.user.id;
+    const pool = req.app.locals.pool;
+
+    try {
+        // Ensure the item list exists and belongs to the current user
+        const itemListResult = await pool.query(
+            "SELECT * FROM item_list WHERE id = $1 AND user_id = $2",
+            [itemListId, userId]
+        );
+
+        if (itemListResult.rows.length === 0) {
+            return res.status(404).send("Item list not found or not authorized");
+        }
+
+        // Remove the hero image
+        const result = await pool.query(
+            "UPDATE item_list SET hero_image = NULL WHERE id = $1 AND user_id = $2 RETURNING *",
+            [itemListId, userId]
+        );
+
+        await createActivity(pool, {
+            category: "ITEM_LIST", 
+            element_id: itemListId, 
+            type: "DELETE_HERO", 
+            user_id: userId
+        });
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error("Error deleting hero image:", err);
+        res.status(500).send("Error deleting hero image");
+    }
+});
 
 module.exports = router;

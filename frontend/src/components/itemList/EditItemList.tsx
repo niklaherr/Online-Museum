@@ -10,7 +10,6 @@ import {
   Dialog,
   DialogPanel,
   Flex,
-  Grid,
   Badge,
 } from "@tremor/react";
 import { 
@@ -25,7 +24,9 @@ import {
   UserIcon,
   CalendarIcon,
   TagIcon,
-  XMarkIcon
+  XMarkIcon,
+  PhotoIcon,
+  CloudArrowUpIcon
 } from "@heroicons/react/24/outline";
 import Item, { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
@@ -47,6 +48,13 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
   const [isPrivate, setIsPrivate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Hero Image States
+  const [currentHeroImage, setCurrentHeroImage] = useState<string | null>(null);
+  const [newHeroImage, setNewHeroImage] = useState<File | null>(null);
+  const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
+  const [isHeroImageModalOpen, setIsHeroImageModalOpen] = useState(false);
+  const [isUploadingHero, setIsUploadingHero] = useState(false);
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUpdateConfirmOpen, setIsUpdateConfirmOpen] = useState(false);
@@ -64,6 +72,12 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
         setTitle(listDetails.title);
         setDescription(listDetails.description || "");
         setIsPrivate(listDetails.isprivate ?? false);
+        
+        // Korrigierte Hero Image Ladung
+        console.log("Loaded list details:", listDetails);
+        console.log("Hero image from backend:", listDetails.hero_image);
+        setCurrentHeroImage(listDetails.hero_image || null);
+        
         setSelectedItems(listItems);
         setUserItems(allUserItems);
         setIsLoading(false);
@@ -73,11 +87,79 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
           errorMessage = error.message;
         }
         NotyfService.showError(errorMessage);
+        setIsLoading(false);
       }
     };
 
     loadItemList();
   }, [id]);
+
+  // Hero Image Handlers
+  const handleHeroImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setNewHeroImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setHeroImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadHeroImage = async () => {
+    if (!newHeroImage) {
+      NotyfService.showError("Bitte wählen Sie ein Bild aus.");
+      return;
+    }
+
+    setIsUploadingHero(true);
+    try {
+      console.log("Uploading hero image for list ID:", id);
+      await itemService.uploadHeroImage(parseInt(id!), newHeroImage);
+      NotyfService.showSuccess("Hauptbild erfolgreich hochgeladen");
+      
+      // Reload the list to get updated hero image
+      const updatedList = await itemService.fetchItemListById(id!);
+      console.log("Updated list after upload:", updatedList);
+      setCurrentHeroImage(updatedList.hero_image || null);
+      
+      // Close modal and reset state
+      setIsHeroImageModalOpen(false);
+      setNewHeroImage(null);
+      setHeroImagePreview(null);
+    } catch (error) {
+      let errorMessage = "Fehler beim Hochladen des Hauptbildes";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      console.error("Hero image upload error:", error);
+      NotyfService.showError(errorMessage);
+    } finally {
+      setIsUploadingHero(false);
+    }
+  };
+
+  const handleDeleteHeroImage = async () => {
+    if (!id) {
+      NotyfService.showError("Keine Liste-ID gefunden.");
+      return;
+    }
+
+    try {
+      console.log("Deleting hero image for list ID:", id);
+      await itemService.deleteHeroImage(parseInt(id));
+      NotyfService.showSuccess("Hauptbild erfolgreich entfernt");
+      setCurrentHeroImage(null);
+    } catch (error) {
+      let errorMessage = "Fehler beim Entfernen des Hauptbildes";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      console.error("Hero image delete error:", error);
+      NotyfService.showError(errorMessage);
+    }
+  };
 
   // Remove item from selection
   const removeItem = (itemId: number) => {
@@ -92,10 +174,9 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
     if (isSelected) {
       removeItem(itemId);
     } else {
-      // Convert Item to GalleryItem format
       const galleryItem: GalleryItem = {
         ...item,
-        username: "You" // Since it's user's own item
+        username: "You"
       };
       setSelectedItems(prev => [...prev, galleryItem]);
     }
@@ -193,25 +274,64 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
         </Button>
       </div>
 
-      {/* Hero Header */}
-      <div className="relative bg-gradient-to-r from-green-600 via-blue-600 to-indigo-600 rounded-2xl overflow-hidden shadow-2xl">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-8 right-8 w-24 h-24 bg-white rounded-full"></div>
-          <div className="absolute bottom-4 left-8 w-16 h-16 bg-white rounded-full"></div>
-          <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-white rounded-full"></div>
-        </div>
+      {/* Hero Header with Current Hero Image */}
+      <div className="relative rounded-2xl overflow-hidden shadow-2xl min-h-[200px]">
+        {/* Hero Image Background (if exists) */}
+        {currentHeroImage ? (
+          <>
+            <img
+              src={currentHeroImage}
+              alt={title || "Hauptbild"}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30"></div>
+          </>
+        ) : (
+          <div className="bg-gradient-to-r from-green-600 via-blue-600 to-indigo-600 min-h-[200px] relative">
+            {/* Background Pattern (when no hero image) */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-8 right-8 w-24 h-24 bg-white rounded-full"></div>
+              <div className="absolute bottom-4 left-8 w-16 h-16 bg-white rounded-full"></div>
+              <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-white rounded-full"></div>
+            </div>
+          </div>
+        )}
         
         <div className="relative p-8 text-white">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
-              <RectangleStackIcon className="w-8 h-8 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
+                <RectangleStackIcon className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <Title className="text-3xl font-bold text-white">Item-Liste bearbeiten</Title>
+                <Text className="text-blue-100 text-lg">
+                  Aktualisieren Sie Ihre persönliche Sammlung aus Ihren eigenen Items
+                </Text>
+              </div>
             </div>
-            <div>
-              <Title className="text-3xl font-bold text-white">Item-Liste bearbeiten</Title>
-              <Text className="text-blue-100 text-lg">
-                Aktualisieren Sie Ihre persönliche Sammlung aus Ihren eigenen Items
-              </Text>
+            
+            {/* Hero Image Management Buttons */}
+            <div className="flex space-x-2">
+              <Button
+                icon={PhotoIcon}
+                size="sm"
+                onClick={() => setIsHeroImageModalOpen(true)}
+                className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border-0"
+              >
+                {currentHeroImage ? 'Bild ändern' : 'Hauptbild hinzufügen'}
+              </Button>
+              {currentHeroImage && (
+                <Button
+                  icon={XMarkIcon}
+                  size="sm"
+                  variant="light"
+                  onClick={handleDeleteHeroImage}
+                  className="bg-white/20 backdrop-blur-sm text-white hover:bg-red-500/30 border-0"
+                >
+                  Bild entfernen
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -408,6 +528,42 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
 
         {/* Status/Preview Section */}
         <div className="space-y-6">
+          {/* Current Hero Image Preview */}
+          {currentHeroImage && (
+            <Card>
+              <div className="p-6 space-y-4">
+                <Title className="text-lg">Aktuelles Hauptbild</Title>
+                <div className="relative aspect-video w-full overflow-hidden rounded-lg border-2 border-gray-200">
+                  <img
+                    src={currentHeroImage}
+                    alt="Hauptbild"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex space-x-2">
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="blue"
+                    onClick={() => setIsHeroImageModalOpen(true)}
+                    className="flex-1"
+                  >
+                    Ändern
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="light"
+                    color="red"
+                    onClick={handleDeleteHeroImage}
+                    className="flex-1"
+                  >
+                    Entfernen
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )}
+
           {/* Status Card */}
           <Card>
             <div className="p-6 space-y-4">
@@ -435,6 +591,15 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Beschreibung vorhanden</Text>
                   {description.trim() ? (
+                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <XCircleIcon className="w-5 h-5 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Text className="text-sm">Hauptbild vorhanden</Text>
+                  {currentHeroImage ? (
                     <CheckCircleIcon className="w-5 h-5 text-green-500" />
                   ) : (
                     <XCircleIcon className="w-5 h-5 text-gray-400" />
@@ -510,6 +675,77 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
           </div>
         </div>
       </div>
+
+      {/* Hero Image Upload Modal */}
+      <Dialog open={isHeroImageModalOpen} onClose={() => setIsHeroImageModalOpen(false)} static={true}>
+        <DialogPanel className="max-w-2xl">
+          <div className="p-6 space-y-6">
+            <div className="flex items-center space-x-3">
+              <PhotoIcon className="w-8 h-8 text-blue-600" />
+              <Title className="text-xl">Hauptbild {currentHeroImage ? 'ändern' : 'hinzufügen'}</Title>
+            </div>
+
+            <div className="space-y-4">
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleHeroImageChange}
+                  className="hidden"
+                  id="hero-image-upload"
+                />
+                <label
+                  htmlFor="hero-image-upload"
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors duration-200"
+                >
+                  <CloudArrowUpIcon className="w-12 h-12 text-gray-400 mb-3" />
+                  <Text className="text-sm text-gray-600 text-center font-medium">
+                    {newHeroImage ? "Bild erfolgreich ausgewählt!" : "Klicken oder Dateien hierher ziehen"}
+                  </Text>
+                  <Text className="text-xs text-gray-500 mt-1">
+                    PNG, JPG, GIF bis 10MB
+                  </Text>
+                </label>
+              </div>
+
+              {/* Image Preview */}
+              {heroImagePreview && (
+                <div className="space-y-2">
+                  <Text className="text-sm font-medium text-gray-700">Vorschau:</Text>
+                  <div className="relative aspect-video w-full overflow-hidden rounded-lg border-2 border-green-200 shadow-lg">
+                    <img
+                      src={heroImagePreview}
+                      alt="Vorschau"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Flex justifyContent="end" className="space-x-3">
+              <Button 
+                variant="secondary" 
+                onClick={() => {
+                  setIsHeroImageModalOpen(false);
+                  setNewHeroImage(null);
+                  setHeroImagePreview(null);
+                }}
+              >
+                Abbrechen
+              </Button>
+              <Button 
+                color="blue" 
+                onClick={handleUploadHeroImage}
+                disabled={!newHeroImage}
+                loading={isUploadingHero}
+              >
+                {isUploadingHero ? "Wird hochgeladen..." : "Hauptbild speichern"}
+              </Button>
+            </Flex>
+          </div>
+        </DialogPanel>
+      </Dialog>
 
       {/* AI Description Dialog */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>

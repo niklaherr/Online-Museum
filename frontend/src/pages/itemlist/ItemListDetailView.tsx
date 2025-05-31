@@ -21,7 +21,10 @@ import {
   PencilIcon,
   ArrowLeftIcon,
   RectangleStackIcon,
-  TagIcon
+  TagIcon,
+  PhotoIcon,
+  CloudArrowUpIcon,
+  XMarkIcon
 } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import ItemList from "interfaces/ItemList";
@@ -41,6 +44,10 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [list, setList] = useState<ItemList | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isHeroImageModalOpen, setIsHeroImageModalOpen] = useState(false);
+  const [selectedHeroImage, setSelectedHeroImage] = useState<File | null>(null);
+  const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
+  const [isUploadingHero, setIsUploadingHero] = useState(false);
 
   useEffect(() => {
     const loadItemLists = async () => {
@@ -79,6 +86,64 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
     }
   };
 
+  const handleHeroImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedHeroImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setHeroImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadHeroImage = async () => {
+    if (!selectedHeroImage || !list) return;
+
+    setIsUploadingHero(true);
+    try {
+      await itemService.uploadHeroImage(list.id, selectedHeroImage);
+      NotyfService.showSuccess("Hauptbild erfolgreich hochgeladen");
+      
+      // Reload the list to get the updated hero image
+      const updatedList = await itemService.fetchItemListById(id!);
+      setList(updatedList);
+      
+      // Close modal and reset state
+      setIsHeroImageModalOpen(false);
+      setSelectedHeroImage(null);
+      setHeroImagePreview(null);
+    } catch (error) {
+      let errorMessage = "Fehler beim Hochladen des Hauptbildes";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      NotyfService.showError(errorMessage);
+    } finally {
+      setIsUploadingHero(false);
+    }
+  };
+
+  const handleDeleteHeroImage = async () => {
+    if (!list) return;
+
+    try {
+      await itemService.deleteHeroImage(list.id);
+      NotyfService.showSuccess("Hauptbild erfolgreich entfernt");
+      
+      // Reload the list to get the updated state
+      const updatedList = await itemService.fetchItemListById(id!);
+      setList(updatedList);
+    } catch (error) {
+      let errorMessage = "Fehler beim Entfernen des Hauptbildes";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      NotyfService.showError(errorMessage);
+    }
+  };
+
   if (isLoading) return <Loading />
 
   const isOwner = list?.user_id === userService.getUserID();
@@ -97,88 +162,149 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
         </Button>
       </div>
 
-      {/* Header Card */}
+      {/* Header Card with Hero Image */}
       <Card className="relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 opacity-60"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200/20 rounded-full translate-y-12 -translate-x-12"></div>
-        
-        <div className="relative p-8">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-            <div className="flex-1 space-y-4">
-              {/* Badges */}
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge color="blue" icon={RectangleStackIcon}>
-                  {items.length} {items.length === 1 ? "Item" : "Items"}
-                </Badge>
+        {/* Hero Image or Gradient Background */}
+        <div className="relative h-80 w-full overflow-hidden">
+          {list?.hero_image ? (
+            <>
+              {/* Hero Image */}
+              <img
+                src={list.hero_image}
+                alt={list.title}
+                className="w-full h-full object-cover"
+              />
+              {/* Dark overlay for better text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+            </>
+          ) : (
+            <>
+              {/* Fallback Gradient Background */}
+              <div className="w-full h-full bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute top-8 right-8 w-32 h-32 bg-blue-200 rounded-full"></div>
+                  <div className="absolute bottom-8 left-8 w-24 h-24 bg-purple-200 rounded-full"></div>
+                  <div className="absolute top-1/2 left-1/2 w-40 h-40 bg-indigo-200 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+                </div>
                 
-                {list?.isprivate ? (
-                  <Badge color="red" icon={LockClosedIcon}>
-                    Privat
-                  </Badge>
-                ) : (
-                  <Badge color="green" icon={EyeIcon}>
-                    Öffentlich
-                  </Badge>
-                )}
-
-                {isOwner && (
-                  <Badge color="gray">
-                    Eigene Liste
-                  </Badge>
-                )}
-              </div>
-
-              {/* Title & Description */}
-              <div className="space-y-3">
-                <Title className="text-3xl text-blue-900 leading-tight">
-                  {list?.title}
-                </Title>
-                
-                {list?.description && (
-                  <Subtitle className="text-blue-700 text-lg leading-relaxed max-w-3xl">
-                    {list.description}
-                  </Subtitle>
-                )}
-              </div>
-
-              {/* Meta Info */}
-              <div className="flex items-center text-blue-600 space-x-4">
-                <div className="flex items-center">
-                  <CalendarIcon className="w-5 h-5 mr-2" />
-                  <Text className="font-medium">
-                    Erstellt am {list ? new Date(list.entered_on).toLocaleDateString('de-DE', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    }) : "/"}
-                  </Text>
+                {/* Center Icon */}
+                <div className="relative z-10 flex items-center justify-center h-full">
+                  <div className="p-8 bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl">
+                    <RectangleStackIcon className="w-20 h-20 text-indigo-600" />
+                  </div>
                 </div>
               </div>
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+            </>
+          )}
 
-            {/* Action Buttons */}
-            {isOwner && (
-              <div className="flex flex-col sm:flex-row gap-3">
+          {/* Hero Image Management Button (für Owner) */}
+          {isOwner && (
+            <div className="absolute top-4 right-4">
+              <div className="flex space-x-2">
                 <Button
-                  icon={PencilIcon}
-                  onClick={() => onNavigate(`/item-list/${id}/edit`)}
-                  color="blue"
+                  icon={PhotoIcon}
+                  size="xs"
+                  onClick={() => setIsHeroImageModalOpen(true)}
+                  className="bg-white/90 backdrop-blur-sm text-gray-700 hover:bg-white border-0 shadow-lg"
                 >
-                  Bearbeiten
+                  {list?.hero_image ? 'Bild ändern' : 'Bild hinzufügen'}
                 </Button>
-                
-                <Button
-                  variant="light"
-                  color="red"
-                  icon={TrashIcon}
-                  onClick={() => setIsDeleteModalOpen(true)}
-                >
-                  Löschen
-                </Button>
+                {list?.hero_image && (
+                  <Button
+                    icon={XMarkIcon}
+                    size="xs"
+                    variant="light"
+                    color="red"
+                    onClick={handleDeleteHeroImage}
+                    className="bg-white/90 backdrop-blur-sm hover:bg-red-50 border-0 shadow-lg"
+                  >
+                    Entfernen
+                  </Button>
+                )}
               </div>
-            )}
+            </div>
+          )}
+
+          {/* Content Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-8">
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+              <div className="flex-1 space-y-4">
+                {/* Badges */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge color="blue" icon={RectangleStackIcon} className="bg-white/90 backdrop-blur-sm shadow-lg">
+                    {items.length} {items.length === 1 ? "Item" : "Items"}
+                  </Badge>
+                  
+                  {list?.isprivate ? (
+                    <Badge color="red" icon={LockClosedIcon} className="bg-white/90 backdrop-blur-sm shadow-lg">
+                      Privat
+                    </Badge>
+                  ) : (
+                    <Badge color="green" icon={EyeIcon} className="bg-white/90 backdrop-blur-sm shadow-lg">
+                      Öffentlich
+                    </Badge>
+                  )}
+
+                  {isOwner && (
+                    <Badge color="gray" className="bg-white/90 backdrop-blur-sm shadow-lg">
+                      Eigene Liste
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Title & Description */}
+                <div className="space-y-3">
+                  <Title className="text-4xl font-bold text-white leading-tight drop-shadow-lg">
+                    {list?.title}
+                  </Title>
+                  
+                  {list?.description && (
+                    <Subtitle className="text-xl text-white/90 leading-relaxed max-w-3xl drop-shadow-md">
+                      {list.description}
+                    </Subtitle>
+                  )}
+                </div>
+
+                {/* Meta Info */}
+                <div className="flex items-center text-white/80 space-x-4">
+                  <div className="flex items-center">
+                    <CalendarIcon className="w-5 h-5 mr-2" />
+                    <Text className="font-medium text-white/90">
+                      Erstellt am {list ? new Date(list.entered_on).toLocaleDateString('de-DE', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      }) : "/"}
+                    </Text>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              {isOwner && (
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    icon={PencilIcon}
+                    onClick={() => onNavigate(`/item-list/${id}/edit`)}
+                    className="bg-white/90 backdrop-blur-sm text-blue-600 hover:bg-white border-0 shadow-lg"
+                  >
+                    Bearbeiten
+                  </Button>
+                  
+                  <Button
+                    variant="light"
+                    color="red"
+                    icon={TrashIcon}
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    className="bg-white/90 backdrop-blur-sm hover:bg-red-50 border-0 shadow-lg"
+                  >
+                    Löschen
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </Card>
@@ -275,6 +401,77 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
           </div>
         </Card>
       )}
+
+      {/* Hero Image Upload Modal */}
+      <Dialog open={isHeroImageModalOpen} onClose={() => setIsHeroImageModalOpen(false)} static={true}>
+        <DialogPanel className="max-w-2xl">
+          <div className="p-6 space-y-6">
+            <div className="flex items-center space-x-3">
+              <PhotoIcon className="w-8 h-8 text-blue-600" />
+              <Title className="text-xl">Hauptbild {list?.hero_image ? 'ändern' : 'hinzufügen'}</Title>
+            </div>
+
+            <div className="space-y-4">
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleHeroImageChange}
+                  className="hidden"
+                  id="hero-image-upload"
+                />
+                <label
+                  htmlFor="hero-image-upload"
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors duration-200"
+                >
+                  <CloudArrowUpIcon className="w-12 h-12 text-gray-400 mb-3" />
+                  <Text className="text-sm text-gray-600 text-center font-medium">
+                    {selectedHeroImage ? "Bild erfolgreich ausgewählt!" : "Klicken oder Dateien hierher ziehen"}
+                  </Text>
+                  <Text className="text-xs text-gray-500 mt-1">
+                    PNG, JPG, GIF bis 10MB
+                  </Text>
+                </label>
+              </div>
+
+              {/* Image Preview */}
+              {heroImagePreview && (
+                <div className="space-y-2">
+                  <Text className="text-sm font-medium text-gray-700">Vorschau:</Text>
+                  <div className="relative aspect-video w-full overflow-hidden rounded-lg border-2 border-green-200 shadow-lg">
+                    <img
+                      src={heroImagePreview}
+                      alt="Vorschau"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Flex justifyContent="end" className="space-x-3">
+              <Button 
+                variant="secondary" 
+                onClick={() => {
+                  setIsHeroImageModalOpen(false);
+                  setSelectedHeroImage(null);
+                  setHeroImagePreview(null);
+                }}
+              >
+                Abbrechen
+              </Button>
+              <Button 
+                color="blue" 
+                onClick={handleUploadHeroImage}
+                disabled={!selectedHeroImage}
+                loading={isUploadingHero}
+              >
+                {isUploadingHero ? "Wird hochgeladen..." : "Hauptbild speichern"}
+              </Button>
+            </Flex>
+          </div>
+        </DialogPanel>
+      </Dialog>
 
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
