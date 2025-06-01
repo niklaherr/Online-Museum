@@ -25,7 +25,9 @@ import {
   UserIcon,
   CalendarIcon,
   TagIcon,
-  XMarkIcon
+  XMarkIcon,
+  PhotoIcon,
+  CloudArrowUpIcon
 } from "@heroicons/react/24/outline";
 import Item, { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
@@ -46,6 +48,8 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
   const [selectedItems, setSelectedItems] = useState<GalleryItem[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
+  const [existingMainImage, setExistingMainImage] = useState<string | null>(null);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -64,6 +68,7 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
         setTitle(listDetails.title);
         setDescription(listDetails.description || "");
         setIsPrivate(listDetails.isprivate ?? false);
+        setExistingMainImage(listDetails.main_image || null);
         setSelectedItems(listItems);
         setUserItems(allUserItems);
         setIsLoading(false);
@@ -78,6 +83,13 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
 
     loadItemList();
   }, [id]);
+
+  const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setMainImageFile(file);
+    }
+  };
 
   // Remove item from selection
   const removeItem = (itemId: number) => {
@@ -118,6 +130,7 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
         description,
         item_ids: selectedItems.map(item => item.id),
         is_private: isPrivate,
+        main_image: mainImageFile || undefined,
       });
       NotyfService.showSuccess("Liste erfolgreich aktualisiert.");
       onNavigate("/item-list");
@@ -262,6 +275,69 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
                     className="w-full"
                   />
                 </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Main Image Upload Card */}
+          <Card>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center space-x-3">
+                <PhotoIcon className="w-6 h-6 text-purple-600" />
+                <Title className="text-xl">Banner-Bild</Title>
+              </div>
+
+              <div className="space-y-4">
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleMainImageChange}
+                    className="hidden"
+                    id="main-image-upload"
+                  />
+                  <label
+                    htmlFor="main-image-upload"
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors duration-200"
+                  >
+                    <CloudArrowUpIcon className="w-8 h-8 text-gray-400 mb-2" />
+                    <Text className="text-sm text-gray-600 text-center">
+                      {mainImageFile ? "Neues Banner-Bild ausgewählt" : "Klicken zum Banner-Bild hochladen"}
+                    </Text>
+                    <Text className="text-xs text-gray-500">
+                      PNG, JPG, GIF bis 10MB
+                    </Text>
+                  </label>
+                </div>
+
+                {/* Image Preview */}
+                {(mainImageFile || existingMainImage) && (
+                  <div className="space-y-2">
+                    <Text className="text-sm font-medium text-gray-700">Vorschau:</Text>
+                    <div className="relative aspect-video w-full overflow-hidden rounded-xl border-2 border-gray-200">
+                      <img
+                        src={mainImageFile ? URL.createObjectURL(mainImageFile) : existingMainImage!}
+                        alt="Banner Vorschau"
+                        className="w-full h-full object-cover"
+                      />
+                      {/* ListView Bereich Markierung */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative w-full border-2 border-yellow-400 border-dashed bg-yellow-400/20" style={{ height: '140px' }}>
+                          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-xs px-3 py-1 rounded-full shadow text-black font-medium">
+                            Anzeige: Detailansicht der Liste
+                          </div>
+                        </div>
+                      </div>
+                      {mainImageFile && (
+                        <div className="absolute top-2 right-2">
+                          <Badge color="green" icon={CheckCircleIcon} size="xs">
+                            Neu
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </Card>
@@ -435,6 +511,15 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Beschreibung vorhanden</Text>
                   {description.trim() ? (
+                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <XCircleIcon className="w-5 h-5 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Text className="text-sm">Banner-Bild vorhanden</Text>
+                  {(mainImageFile || existingMainImage) ? (
                     <CheckCircleIcon className="w-5 h-5 text-green-500" />
                   ) : (
                     <XCircleIcon className="w-5 h-5 text-gray-400" />

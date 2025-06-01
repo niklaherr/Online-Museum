@@ -362,18 +362,28 @@ class ItemService {
     description?: string;
     item_ids: number[];
     is_private: boolean;
+    main_image?: File;
   }): Promise<any> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
 
     try {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description || "");
+      formData.append("item_ids", JSON.stringify(data.item_ids));
+      formData.append("is_private", data.is_private.toString());
+      
+      if (data.main_image) {
+        formData.append("main_image", data.main_image);
+      }
+
       const res = await fetch(`${this.baseUrl}/item-lists`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: formData,
       });
 
       if (res.status === 401) {
@@ -399,18 +409,28 @@ class ItemService {
     description?: string;
     item_ids: number[];
     is_private: boolean;
+    main_image?: File;
   }): Promise<any> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
   
     try {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description || "");
+      formData.append("item_ids", JSON.stringify(data.item_ids));
+      formData.append("is_private", data.is_private.toString());
+      
+      if (data.main_image) {
+        formData.append("main_image", data.main_image);
+      }
+
       const res = await fetch(`${this.baseUrl}/item-lists/${id}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: formData,
       });
 
       if (res.status === 401) {
