@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { Pool } = require("pg");
+const os = require("os");
 
 // Import routes
 const authRoutes = require("./routes/auth");
@@ -53,9 +54,29 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: "Something went wrong!" });
 });
 
-// Start the server
+// Function to get local IP address
+function getLocalIPAddress() {
+    const interfaces = os.networkInterfaces();
+    for (const devName in interfaces) {
+        const iface = interfaces[devName];
+        for (let i = 0; i < iface.length; i++) {
+            const alias = iface[i];
+            if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+                return alias.address;
+            }
+        }
+    }
+    return 'localhost';
+}
+
+// Start the server on all network interfaces
 app.listen(port, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${port}`);
+    const localIP = getLocalIPAddress();
+    console.log(`🚀 Server running on:`);
+    console.log(`   Local:    http://localhost:${port}`);
+    console.log(`   Network:  http://${localIP}:${port}`);
+    console.log(`   Mobile:   http://${localIP}:${port}`);
+    console.log(`\n📱 Access from mobile device: http://${localIP}:${port}`);
 });
 
 module.exports = app;
