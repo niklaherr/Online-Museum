@@ -24,7 +24,9 @@ import {
   UserIcon,
   CalendarIcon,
   TagIcon,
-  XMarkIcon
+  XMarkIcon,
+  PhotoIcon,
+  CloudArrowUpIcon
 } from "@heroicons/react/24/outline";
 import Item, { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
@@ -41,6 +43,8 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
   const [userItems, setUserItems] = useState<Item[]>([]);
   const [selectedItems, setSelectedItems] = useState<GalleryItem[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
+  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -58,6 +62,19 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     };
     fetchUserItems();
   }, []);
+
+  const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setMainImageFile(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMainImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Remove item from selection
   const removeItem = (itemId: number) => {
@@ -98,6 +115,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
         description: description,
         item_ids: selectedItems.map(item => item.id),
         is_private: isPrivate,
+        main_image: mainImageFile || undefined,
       });
       NotyfService.showSuccess("Liste erfolgreich erstellt.");
       onNavigate("/item-list");
@@ -105,6 +123,8 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
       setDescription("");
       setSelectedItems([]);
       setIsPrivate(false);
+      setMainImageFile(null);
+      setMainImagePreview(null);
     } catch (err: any) {
       NotyfService.showError(err.message || "Fehler beim Erstellen der Liste.");
     }
@@ -242,6 +262,75 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                     className="w-full"
                   />
                 </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Main Image Upload Card */}
+          <Card>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center space-x-3">
+                <PhotoIcon className="w-6 h-6 text-purple-600" />
+                <Title className="text-xl">Banner-Bild hochladen</Title>
+              </div>
+
+              <div className="space-y-4">
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleMainImageChange}
+                    className="hidden"
+                    id="main-image-upload"
+                  />
+                  <label
+                    htmlFor="main-image-upload"
+                    className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200 ${
+                      mainImageFile 
+                        ? 'border-green-400 bg-green-50 hover:bg-green-100' 
+                        : 'border-gray-300 hover:border-purple-500 hover:bg-purple-50'
+                    }`}
+                  >
+                    <CloudArrowUpIcon className={`w-12 h-12 mb-3 ${
+                      mainImageFile ? 'text-green-500' : 'text-gray-400'
+                    }`} />
+                    <Text className={`text-sm text-center font-medium ${
+                      mainImageFile ? 'text-green-700' : 'text-gray-600'
+                    }`}>
+                      {mainImageFile ? "Banner-Bild erfolgreich hochgeladen!" : "Klicken oder Dateien hierher ziehen"}
+                    </Text>
+                    <Text className="text-xs text-gray-500 mt-1">
+                      PNG, JPG, GIF bis 10MB (optional)
+                    </Text>
+                  </label>
+                </div>
+
+                {/* Image Preview */}
+                {mainImagePreview && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Text className="text-sm font-medium text-gray-700">Vorschau:</Text>
+                      <Badge color="green" icon={CheckCircleIcon} size="xs">
+                        Geladen
+                      </Badge>
+                    </div>
+                    <div className="relative aspect-video w-full overflow-hidden rounded-xl border-2 border-green-200 shadow-lg">
+                      <img
+                        src={mainImagePreview}
+                        alt="Banner Vorschau"
+                        className="w-full h-full object-cover"
+                      />
+                      {/* ListView Bereich Markierung */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative w-full border-2 border-yellow-400 border-dashed bg-yellow-400/20" style={{ height: '140px' }}>
+                          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-xs px-3 py-1 rounded-full shadow text-black font-medium">
+                            ListView Bereich (140px hoch)
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </Card>
@@ -415,6 +504,15 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Beschreibung vorhanden</Text>
                   {description.trim() ? (
+                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <XCircleIcon className="w-5 h-5 text-gray-400" />
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Text className="text-sm">Banner-Bild hochgeladen</Text>
+                  {mainImageFile ? (
                     <CheckCircleIcon className="w-5 h-5 text-green-500" />
                   ) : (
                     <XCircleIcon className="w-5 h-5 text-gray-400" />

@@ -31,6 +31,7 @@ CREATE TABLE item_list (
     entered_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_id INTEGER NOT NULL,
     isprivate BOOLEAN DEFAULT FALSE,
+    main_image BYTEA,
     CONSTRAINT fk_user FOREIGN KEY (user_id)
         REFERENCES users(id)
         ON DELETE CASCADE

@@ -21,7 +21,8 @@ import {
   PencilIcon,
   ArrowLeftIcon,
   RectangleStackIcon,
-  TagIcon
+  TagIcon,
+  PhotoIcon
 } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import ItemList from "interfaces/ItemList";
@@ -98,87 +99,107 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
       </div>
 
       {/* Header Card */}
-      <Card className="relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 opacity-60"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200/20 rounded-full translate-y-12 -translate-x-12"></div>
-        
-        <div className="relative p-8">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-            <div className="flex-1 space-y-4">
-              {/* Badges */}
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge color="blue" icon={RectangleStackIcon}>
-                  {items.length} {items.length === 1 ? "Item" : "Items"}
-                </Badge>
-                
-                {list?.isprivate ? (
-                  <Badge color="red" icon={LockClosedIcon}>
-                    Privat
-                  </Badge>
-                ) : (
-                  <Badge color="green" icon={EyeIcon}>
-                    Öffentlich
-                  </Badge>
-                )}
+      <Card className="relative overflow-hidden rounded-xl">
+        {/* Background with main image or gradient */}
+        <div className="relative h-64 w-full overflow-hidden rounded-xl">
+          {list?.main_image ? (
+            <>
+              <img
+                src={list.main_image}
+                alt={list.title}
+                className="w-full h-full object-cover"
+              />
+              {/* Dark overlay for text readability */}
+              <div className="absolute inset-0 bg-black/40"></div>
+            </>
+          ) : (
+            <>
+              {/* Gradient Background Pattern */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200/20 rounded-full translate-y-12 -translate-x-12"></div>
+            </>
+          )}
+          
+          {/* Content overlay */}
+          <div className="absolute inset-0 flex items-end">
+            <div className="p-8 w-full">
+              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+                <div className="flex-1 space-y-4">
+                  {/* Badges */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge color="blue" icon={RectangleStackIcon}>
+                      {items.length} {items.length === 1 ? "Item" : "Items"}
+                    </Badge>
+                    
+                    {list?.isprivate ? (
+                      <Badge color="red" icon={LockClosedIcon}>
+                        Privat
+                      </Badge>
+                    ) : (
+                      <Badge color="green" icon={EyeIcon}>
+                        Öffentlich
+                      </Badge>
+                    )}
 
-                {isOwner && (
-                  <Badge color="gray">
-                    Eigene Liste
-                  </Badge>
-                )}
-              </div>
+                    {isOwner && (
+                      <Badge color="gray">
+                        Eigene Liste
+                      </Badge>
+                    )}
+                  </div>
 
-              {/* Title & Description */}
-              <div className="space-y-3">
-                <Title className="text-3xl text-blue-900 leading-tight">
-                  {list?.title}
-                </Title>
-                
-                {list?.description && (
-                  <Subtitle className="text-blue-700 text-lg leading-relaxed max-w-3xl">
-                    {list.description}
-                  </Subtitle>
-                )}
-              </div>
+                  {/* Title & Description */}
+                  <div className="space-y-3">
+                    <Title className={`text-3xl leading-tight ${list?.main_image ? 'text-white' : 'text-blue-900'}`}>
+                      {list?.title}
+                    </Title>
+                    
+                    {list?.description && (
+                      <Subtitle className={`text-lg leading-relaxed max-w-3xl ${list?.main_image ? 'text-blue-100' : 'text-blue-700'}`}>
+                        {list.description}
+                      </Subtitle>
+                    )}
+                  </div>
 
-              {/* Meta Info */}
-              <div className="flex items-center text-blue-600 space-x-4">
-                <div className="flex items-center">
-                  <CalendarIcon className="w-5 h-5 mr-2" />
-                  <Text className="font-medium">
-                    Erstellt am {list ? new Date(list.entered_on).toLocaleDateString('de-DE', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    }) : "/"}
-                  </Text>
+                  {/* Meta Info */}
+                  <div className={`flex items-center space-x-4 ${list?.main_image ? 'text-blue-200' : 'text-blue-600'}`}>
+                    <div className="flex items-center">
+                      <CalendarIcon className="w-5 h-5 mr-2" />
+                      <Text className={`font-medium ${list?.main_image ? 'text-blue-200' : 'text-blue-600'}`}>
+                        Erstellt am {list ? new Date(list.entered_on).toLocaleDateString('de-DE', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }) : "/"}
+                      </Text>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Action Buttons */}
+                {isOwner && (
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      icon={PencilIcon}
+                      onClick={() => onNavigate(`/item-list/${id}/edit`)}
+                      color="blue"
+                    >
+                      Bearbeiten
+                    </Button>
+                    
+                    <Button
+                      variant="light"
+                      color="red"
+                      icon={TrashIcon}
+                      onClick={() => setIsDeleteModalOpen(true)}
+                    >
+                      Löschen
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
-
-            {/* Action Buttons */}
-            {isOwner && (
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  icon={PencilIcon}
-                  onClick={() => onNavigate(`/item-list/${id}/edit`)}
-                  color="blue"
-                >
-                  Bearbeiten
-                </Button>
-                
-                <Button
-                  variant="light"
-                  color="red"
-                  icon={TrashIcon}
-                  onClick={() => setIsDeleteModalOpen(true)}
-                >
-                  Löschen
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       </Card>
@@ -210,7 +231,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <EyeIcon className="w-12 h-12 opacity-50" />
+                      <PhotoIcon className="w-12 h-12 opacity-50" />
                     </div>
                   )}
                 </div>

@@ -22,8 +22,7 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   CloudArrowUpIcon,
-  PlusIcon,
-  BeakerIcon
+  PlusIcon
 } from "@heroicons/react/24/outline";
 import { itemService } from "../../services/ItemService";
 import { itemAssistantService } from "../../services/ItemAssistantService";
@@ -118,7 +117,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
   };
 
   const canCreate = title.trim().length > 0;
-  const isComplete = title.trim() && category.trim() && description.trim() && imageFile;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -155,17 +153,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                   Teilen Sie Ihr Kunstwerk oder Ihre Sammlung mit der Welt
                 </Text>
               </div>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              <Badge color="emerald" icon={BeakerIcon}>
-                Neu
-              </Badge>
-              {isComplete && (
-                <Badge color="green" icon={CheckCircleIcon}>
-                  Vollständig
-                </Badge>
-              )}
             </div>
           </div>
         </div>
@@ -374,8 +361,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
           <Card>
             <div className="p-6 space-y-4">
               <Title className="text-lg flex items-center">
-                <BeakerIcon className="w-5 h-5 mr-2 text-indigo-600" />
-                Erstellungsfortschritt
+                Status
               </Title>
               
               <div className="space-y-3">
@@ -413,24 +399,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                   ) : (
                     <XCircleIcon className="w-5 h-5 text-gray-400" />
                   )}
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="pt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <Text className="text-xs text-gray-600">Vollständigkeit</Text>
-                  <Text className="text-xs text-gray-600">
-                    {Math.round(([title, category, description, imageFile].filter(Boolean).length / 4) * 100)}%
-                  </Text>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-emerald-500 to-blue-500 h-2 rounded-full transition-all duration-300"
-                    style={{ 
-                      width: `${([title, category, description, imageFile].filter(Boolean).length / 4) * 100}%` 
-                    }}
-                  />
                 </div>
               </div>
             </div>

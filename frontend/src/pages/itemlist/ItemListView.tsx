@@ -17,7 +17,8 @@ import {
   EyeIcon,
   RectangleStackIcon,
   UserGroupIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 
 type ItemListCardProps = {
@@ -27,6 +28,7 @@ type ItemListCardProps = {
 
 const ItemListCard = ({ list, onView }: ItemListCardProps) => {
   const isEditorial = !('isprivate' in list);
+  const hasMainImage = 'main_image' in list && list.main_image;
   
   return (
     <Card
@@ -34,22 +36,32 @@ const ItemListCard = ({ list, onView }: ItemListCardProps) => {
       onClick={() => onView(list.id, isEditorial ? 'editorial' : 'item-list')}
     >
       {/* Header Image/Icon Area */}
-      <div className="relative h-48 w-full bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 right-4 w-16 h-16 bg-blue-300 rounded-full"></div>
-          <div className="absolute bottom-4 left-4 w-12 h-12 bg-purple-300 rounded-full"></div>
-          <div className="absolute top-1/2 left-1/2 w-20 h-20 bg-indigo-200 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
-        </div>
+      <div className="relative h-48 w-full overflow-hidden rounded-xl">
+        {hasMainImage ? (
+          <img
+            src={(list as ItemList).main_image!}
+            alt={list.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center h-full">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-4 right-4 w-16 h-16 bg-blue-300 rounded-full"></div>
+              <div className="absolute bottom-4 left-4 w-12 h-12 bg-purple-300 rounded-full"></div>
+              <div className="absolute top-1/2 left-1/2 w-20 h-20 bg-indigo-200 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+            </div>
 
-        {/* Center Icon */}
-        <div className="relative z-10 p-4 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-          {isEditorial ? (
-            <SparklesIcon className="w-12 h-12 text-blue-600" />
-          ) : (
-            <RectangleStackIcon className="w-12 h-12 text-indigo-600" />
-          )}
-        </div>
+            {/* Center Icon */}
+            <div className="relative z-10 p-4 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+              {isEditorial ? (
+                <SparklesIcon className="w-12 h-12 text-blue-600" />
+              ) : (
+                <RectangleStackIcon className="w-12 h-12 text-indigo-600" />
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Status Badge */}
         <div className="absolute top-4 right-4">
