@@ -3,6 +3,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { authenticateJWT, JWT_SECRET } = require("../middleware/auth");
+const { isSQLInjection } = require("../services/injectionService");
 
 const router = express.Router();
 
@@ -14,9 +15,14 @@ router.post("/register", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
         const hashedSecurityAnswer = await bcrypt.hash(securityAnswer, 10); // Hash the security answer too
         
+        const query = "INSERT INTO users (username, password, security_question, security_answer) VALUES ($1, $2, $3, $4) RETURNING id, username"
+
+        if (isSQLInjection(query)) {
+            return res.status(401).send("Access denied");
+        }
+
         const result = await pool.query(
-            "INSERT INTO users (username, password, security_question, security_answer) VALUES ($1, $2, $3, $4) RETURNING id, username",
-            [username, hashedPassword, securityQuestion, hashedSecurityAnswer]
+            query, [username, hashedPassword, securityQuestion, hashedSecurityAnswer]
         );
 
         const user = result.rows[0];
@@ -34,7 +40,12 @@ router.post("/login", async (req, res) => {
     const pool = req.app.locals.pool;
     
     try {
-        const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
+        const query = "SELECT * FROM users WHERE username = $1"
+        if (isSQLInjection(query)) {
+            return res.status(401).send("Access denied");
+        }
+
+        const result = await pool.query(query, [username]);
         const user = result.rows[0];
 
         if (!user) return res.status(401).json({ error: "Invalid credentials" });
@@ -57,8 +68,12 @@ router.post("/verify-security-question", async (req, res) => {
     
     try {
         // Find the user
+        const query = "SELECT * FROM users WHERE username = $1"
+        if (isSQLInjection(query)) {
+            return res.status(401).send("Access denied");
+        }
         const result = await pool.query(
-            "SELECT * FROM users WHERE username = $1", 
+            query,
             [username]
         );
         
@@ -100,8 +115,12 @@ router.get("/security-question/:username", async (req, res) => {
     const { username } = req.params;
     
     try {
+        const query = "SELECT security_question FROM users WHERE username = $1"
+        if (isSQLInjection(query)) {
+            return res.status(401).send("Access denied");
+        }
         const result = await pool.query(
-            "SELECT security_question FROM users WHERE username = $1", 
+            query,
             [username]
         );
         
@@ -134,8 +153,12 @@ router.post("/reset-password", async (req, res) => {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         
         // Update the user's password
+        const query = "UPDATE users SET password = $1 WHERE id = $2"
+        if (isSQLInjection(query)) {
+            return res.status(401).send("Access denied");
+        }
         await pool.query(
-            "UPDATE users SET password = $1 WHERE id = $2",
+            query,
             [hashedPassword, decoded.id]
         );
         
@@ -168,7 +191,11 @@ router.put("/reset-password-with-old-password", authenticateJWT, async (req, res
 
     const pool = req.app.locals.pool;
     try {
-        const result = await pool.query("SELECT * FROM users WHERE id = $1", [req.user.id]);
+        const query = "SELECT * FROM users WHERE id = $1"
+        if (isSQLInjection(query)) {
+            return res.status(401).send("Access denied");
+        }
+        const result = await pool.query(query, [req.user.id]);
         const user = result.rows[0];
         if (!user) return res.status(404).json({ error: "Benutzer nicht gefunden." });
 
@@ -176,7 +203,11 @@ router.put("/reset-password-with-old-password", authenticateJWT, async (req, res
         if (!passwordMatch) return res.status(401).json({ error: "Altes Passwort ist falsch." });
 
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-        await pool.query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, user.id]);
+        query = "UPDATE users SET password = $1 WHERE id = $2"
+        if (isSQLInjection(query)) {
+            return res.status(401).send("Access denied");
+        }
+        await pool.query(query, [hashedNewPassword, user.id]);
 
         res.status(200).json({ message: "Passwort erfolgreich aktualisiert." });
     } catch (err) {

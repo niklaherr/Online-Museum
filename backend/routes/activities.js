@@ -1,6 +1,7 @@
 // routes/activities.js
 const express = require("express");
 const { authenticateJWT } = require("../middleware/auth");
+const { isSQLInjection } = require("../services/injectionService");
 
 const router = express.Router();
 
@@ -10,13 +11,19 @@ router.get("/activities", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
 
     try {
-        const result = await pool.query(
-            `SELECT * FROM activities 
-             WHERE user_id = $1
-             ORDER BY entered_on DESC 
-             LIMIT 5`,
-            [userId]
-        );
+
+        const query = 
+        `SELECT * FROM activities 
+        WHERE user_id = $1
+        ORDER BY entered_on DESC 
+        LIMIT 5`;
+
+        if (isSQLInjection(query)) {
+            res.status(401).send("Access denied");
+            return;
+        }
+
+        const result = await pool.query(query, [userId]);
 
         res.json(result.rows);
     } catch (err) {

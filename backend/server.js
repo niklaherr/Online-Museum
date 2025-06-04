@@ -14,9 +14,6 @@ const activityRoutes = require("./routes/activities");
 const contactFormRoutes = require("./routes/contact-form");
 const adminRoutes = require("./routes/admin");
 
-// Import middleware
-const { authenticateJWT } = require("./middleware/auth");
-
 // Initialize express app
 const app = express();
 const port = process.env.PORT || 3001;

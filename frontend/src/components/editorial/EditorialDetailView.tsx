@@ -65,12 +65,6 @@ const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
             <Badge color="blue" icon={RectangleStackIcon}>
               {items.length} {items.length === 1 ? "Item" : "Items"}
             </Badge>
-            {/* Optional: If there's a privacy field, use this */}
-            {/* list?.isprivate ? (
-              <Badge color="red" icon={LockClosedIcon}>Privat</Badge>
-            ) : (
-              <Badge color="green" icon={EyeIcon}>Öffentlich</Badge>
-            ) */}
           </div>
 
           <div className="space-y-2">
