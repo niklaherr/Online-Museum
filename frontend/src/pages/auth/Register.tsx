@@ -30,6 +30,11 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
       setError('Bitte füllen Sie alle Pflichtfelder aus');
       return;
     }
+
+    if (password.length < 6) {
+      setError('Das Passwort muss mindestens 6 Zeichen lang sein.');
+      return;
+    }
     
     if (password !== confirmPassword) {
       setError('Die Passwörter stimmen nicht überein');
