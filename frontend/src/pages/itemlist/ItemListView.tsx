@@ -18,7 +18,6 @@ import {
   RectangleStackIcon,
   UserGroupIcon,
   GlobeAltIcon,
-  PhotoIcon
 } from '@heroicons/react/24/outline';
 
 type ItemListCardProps = {
