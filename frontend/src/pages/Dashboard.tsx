@@ -1,7 +1,5 @@
-// frontend/src/pages/Dashboard.tsx (Erweiterte Version mit redaktionellen Listen)
 import { useEffect, useState } from 'react';
 
-// Tremor-Komponenten importieren
 import {
   Card,
   Title,
@@ -122,7 +120,7 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
   );
 };
 
-// Editorial-Listen Komponente für Dashboard (behalten das coole Banner!)
+// Editorial list component for dashboard
 type EditorialItemProps = {
   editorial: Editorial;
   onNavigate: (route: string) => void;
@@ -224,7 +222,7 @@ const StatsCard = ({
   );
 };
 
-// Hauptkomponente für das Dashboard
+// Maincomponent for the Dashboard
 const Dashboard = () => {
   
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -236,7 +234,7 @@ const Dashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Laden der Basis-Daten
+        // Load activities, item list counts and item data counts
         const [activitiesData, itemListData, itemData] = await Promise.all([
           itemService.fetchActivities(),
           itemService.fetchItemListDataCounting(),
@@ -247,7 +245,7 @@ const Dashboard = () => {
         setItemListDateCount(itemListData);
         setItemDataCount(itemData);
 
-        // Redaktionelle Listen separat laden, wenn der Benutzer angemeldet ist
+        // Load editorial lists separately when the user is logged in
         if (userService.isLoggedIn()) {
           try {
             const editorialData = await editorialService.fetchEditorialLists();
@@ -311,7 +309,7 @@ const Dashboard = () => {
         />
       </Grid>
 
-      {/* Redaktionelle Listen Section (behält das coole Banner!) */}
+      {/* Redaktionelle Listen Section */}
       {editorialLists.length > 0 && (
         <Card className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border-0 shadow-2xl overflow-hidden">
           <div className="relative p-8">

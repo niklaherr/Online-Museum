@@ -24,12 +24,12 @@ type GalleryProps = {
   onNavigate: (route: string) => void;
 };
 
-// Gruppiert Items nach Kategorien
+// Group Items in Categories
 const groupItemsByCategory = (items: GalleryItem[]) => {
   const groupedItems: { [key: string]: GalleryItem[] } = {};
   
   items.forEach((item) => {
-    const category = item.category || "Unkategorisiert";
+    const category = item.category && item.category.trim() !== "" ? item.category : "Unkategorisiert";
     if (!groupedItems[category]) {
       groupedItems[category] = [];
     }
@@ -186,7 +186,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     loadItems();
   }, []);
 
-  // Filtere Items basierend auf der Suche und dem Kategorie-Filter
+  // Filter Items based on search query and category filter
   const filteredItems = museumItems.filter((item) => {
     const query = searchQuery.toLowerCase();
     const matchesSearch = 
@@ -202,7 +202,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     return matchesSearch;
   });
 
-  // Filtere User Items basierend auf der Suche
+  // Filter User Items based on search query
   const filteredUserItems = userItems.filter((item) => {
     const query = searchQuery.toLowerCase();
     return (
@@ -211,7 +211,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     );
   });
 
-  // Gruppiere die gefilterten Items nach Kategorien
+  // Group the filtered items by category
   const groupedItems = groupItemsByCategory(filteredItems);
   const categories = Object.keys(groupedItems).sort();
 
@@ -324,35 +324,35 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
         </div>
       )}
 
-      {/* User's Items Section */}
-      {filteredUserItems.length > 0 && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <SparklesIcon className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <Title className="text-2xl text-gray-900">Meine Items</Title>
-                <Text className="text-gray-600">Ihre persönlichen Kunstwerke und Sammlungen</Text>
-              </div>
-            </div>
-            <Badge color="green" size="lg">
-              {filteredUserItems.length}
-            </Badge>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {filteredUserItems.map((item) => (
-              <ItemCard
-                key={item.id}
-                item={item}
-                onClick={() => onNavigate('/items/' + item.id)}
-              />
-            ))}
-          </div>
+{/* User's Items Section */}
+{filteredUserItems.length > 0 && (
+  <div className="space-y-12">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-green-100 rounded-lg">
+          <SparklesIcon className="w-6 h-6 text-green-600" />
         </div>
-      )}
+        <div>
+          <Title className="text-2xl text-gray-900">Meine Items</Title>
+          <Text className="text-gray-600">Ihre persönlichen Kunstwerke und Sammlungen</Text>
+        </div>
+      </div>
+      <Badge color="green" size="lg">
+        {filteredUserItems.length}
+      </Badge>
+    </div>
+
+    {/* Group user items by category */}
+    {Object.keys(groupItemsByCategory(filteredUserItems)).sort().map((category) => (
+      <CategorySection
+        key={`user-${category}`}
+        category={`${category} (Meine Items)`}
+        items={groupItemsByCategory(filteredUserItems)[category]}
+        onNavigate={onNavigate}
+      />
+    ))}
+  </div>
+)}
 
       {/* No Results when no search and no items */}
       {!searchQuery && categories.length === 0 && filteredUserItems.length === 0 && (

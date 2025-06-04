@@ -73,7 +73,6 @@ const SupportRequests = () => {
         prev.map(form => form.id === formId ? updatedForm : form)
       );
       
-      // If we're updating the selected form, update that too
       if (selectedForm && selectedForm.id === formId) {
         setSelectedForm(updatedForm);
       }

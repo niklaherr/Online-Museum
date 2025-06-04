@@ -174,7 +174,6 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
     <div className="space-y-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-2 mt-8">Redaktionelle Listen bearbeiten</h1>
       
-      {/* Create new editorial list */}
       <Card>
         <Title className="mb-4">Redaktionelle Liste bearbeiten</Title>
         

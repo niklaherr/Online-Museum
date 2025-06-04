@@ -7,7 +7,7 @@ const PrivacyPolicy = () => {
         <Title className="text-2xl mb-6">Datenschutzerklärung</Title>
         <div className="space-y-6">
 
-          {/* Abschnitt 1 */}
+          {/* Section 1 */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">1. Einleitung und Übersicht</h2>
             <Text className="mb-2">
@@ -20,7 +20,7 @@ const PrivacyPolicy = () => {
             <Text>Alle Formulierungen gelten geschlechtsneutral.</Text>
           </div>
 
-          {/* Abschnitt 2 */}
+          {/* Section 2 */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Anwendungsbereich</h2>
             <Text className="mb-2">
@@ -32,7 +32,7 @@ const PrivacyPolicy = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 3 */}
+          {/* Section 3 */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">3. Rechtsgrundlagen</h2>
             <Text className="mb-2">Die Verarbeitung Ihrer Daten erfolgt auf Basis folgender Rechtsgrundlagen:</Text>
@@ -47,7 +47,7 @@ const PrivacyPolicy = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 4 */}
+          {/* Section 4 */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">4. Welche Daten wir erheben und wie lange sie gespeichert werden</h2>
             <Text className="mb-2">
@@ -66,7 +66,7 @@ const PrivacyPolicy = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 5 */}
+          {/* Section 5 */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">5. Ihre Rechte</h2>
             <Text className="mb-2">Laut DSGVO haben Sie folgende Rechte:</Text>
@@ -84,7 +84,7 @@ const PrivacyPolicy = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 6 */}
+          {/* Section 6 */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Kontakt</h2>
             <Text className="mb-2">
@@ -93,7 +93,7 @@ const PrivacyPolicy = () => {
             <Text className="font-medium">datenschutz@online-museum.com</Text>
           </div>
 
-          {/* Abschnitt 7 */}
+          {/* Section 7 */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Änderungen dieser Datenschutzerklärung</h2>
             <Text className="mb-2">
