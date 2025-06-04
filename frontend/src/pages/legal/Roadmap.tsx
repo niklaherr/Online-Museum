@@ -1,4 +1,3 @@
-// frontend/src/pages/legal/Roadmap.tsx
 import React, { useEffect } from 'react';
 import { Card, Title, Text, Divider } from '@tremor/react';
 

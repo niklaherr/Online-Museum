@@ -206,7 +206,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
         </div>
       </Card>
 
-      {/* Additional Information Card (wenn nötig für zukünftige Features) */}
+      {/* Additional Information Card below item Infos */}
       <Card>
         <div className="p-6">
           <Title className="text-lg mb-4">Item-Details</Title>

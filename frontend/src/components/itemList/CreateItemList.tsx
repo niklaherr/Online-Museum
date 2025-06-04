@@ -90,7 +90,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
       // Convert Item to GalleryItem format
       const galleryItem: GalleryItem = {
         ...item,
-        username: "You" // Since it's user's own item
+        username: "You"
       };
       setSelectedItems(prev => [...prev, galleryItem]);
     }
