@@ -1,18 +1,15 @@
-import { useState, useContext } from 'react';
+import { useState, } from 'react';
 import {
   Card, Title, Text, Flex, Button, TextInput, Dialog, DialogPanel, Badge,
 } from '@tremor/react';
 import {
-  PencilSquareIcon,
   KeyIcon,
   ShieldCheckIcon,
   TrashIcon,
   ArrowRightOnRectangleIcon,
   UserIcon,
-  SparklesIcon,
   CogIcon,
   ExclamationTriangleIcon,
-  CheckCircleIcon,
   ArrowRightCircleIcon,
 } from '@heroicons/react/24/outline';
 import { ResetPasswordWithOldPasswordCredentials, userService } from 'services/UserService';

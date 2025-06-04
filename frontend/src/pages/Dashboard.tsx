@@ -9,20 +9,17 @@ import {
   Metric,
   Flex,
   Badge,
-  AreaChart,
   BarChart,
   Grid
 } from '@tremor/react';
 import { 
   SparklesIcon, 
   ClockIcon,
-  UserIcon,
   ArrowRightIcon,
   ChartBarIcon,
   DocumentTextIcon,
   PhotoIcon,
   RectangleStackIcon,
-  CalendarIcon,
   ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 import { userService } from 'services/UserService';
@@ -31,7 +28,6 @@ import Editorial from 'interfaces/Editorial';
 import { itemService } from 'services/ItemService';
 import { editorialService } from 'services/EditorialService';
 import NotyfService from 'services/NotyfService';
-import NoResults from '../components/helper/NoResults';
 import DateCount from 'interfaces/DateCount';
 import Loading from 'components/helper/Loading';
 
@@ -258,7 +254,6 @@ const Dashboard = () => {
             setEditorialLists(editorialData);
           } catch (editorialError) {
             console.log("Redaktionelle Listen konnten nicht geladen werden:", editorialError);
-            // Fehler beim Laden der redaktionellen Listen ist nicht kritisch
           }
         }
         

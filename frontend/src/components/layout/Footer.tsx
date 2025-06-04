@@ -4,12 +4,10 @@ import {
   HeartIcon,
   GlobeAltIcon,
   ShieldCheckIcon,
-  DocumentTextIcon,
   QuestionMarkCircleIcon
 } from '@heroicons/react/24/outline';
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
 
   const footerLinks = [
     {

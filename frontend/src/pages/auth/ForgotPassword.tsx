@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { userService } from 'services/UserService';
 import NotyfService from 'services/NotyfService';
 
 type ForgotPasswordProps = {

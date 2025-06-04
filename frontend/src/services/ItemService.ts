@@ -1,6 +1,4 @@
-import NotyfService from "./NotyfService";
 import { userService } from "./UserService";
-import User from "../interfaces/User";
 import Item, { GalleryItem } from "../interfaces/Item";
 import ItemList from "interfaces/ItemList";
 import Activity from "interfaces/Activity";
@@ -31,7 +29,7 @@ class ItemService {
       const item: GalleryItem[] = await res.json();
       return item;
     } catch (error) {
-      throw new Error("Fehler beim Laden des Items und Benutzerinformationen.");
+      throw new Error("Fehler beim Laden der Items");
     }
   }
 
