@@ -1,10 +1,6 @@
-Hier ist die strukturierte, gut lesbare **Markdown-Version** deiner Projektbeschreibung für das **Online Museum**:
-
----
-
 # 🖼️ Online Museum
 
-Ein digitales Museum, das Benutzern ermöglicht, kulturelle und kreative Inhalte zu sammeln, zu organisieren und zu teilen. Die Plattform bietet **private und öffentliche Sammlungen**, **redaktionelle Inhalte** und **soziale Funktionen**.
+Ein digitales Museum, das Benutzern ermöglicht, kulturelle und kreative Inhalte zu sammeln, zu organisieren und zu teilen. Die Plattform bietet **private und öffentliche Sammlungen** und **redaktionelle Inhalte**.
 
 ---
 
@@ -82,7 +78,7 @@ Ein digitales Museum, das Benutzern ermöglicht, kulturelle und kreative Inhalte
 ## 📋 Voraussetzungen
 
 * Node.js (v18+)
-* Docker & Docker Compose
+* (Docker & Docker Compose)
 * Git
 
 ---
@@ -96,7 +92,31 @@ git clone https://github.com/your-username/online-museum.git
 cd online-museum
 ```
 
-### 2. Mit Docker Compose (Empfohlen)
+### 2. Datenbank starten
+```bash
+cd db
+docker build -t online-museum-db .
+```
+Wenn die PostgreSQl-Datenbank nicht über Docker gestartet werden sollen, müssen die Daten für die Verbindung zur Datenbank im Backend angepasst werden. Die Datei ist zu finden unter /backend/server.js
+In der Dockerfile unter /db können ebenfalls eigene Passwörter angegeben werden. Welche dann ebenfalls im Backend angepasst werden müssen. Wenn die Dockerfile nicht verwendet wird, dann muss ebenfalls die /db/init_db.sql Datei als Initialisierungsskript der Datenbank ausgeführt werden
+
+### 3. Backend starten
+
+```bash
+cd backend
+npm install
+node server.js
+```
+
+### 4. Frontend starten
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+### Alternativ mit Docker Compose
 
 ```bash
 # Alle Services starten
@@ -104,9 +124,6 @@ docker-compose up -d
 
 # Logs anzeigen
 docker-compose logs -f
-
-# Nur bestimmte Services starten
-docker-compose up database backend
 ```
 
 **Zugänglichkeit:**
@@ -114,96 +131,6 @@ docker-compose up database backend
 * Frontend: `http://localhost:3000`
 * Backend: `http://localhost:3001`
 * DB: `localhost:5432`
-
-### 3. Manuelle Installation
-
-#### 🛢️ Datenbank Setup
-
-```bash
-docker run -d \
-  --name museum-postgres \
-  -e POSTGRES_DB=online_museum \
-  -e POSTGRES_USER=museum_user \
-  -e POSTGRES_PASSWORD=museum_password \
-  -p 5432:5432 \
-  postgres:15
-```
-
-Oder mit Docker Compose:
-
-```bash
-docker-compose up -d database
-```
-
-#### 🔧 Backend Setup
-
-```bash
-cd backend
-npm install
-cp .env.example .env
-```
-
-`.env` anpassen:
-
-```
-DATABASE_URL=postgresql://museum_user:museum_password@localhost:5432/online_museum
-JWT_SECRET=your_super_secret_jwt_key_here
-MISTRAL_API_KEY=your_mistral_api_key_here
-```
-
-Starten:
-
-```bash
-npm start     # Produktion
-npm run dev   # Entwicklung mit Hot Reload
-```
-
-#### 🎨 Frontend Setup
-
-```bash
-cd frontend
-npm install
-cp .env.example .env
-```
-
-`.env` anpassen:
-
-```
-REACT_APP_BACKEND_API_URL=http://localhost:3001
-MISTRAL_API_KEY=your_mistral_api_key_here
-```
-
-Starten:
-
-```bash
-npm start     # Entwicklung
-npm run build # Produktion
-```
-
----
-
-## 🗄️ Datenbank-Initialisierung
-
-### Mit Docker Compose
-
-Die Datenbank wird automatisch initialisiert.
-
-### Manuell
-
-```sql
--- Verbindung
-psql -h localhost -p 5432 -U museum_user -d online_museum
-```
-
-Oder mit Docker:
-
-```bash
-docker exec -it museum-postgres psql -U museum_user -d online_museum
-```
-
-**Tabellen anlegen:**
-
-init-db.sql Skript bei der Datenbank ausführen
 
 ## 🎮 Verwendung
 
@@ -225,24 +152,6 @@ UPDATE users SET "isadmin" = true WHERE id = 1;
 
 * `.env` mit Mistral-API-Key
 * Bei Item-Erstellung auf **"KI-Beschreibung generieren"** klicken
----
-
-## 🔧 Entwicklung
-
-### Backend
-
-```bash
-cd backend
-npm run dev
-```
-
-### Frontend
-
-```bash
-cd frontend
-npm start
-```
-
 ---
 
 ## 📚 API-Dokumentation
@@ -283,26 +192,10 @@ npm start
 
 * JWT-basierte Authentifizierung
 * Passwort-Hashing (bcrypt)
-* SQL-Injection-Schutz
-* CORS-Konfiguration
+* SQL-Injection-Schutz -> nochmal prüfen
+* CORS-Konfiguration -> nochmal prüfen
 * Datei-Upload-Validierung
 * Admin-Rollenprüfung
-
----
-
-## 🤝 Beitragen
-
-1. Fork erstellen
-2. Branch: `git checkout -b feature/amazing-feature`
-3. Commit: `git commit -m 'Add amazing feature'`
-4. Push: `git push origin feature/amazing-feature`
-5. Pull Request stellen
-
----
-
-## 📄 Lizenz
-
-MIT-Lizenz – Siehe `LICENSE`.
 
 ---
 
@@ -310,7 +203,6 @@ MIT-Lizenz – Siehe `LICENSE`.
 
 * 📘 Doku: Diese README
 * 🐞 Bugs: GitHub Issues
-* 💬 Community: *Discord folgt*
 
 ---
 
@@ -318,5 +210,5 @@ MIT-Lizenz – Siehe `LICENSE`.
 
 * Erste Version: **Mai 2025**
 * Aktive Entwicklung: ✅
-* Letztes Update: **Mai 2025**
+* Letztes Update: **Juni 2025**
 * Contributors: **3+** – *Vielleicht bald du?* ❤️
