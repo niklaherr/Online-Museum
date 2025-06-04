@@ -1,6 +1,7 @@
 // routes/users.js
 const express = require("express");
 const { authenticateJWT } = require("../middleware/auth");
+const { isSQLInjection } = require("../services/injectionService");
 
 const router = express.Router();
 
@@ -10,7 +11,9 @@ router.delete("/users", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
     
     try {
-        const result = await pool.query("DELETE FROM users WHERE id = $1", [userId]);
+        const query = "DELETE FROM users WHERE id = $1"
+        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+        const result = await pool.query(query, [userId]);
 
         if (result.rowCount === 0) {
             return res.status(404).json({ error: "User not found" });

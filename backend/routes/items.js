@@ -3,6 +3,7 @@ const express = require("express");
 const multer = require("multer");
 const { authenticateJWT } = require("../middleware/auth");
 const { createActivity } = require("../services/activityService");
+const { isSQLInjection } = require("../services/injectionService");
 
 const router = express.Router();
 const upload = multer(); // Files will be stored as Buffer in memory
@@ -20,6 +21,7 @@ router.get("/items/no-auth", async (req, res) => {
             ORDER BY item.entered_on DESC
             LIMIT 5;
         `;
+        if (isSQLInjection(query)) return res.status(401).send("Access denied");
         const result = await pool.query(query);
 
         const items = result.rows.map(item => ({
@@ -120,6 +122,8 @@ router.get("/items", authenticateJWT, async (req, res) => {
             ORDER BY i.entered_on DESC;
         `;
 
+        if (isSQLInjection(sqlQuery)) return res.status(401).send("Access denied");
+
         const result = await pool.query(sqlQuery, values);
 
         const items = result.rows.map(item => ({
@@ -155,6 +159,7 @@ router.get("/items/:id", authenticateJWT, async (req, res) => {
             WHERE item.id = $1
             AND (item.isPrivate = false OR item.user_id = $2)
         `;
+        if (isSQLInjection(query)) return res.status(401).send("Access denied");
         const result = await pool.query(query, [id, userId]);
 
         if (result.rows.length === 0) return res.status(404).send("Item not found");
@@ -186,10 +191,13 @@ router.post("/items", authenticateJWT, upload.single("image"), async (req, res) 
     if (!title) return res.status(400).send("Missing required fields: title");
 
     try {
-        const result = await pool.query(
-            `INSERT INTO item (user_id, title, image, description, category, isprivate)
+
+        const query = `INSERT INTO item (user_id, title, image, description, category, isprivate)
              VALUES ($1, $2, $3, $4, $5, $6)
-             RETURNING *`,
+             RETURNING *`;
+        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+        const result = await pool.query(
+            query,
             [req.user.id, title, image, description || null, category || null, isprivate]
         );
         
@@ -234,6 +242,8 @@ router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, re
         query += ` WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *`;
         values.push(id, req.user.id);
 
+        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+
         const result = await pool.query(query, values);
 
         if (result.rows.length === 0)
@@ -266,8 +276,10 @@ router.delete("/items/:id", authenticateJWT, async (req, res) => {
 
     try {
         // Ensure the item exists and belongs to the current user
+        const query = "SELECT * FROM item WHERE id = $1 AND user_id = $2"
+        if (isSQLInjection(query)) return res.status(401).send("Access denied");
         const itemResult = await pool.query(
-            "SELECT * FROM item WHERE id = $1 AND user_id = $2",
+            query,
             [itemID, userId]
         );
 
@@ -275,8 +287,10 @@ router.delete("/items/:id", authenticateJWT, async (req, res) => {
             return res.status(404).send("Item not found or does not belong to you.");
         }
 
+        const deleteQuery = "DELETE FROM item WHERE id = $1"
+        if (isSQLInjection(deleteQuery)) return res.status(401).send("Access denied");
         // Delete the item (cascading will handle associations)
-        await pool.query("DELETE FROM item WHERE id = $1", [itemID]);
+        await pool.query(deleteQuery, [itemID]);
 
         await createActivity(pool, {
             category: "ITEM", 
@@ -316,6 +330,8 @@ router.get("/items-search", authenticateJWT, async (req, res) => {
             i.id::TEXT ILIKE $1) AND i.isprivate = false
         ORDER BY i.entered_on DESC
         `;
+
+        if (isSQLInjection(sqlQuery)) return res.status(401).send("Access denied");
         
         const searchPattern = `%${query}%`;
         const result = await pool.query(sqlQuery, [searchPattern]);
