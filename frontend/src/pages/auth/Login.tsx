@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Credentials, userService } from 'services/UserService';
-import NotyfService from 'services/NotyfService';
 
 type LoginPageProps = {
   onNavigate: (route: string) => void;

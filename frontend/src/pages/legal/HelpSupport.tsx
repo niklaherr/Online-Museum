@@ -249,13 +249,12 @@ const HelpSupport = () => {
                 </svg>
                 <h3 className="font-medium mb-1">Benutzerhandbuch</h3>
                 <Text className="text-sm text-gray-500 mb-3">Umfassendes Handbuch für alle Funktionen.</Text>
-                <a 
-                  href="#" 
+                <button
                   onClick={handleOpenSnakeGame} 
                   className="text-blue-600 text-sm font-medium hover:underline"
                 >
                   PDF herunterladen
-                </a>
+                </button>
               </div>
               
               <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">

@@ -1,46 +1,27 @@
 // routes/itemLists.js
 const express = require("express");
+const multer = require("multer");
 const { authenticateJWT } = require("../middleware/auth");
 const { createActivity } = require("../services/activityService");
 
 const router = express.Router();
-
-// Fetch all item lists
-router.get("/item-lists", authenticateJWT, async (req, res) => {
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query("SELECT * FROM item_list ORDER BY id ASC");
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching item lists");
-    }
-});
+const upload = multer(); // Files will be stored as Buffer in memory
 
 // Get one item list by ID
 router.get("/item-lists/:id", authenticateJWT, async (req, res) => {
     const { id } = req.params;
+    const userId = req.user.id
     const pool = req.app.locals.pool;
     
     try {
-        const result = await pool.query("SELECT * FROM item_list WHERE id = $1", [id]);
+        const result = await pool.query("SELECT * FROM item_list WHERE id = $1 AND (isPrivate = false OR user_id = $2)", [id, userId]);
         if (result.rows.length === 0) return res.status(404).send("Item list not found");
-        res.json(result.rows[0]);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching item list");
-    }
-});
-
-// Fetch the authenticated user's item lists
-router.get("/me/item-lists", authenticateJWT, async (req, res) => {
-    const userId = req.user.id;
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query("SELECT * FROM item_list WHERE user_id = $1", [userId]);
-        res.json(result.rows);
+        
+        const itemList = result.rows[0];
+        res.json({
+            ...itemList,
+            main_image: itemList.main_image ? `data:image/jpeg;base64,${itemList.main_image.toString('base64')}` : null
+        });
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching item list");
@@ -92,8 +73,9 @@ router.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) 
 
 
 // Create a new item list and link items to it
-router.post("/item-lists", authenticateJWT, async (req, res) => {
+router.post("/item-lists", authenticateJWT, upload.single("main_image"), async (req, res) => {
     const { title, description, item_ids, is_private } = req.body;
+    const main_image = req.file ? req.file.buffer : null;
     const userId = req.user.id;
     const pool = req.app.locals.pool;
 
@@ -101,18 +83,26 @@ router.post("/item-lists", authenticateJWT, async (req, res) => {
         return res.status(400).send("Title and at least one item ID are required.");
     }
 
+    // Parse item_ids if it's a string (from FormData)
+    let parsedItemIds;
+    try {
+        parsedItemIds = typeof item_ids === 'string' ? JSON.parse(item_ids) : item_ids;
+    } catch (error) {
+        return res.status(400).send("Invalid item_ids format.");
+    }
+
     try {
         // Start a transaction
         await pool.query('BEGIN');
 
         const result = await pool.query(
-            "INSERT INTO item_list (title, description, user_id, isprivate) VALUES ($1, $2, $3, $4) RETURNING id",
-            [title, description || "", userId, is_private]
+            "INSERT INTO item_list (title, description, user_id, isprivate, main_image) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+            [title, description || "", userId, is_private, main_image]
         );
 
         const newItemListId = result.rows[0].id;
 
-        for (const itemId of item_ids) {
+        for (const itemId of parsedItemIds) {
             await pool.query("INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)", [newItemListId, itemId]);
         }
 
@@ -126,7 +116,7 @@ router.post("/item-lists", authenticateJWT, async (req, res) => {
         // Commit the transaction
         await pool.query('COMMIT');
 
-        res.status(201).json({ id: newItemListId, title, description, user_id: userId, item_ids });
+        res.status(201).json({ id: newItemListId, title, description, user_id: userId, item_ids: parsedItemIds });
     } catch (err) {
         // Rollback in case of error
         await pool.query('ROLLBACK');
@@ -136,14 +126,26 @@ router.post("/item-lists", authenticateJWT, async (req, res) => {
 });
 
 // Update an item list and its associations
-router.put("/item-lists/:id", authenticateJWT, async (req, res) => {
+router.put("/item-lists/:id", authenticateJWT, upload.single("main_image"), async (req, res) => {
     const itemListId = parseInt(req.params.id, 10);
     const { title, description, item_ids, is_private } = req.body;
+    const main_image = req.file ? req.file.buffer : null;
     const userId = req.user.id;
     const pool = req.app.locals.pool;
 
-    if (!title || !Array.isArray(item_ids) || item_ids.length === 0) {
-        return res.status(400).send("Title and at least one item ID are required.");
+    if (!title) {
+        return res.status(400).send("Title is required.");
+    }
+
+    // Parse item_ids if it's a string (from FormData)
+    let parsedItemIds;
+    try {
+        parsedItemIds = typeof item_ids === 'string' ? JSON.parse(item_ids) : item_ids;
+        if (!Array.isArray(parsedItemIds) || parsedItemIds.length === 0) {
+            return res.status(400).send("At least one item ID is required.");
+        }
+    } catch (error) {
+        return res.status(400).send("Invalid item_ids format.");
     }
 
     try {
@@ -159,12 +161,23 @@ router.put("/item-lists/:id", authenticateJWT, async (req, res) => {
             return res.status(404).send("Item list not found or not authorized.");
         }
 
-        await pool.query("UPDATE item_list SET title = $1, description = $2, isprivate = $3 WHERE id = $4",
-            [title, description || "",is_private, itemListId]);
+        // Build the update query dynamically based on whether main_image is provided
+        let updateQuery = "UPDATE item_list SET title = $1, description = $2, isprivate = $3";
+        let updateValues = [title, description || "", is_private];
+        
+        if (main_image) {
+            updateQuery += ", main_image = $4 WHERE id = $5";
+            updateValues.push(main_image, itemListId);
+        } else {
+            updateQuery += " WHERE id = $4";
+            updateValues.push(itemListId);
+        }
+
+        await pool.query(updateQuery, updateValues);
 
         await pool.query("DELETE FROM item_itemlist WHERE item_list_id = $1", [itemListId]);
 
-        for (const itemId of item_ids) {
+        for (const itemId of parsedItemIds) {
             await pool.query("INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)", [itemListId, itemId]);
         }
 
@@ -178,7 +191,7 @@ router.put("/item-lists/:id", authenticateJWT, async (req, res) => {
         // Commit the transaction
         await pool.query('COMMIT');
 
-        res.status(200).json({ id: itemListId, title, description, user_id: userId, item_ids });
+        res.status(200).json({ id: itemListId, title, description, user_id: userId, item_ids: parsedItemIds });
     } catch (err) {
         // Rollback in case of error
         await pool.query('ROLLBACK');
@@ -230,31 +243,93 @@ router.delete("/item-lists/:id", authenticateJWT, async (req, res) => {
     }
 });
 
-// Fetch public items
-router.get("/public/item-lists", authenticateJWT, async (req, res) => {
+
+router.get("/item-lists", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
-    
+    const userId = req.user.id;
+
+    const {
+        title,
+        description,
+        username,
+        id,
+        user_id,
+        entered_on,
+        exclude_user_id
+    } = req.query;
+
     try {
-        const result = await pool.query("SELECT * FROM item_list WHERE isprivate = false",);
-        res.json(result.rows);
+        const conditions = [];
+        const values = [];
+
+        if (title) {
+            values.push(`%${title}%`);
+            conditions.push(`il.title ILIKE $${values.length}`);
+        }
+
+        if (description) {
+            values.push(`%${description}%`);
+            conditions.push(`il.description ILIKE $${values.length}`);
+        }
+
+        if (username) {
+            values.push(`%${username}%`);
+            conditions.push(`u.username ILIKE $${values.length}`);
+        }
+
+        if (id) {
+            values.push(id);
+            conditions.push(`il.id = $${values.length}`);
+        }
+
+        if (user_id) {
+            values.push(user_id);
+            conditions.push(`il.user_id = $${values.length}`);
+        }
+
+        if (entered_on) {
+            values.push(entered_on);
+            conditions.push(`DATE(il.entered_on) = DATE($${values.length})`);
+        }
+
+        if (exclude_user_id) {
+            values.push(exclude_user_id);
+            conditions.push(`il.user_id != $${values.length}`);
+        }
+
+        // Visibility constraint
+        values.push(userId);
+        conditions.push(`(il.isprivate = false OR il.user_id = $${values.length})`);
+
+        const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+        const sqlQuery = `
+            SELECT il.*, u.username
+            FROM item_list il
+            JOIN users u ON il.user_id = u.id
+            ${whereClause}
+            ORDER BY il.entered_on DESC;
+        `;
+
+        const result = await pool.query(sqlQuery, values);
+
+        const itemLists = result.rows.map(list => ({
+            id: list.id,
+            title: list.title,
+            description: list.description,
+            entered_on: list.entered_on,
+            user_id: list.user_id,
+            username: list.username,
+            isprivate: list.isprivate,
+            main_image: list.main_image ? `data:image/jpeg;base64,${list.main_image.toString('base64')}` : null
+        }));
+
+        res.json(itemLists);
     } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching items");
+        console.error("Error filtering item lists:", err);
+        res.status(500).send("Error filtering item lists");
     }
 });
 
-// Fetch current user's items
-router.get("/me/item-lists", authenticateJWT, async (req, res) => {
-    const userId = req.user.id;
-    const pool = req.app.locals.pool;
-    
-    try {
-        const result = await pool.query("SELECT * FROM item_list WHERE user_id = $1", [userId]);
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching items");
-    }
-});
 
 module.exports = router;
