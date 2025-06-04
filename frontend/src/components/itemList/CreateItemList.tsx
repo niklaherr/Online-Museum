@@ -307,27 +307,43 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
 
                 {/* Image Preview */}
                 {mainImagePreview && (
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Text className="text-sm font-medium text-gray-700">Vorschau:</Text>
+                      <Text className="text-sm font-medium text-gray-700">Banner-Vorschau:</Text>
                       <Badge color="green" icon={CheckCircleIcon} size="xs">
                         Geladen
                       </Badge>
                     </div>
-                    <div className="relative aspect-video w-full overflow-hidden rounded-xl border-2 border-green-200 shadow-lg">
-                      <img
-                        src={mainImagePreview}
-                        alt="Banner Vorschau"
-                        className="w-full h-full object-cover"
-                      />
-                      {/* ListView Bereich Markierung */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="relative w-full border-2 border-yellow-400 border-dashed bg-yellow-400/20" style={{ height: '140px' }}>
-                          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-xs px-3 py-1 rounded-full shadow text-black font-medium">
-                            ListView Bereich (140px hoch)
-                          </div>
+                    
+                    {/* Live Banner Preview - matches ItemListDetailView exactly */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Text className="text-xs text-gray-500">So wird es als Banner dargestellt:</Text>
+                      </div>
+                      
+                      {/* Fixed Height Banner - matches ItemListDetailView exactly */}
+                      <div className="relative h-64 w-full overflow-hidden rounded-lg border-2 border-blue-200 shadow-lg">
+                        <img
+                          src={mainImagePreview}
+                          alt="Banner Vorschau"
+                          className="w-full h-full object-cover"
+                        />
+                        {/* Dark overlay like in real banner */}
+                        <div className="absolute inset-0 bg-black/40"></div>
+                        
+                        {/* Banner indicator */}
+                        <div className="absolute bottom-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                          Live Banner
                         </div>
                       </div>
+                    </div>
+
+                    {/* Info Box */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <Text className="text-xs text-blue-800 font-medium mb-1">ℹ️ Banner-Info</Text>
+                      <Text className="text-xs text-blue-700 leading-relaxed">
+                        Das Banner hat eine variable Größe und wird automatisch an der Bildschirmgröße zugeschnitten und zentriert.
+                      </Text>
                     </div>
                   </div>
                 )}

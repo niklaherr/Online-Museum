@@ -1,5 +1,3 @@
-import NotyfService from "./NotyfService";
-
 // API Konfiguration
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || "SpbqZllg57jFyYGIT0PnvGzn8QPAX5Hs";
 const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
