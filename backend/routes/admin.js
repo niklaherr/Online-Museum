@@ -1,5 +1,6 @@
 const express = require("express");
 const { authenticateJWT } = require("../middleware/auth");
+const { isSQLInjection } = require("../services/injectionService"); // <-- make sure this path is correct
 
 const router = express.Router();
 
@@ -16,11 +17,13 @@ router.get("/admin/search", authenticateJWT, requireAdmin, async (req, res) => {
     const pool = req.app.locals.pool;
     const { q } = req.query;
 
+    const query = "SELECT * FROM users WHERE username ILIKE $1 OR id::TEXT ILIKE $1 ORDER BY username ASC";
+    if (isSQLInjection(query)) {
+        return res.status(401).send("Access denied");
+    }
+
     try {
-        const result = await pool.query(
-            "SELECT * FROM users WHERE username ILIKE $1 OR id::TEXT ILIKE $1 ORDER BY username ASC",
-            [`%${q}%`]
-        );
+        const result = await pool.query(query, [`%${q}%`]);
         res.json(result.rows);
     } catch (err) {
         console.error(err);
@@ -38,11 +41,13 @@ router.put("/admin/:id", authenticateJWT, requireAdmin, async (req, res) => {
         return res.status(400).json({ error: "Invalid 'isadmin' value. Must be true or false." });
     }
 
+    const query = 'UPDATE users SET "isadmin" = $1 WHERE id = $2 RETURNING id, username, "isadmin"';
+    if (isSQLInjection(query)) {
+        return res.status(401).send("Access denied");
+    }
+
     try {
-        const result = await pool.query(
-            'UPDATE users SET "isadmin" = $1 WHERE id = $2 RETURNING id, username, "isadmin"',
-            [isadmin, id]
-        );
+        const result = await pool.query(query, [isadmin, id]);
 
         if (result.rowCount === 0) {
             return res.status(404).json({ error: "User not found" });
@@ -59,8 +64,13 @@ router.put("/admin/:id", authenticateJWT, requireAdmin, async (req, res) => {
 router.get("/admin", authenticateJWT, requireAdmin, async (req, res) => {
     const pool = req.app.locals.pool;
 
+    const query = 'SELECT * FROM users WHERE "isadmin" = true ORDER BY username ASC';
+    if (isSQLInjection(query)) {
+        return res.status(401).send("Access denied");
+    }
+
     try {
-        const result = await pool.query('SELECT * FROM users WHERE "isadmin" = true ORDER BY username ASC');
+        const result = await pool.query(query);
         res.json(result.rows);
     } catch (err) {
         console.error(err);
