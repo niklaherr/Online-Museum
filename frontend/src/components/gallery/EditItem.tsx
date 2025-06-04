@@ -54,9 +54,9 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
     const loadItem = async () => {
       try {
         const item = await itemService.fetchItemById(parseInt(id!));
-        setTitle(item.title);
-        setCategory(item.category);
-        setDescription(item.description);
+        setTitle(item.title ?? "");
+        setCategory(item.category ?? "");
+        setDescription(item.description ?? "");
         setExistingImage(item.image);
         setIsPrivate(item.isprivate);
         setIsLoading(false);
@@ -134,7 +134,6 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
 
   if (isLoading) return <Loading />;
 
-  const hasChanges = title.trim() && category.trim();
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -406,7 +405,6 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
               onClick={() => setIsUpdateConfirmOpen(true)} 
               size="lg" 
               className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 border-0"
-              disabled={!hasChanges}
             >
               Änderungen speichern
             </Button>

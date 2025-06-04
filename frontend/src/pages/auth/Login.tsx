@@ -8,7 +8,6 @@ type LoginPageProps = {
 const LoginPage = ({ onNavigate }: LoginPageProps) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -79,17 +78,6 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label className="ml-2 block text-sm text-gray-900">
-                Angemeldet bleiben
-              </label>
-            </div>
 
             <div className="text-sm">
               <button 

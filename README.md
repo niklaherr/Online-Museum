@@ -1,70 +1,215 @@
-# Getting Started with Create React App
+# 🖼️ Online Museum
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Ein digitales Museum, das Benutzern ermöglicht, kulturelle und kreative Inhalte zu sammeln, zu organisieren und zu teilen. Die Plattform bietet **private und öffentliche Sammlungen** und **redaktionelle Inhalte**.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🎯 Hauptfunktionen
 
-### `npm start`
+### 👤 Benutzerverwaltung
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+* **Registrierung & Anmeldung:** Sichere Kontoerstellung mit Sicherheitsfragen
+* **Passwort-Reset:** Wiederherstellung über Sicherheitsfragen
+* **Profilverwaltung:** Passwort ändern, Konto löschen
+* **Admin-System:** Erweiterte Berechtigungen für Administratoren
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🗂️ Inhaltsverwaltung
 
-### `npm test`
+* **Items erstellen:** Upload von Bildern mit Titel, Beschreibung und Kategorisierung
+* **KI-Unterstützung:** Automatische Beschreibung mit *Mistral AI*
+* **Privatsphäre-Einstellungen:** Private oder öffentliche Items
+* **Bildbearbeitung:** Upload & Verwaltung von Bilddateien
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🧾 Listen & Sammlungen
 
-### `npm run build`
+* **Item-Listen:** Eigene thematische Sammlungen erstellen
+* **Redaktionelle Listen:** Von Admins kuratierte Inhalte
+* **Sichtbarkeit:** Öffentlich oder privat
+* **Kollaborative Kuration:** Admins können Items aller User verwenden
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 🔍 Such- & Entdeckung
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+* **Erweiterte Suche:** Nach Titel, Kategorie, Benutzer
+* **Filter:** Vielfältige Filteroptionen
+* **Dashboard:** Übersicht über Aktivitäten & Statistiken
+* **Trending:** Beliebte und neue Inhalte entdecken
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 🛠️ Admin-Funktionen
 
-### `npm run eject`
+* **Benutzerverwaltung:** Rechte vergeben/entziehen
+* **Redaktion:** Kuratierte Listen verwalten
+* **Support:** Kontaktanfragen bearbeiten
+* **Systemüberwachung:** Logs und Statistiken
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### ✨ Zusätzliche Features
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* **Kontaktformular:** Mit Statusverfolgung
+* **Responsive Design:** Für Desktop und Mobile
+* **Mehrsprachigkeit:** Vorbereitet für Internationalisierung
+* **Easter Eggs:** Versteckte Funktionen (z. B. Snake Game)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🏗️ Technologie-Stack
 
-## Learn More
+### Frontend
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* React 18 + TypeScript
+* Tailwind CSS
+* Tremor UI-Komponenten
+* React Router
+* Notyf (Benachrichtigungen)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Backend
 
-### Code Splitting
+* Node.js mit Express
+* PostgreSQL
+* JWT für Authentifizierung
+* Multer für Datei-Uploads
+* bcrypt für Passwort-Hashing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### KI-Integration
 
-### Analyzing the Bundle Size
+* Mistral AI für automatische Beschreibungen
+* Geplante automatische Kategorisierung
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## 📋 Voraussetzungen
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+* Node.js (v18+)
+* (Docker & Docker Compose)
+* Git
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 🚀 Installation & Setup
 
-### Deployment
+### 1. Repository klonen
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+git clone https://github.com/your-username/online-museum.git
+cd online-museum
+```
 
-### `npm run build` fails to minify
+### 2. Datenbank starten
+```bash
+cd db
+docker build -t online-museum-db .
+docker run --name museum-db -dp 5432:5432 museum-db
+```
+Wenn die PostgreSQl-Datenbank nicht über Docker gestartet werden sollen, müssen die Daten für die Verbindung zur Datenbank im Backend angepasst werden. Die Datei ist zu finden unter /backend/server.js
+In der Dockerfile unter /db können ebenfalls eigene Passwörter angegeben werden. Welche dann ebenfalls im Backend angepasst werden müssen. Wenn die Dockerfile nicht verwendet wird, dann muss ebenfalls die /db/init_db.sql Datei als Initialisierungsskript der Datenbank ausgeführt werden. Ebenso werden dann keine Beispieldaten über /db/test_data.sql automatisch geladen
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### 3. Backend starten
+
+```bash
+cd backend
+npm install
+node server.js
+```
+
+### 4. Frontend starten
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+### Alternativ mit Docker Compose
+
+```bash
+# Alle Services starten
+docker-compose up -d
+
+# Logs anzeigen
+docker-compose logs -f
+```
+
+**Zugänglichkeit:**
+
+* Frontend: `http://localhost:3000`
+* Backend: `http://localhost:3001`
+* DB: `localhost:5432`
+
+## 🎮 Verwendung
+
+### Erste Schritte
+
+1. Registrierung: `http://localhost:3000 → Registrieren`
+2. Profil anlegen: Benutzername & Passwort
+3. Sicherheitsfrage ausfüllen
+4. Erstes Item hochladen
+5. Eigene Liste erstellen
+
+### Admin-Zugang aktivieren
+
+```sql
+UPDATE users SET "isadmin" = true WHERE id = 1;
+```
+
+### KI-Funktionen nutzen
+
+* `.env` mit Mistral-API-Key
+* Bei Item-Erstellung auf **"KI-Beschreibung generieren"** klicken
+---
+
+## 📚 API-Dokumentation
+
+### 🔐 Authentifizierung
+
+* `POST /register` – Benutzer registrieren
+* `POST /login` – Login
+* `GET /security-question/:username`
+* `POST /verify-security-question`
+* `POST /reset-password`
+
+### 📦 Items
+
+* `GET /items`
+* `GET /items/:id`
+* `POST /items`
+* `PUT /items/:id`
+* `DELETE /items/:id`
+
+### 📋 Listen
+
+* `GET /item-lists`
+* `POST /item-lists`
+* `PUT /item-lists/:id`
+* `DELETE /item-lists/:id`
+
+### 🛡️ Admin
+
+* `GET /admin`
+* `GET /admin/search`
+* `PUT /admin/:id`
+* `GET /editorial-lists`
+
+---
+
+## 🔒 Sicherheit
+
+* JWT-basierte Authentifizierung
+* Passwort-Hashing (bcrypt)
+* SQL-Injection-Schutz -> nochmal prüfen
+* CORS-Konfiguration -> nochmal prüfen
+* Datei-Upload-Validierung
+* Admin-Rollenprüfung
+
+---
+
+## 🆘 Support
+
+* 📘 Doku: Diese README
+* 🐞 Bugs: GitHub Issues
+
+---
+
+## 📊 Projektstatistiken
+
+* Erste Version: **Mai 2025**
+* Aktive Entwicklung: ✅
+* Letztes Update: **Juni 2025**
+* Contributors: **3+** – *Vielleicht bald du?* ❤️
