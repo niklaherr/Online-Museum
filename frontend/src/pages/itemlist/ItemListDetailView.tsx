@@ -125,37 +125,14 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
             <div className="p-8 w-full">
               <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
                 <div className="flex-1 space-y-4">
-                  {/* Badges */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge color="blue" icon={RectangleStackIcon}>
-                      {items.length} {items.length === 1 ? "Item" : "Items"}
-                    </Badge>
-                    
-                    {list?.isprivate ? (
-                      <Badge color="red" icon={LockClosedIcon}>
-                        Privat
-                      </Badge>
-                    ) : (
-                      <Badge color="green" icon={EyeIcon}>
-                        Öffentlich
-                      </Badge>
-                    )}
-
-                    {isOwner && (
-                      <Badge color="gray">
-                        Eigene Liste
-                      </Badge>
-                    )}
-                  </div>
-
                   {/* Title & Description */}
                   <div className="space-y-3">
-                    <Title className={`text-3xl leading-tight ${list?.main_image ? 'text-white' : 'text-blue-900'}`}>
+                    <Title className={`text-3xl leading-tight ${list?.main_image ? 'text-white drop-shadow-lg' : 'text-blue-900'}`}>
                       {list?.title}
                     </Title>
                     
                     {list?.description && (
-                      <Subtitle className={`text-lg leading-relaxed max-w-3xl ${list?.main_image ? 'text-blue-100' : 'text-blue-700'} line-clamp-2`}>
+                      <Subtitle className={`text-lg leading-relaxed max-w-3xl ${list?.main_image ? 'text-white drop-shadow' : 'text-blue-700'} line-clamp-2`}>
                         {list.description.length > 120 
                           ? `${list.description.substring(0, 120)}...` 
                           : list.description
@@ -165,10 +142,10 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
                   </div>
 
                   {/* Meta Info */}
-                  <div className={`flex items-center space-x-4 ${list?.main_image ? 'text-blue-200' : 'text-blue-600'}`}>
+                  <div className={`flex items-center space-x-4 ${list?.main_image ? 'text-white' : 'text-blue-600'}`}>
                     <div className="flex items-center">
                       <CalendarIcon className="w-5 h-5 mr-2" />
-                      <Text className={`font-medium ${list?.main_image ? 'text-blue-200' : 'text-blue-600'}`}>
+                      <Text className={`font-medium ${list?.main_image ? 'text-white drop-shadow' : 'text-blue-600'}`}>
                         Erstellt am {list ? new Date(list.entered_on).toLocaleDateString('de-DE', {
                           year: 'numeric',
                           month: 'long',
@@ -202,6 +179,61 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Badges below image - Enhanced Design */}
+        <div className="relative rounded-b-xl overflow-hidden">
+          {/* Gradient Background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80"></div>
+          
+          {/* Content */}
+          <div className="relative p-6">
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Items Count Badge */}
+              <div className="group relative">
+                <Badge color="blue" icon={RectangleStackIcon} className="shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                  {items.length} {items.length === 1 ? "Item" : "Items"}
+                </Badge>
+                <div className="absolute inset-0 bg-blue-500/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+              </div>
+              
+              {/* Privacy Badge */}
+              <div className="group relative">
+                {list?.isprivate ? (
+                  <>
+                    <Badge color="red" icon={LockClosedIcon} className="shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                      Privat
+                    </Badge>
+                    <div className="absolute inset-0 bg-red-500/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                  </>
+                ) : (
+                  <>
+                    <Badge color="green" icon={EyeIcon} className="shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                      Öffentlich
+                    </Badge>
+                    <div className="absolute inset-0 bg-green-500/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                  </>
+                )}
+              </div>
+
+              {/* Owner Badge */}
+              {isOwner && (
+                <div className="group relative">
+                  <Badge color="gray" className="shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-300">
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></div>
+                      Eigene Liste
+                    </div>
+                  </Badge>
+                  <div className="absolute inset-0 bg-yellow-500/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                </div>
+              )}
+            </div>
+            
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-16 h-16 bg-blue-200/30 rounded-full -translate-y-8 translate-x-8 blur-xl"></div>
+            <div className="absolute bottom-0 left-0 w-12 h-12 bg-purple-200/30 rounded-full translate-y-6 -translate-x-6 blur-xl"></div>
           </div>
         </div>
       </Card>
