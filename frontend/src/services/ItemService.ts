@@ -40,7 +40,10 @@ class ItemService {
   
     const headers = { Authorization: `Bearer ${token}` };
   
-    const res = await fetch(`${this.baseUrl}/item-lists`, {
+    const url = new URL(`${this.baseUrl}/item-lists`);
+    url.searchParams.append("exclude_user_id", userID.toString());
+
+    const res = await fetch(url.toString(), {
       method: "GET",
       headers,
     });
