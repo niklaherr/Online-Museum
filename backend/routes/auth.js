@@ -203,11 +203,11 @@ router.put("/reset-password-with-old-password", authenticateJWT, async (req, res
         if (!passwordMatch) return res.status(401).json({ error: "Altes Passwort ist falsch." });
 
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-        query = "UPDATE users SET password = $1 WHERE id = $2"
-        if (isSQLInjection(query)) {
+        const updateQuery= "UPDATE users SET password = $1 WHERE id = $2"
+        if (isSQLInjection(updateQuery)) {
             return res.status(401).send("Access denied");
         }
-        await pool.query(query, [hashedNewPassword, user.id]);
+        await pool.query(updateQuery, [hashedNewPassword, user.id]);
 
         res.status(200).json({ message: "Passwort erfolgreich aktualisiert." });
     } catch (err) {
