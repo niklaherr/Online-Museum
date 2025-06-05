@@ -1,35 +1,35 @@
-# frontend/Dockerfile
-FROM node:18-slim
-
-# Set environment variables
-ENV REACT_APP_BACKEND_API_URL=http://localhost:3001
-ENV GENERATE_SOURCEMAP=false
-ENV HOST=0.0.0.0
-ENV BROWSER=none
+# frontend/Dockerfile - PRODUCTION VERSION mit Build-Time ENV
+FROM node:18-slim as build
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files first (for better caching)
+# Copy package files
 COPY package*.json ./
 
 # Install dependencies
 RUN npm ci
 
-# Create non-root user early (before copying source files)
-RUN groupadd -r museum && useradd -r -g museum museum
-
-# Copy source code (node_modules excluded via .dockerignore)
+# Copy source code
 COPY . .
 
-# Change ownership (fewer files to process now)
-RUN chown -R museum:museum /app
+# Set environment variable für BUILD-TIME
+ENV REACT_APP_BACKEND_API_URL=https://museum-backend-production.up.railway.app
 
-# Switch to non-root user
-USER museum
+# Build for production (Environment Variable wird eingebaut)
+RUN npm run build
 
-# Expose port
+# Production stage with nginx
+FROM nginx:alpine
+
+# Copy built app to nginx
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 3000 (für Railway)
 EXPOSE 3000
 
-# Start the development server
-CMD ["npm", "start"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

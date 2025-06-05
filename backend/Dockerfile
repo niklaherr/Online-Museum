@@ -1,7 +1,7 @@
-# backend/Dockerfile
+# backend/Dockerfile - Railway Version mit PRIVATE Network
 FROM node:18-slim
 
-# Install system dependencies including build tools for native modules
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     python3 \
@@ -9,11 +9,11 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables
+# Set environment variables für Railway PRIVATE Network
 ENV NODE_ENV=production \
     PORT=3001 \
     DB_USER=user \
-    DB_HOST=museum-db \
+    DB_HOST=museum-db-production.up.railway.app \
     DB_NAME=mydatabase \
     DB_PASSWORD=password \
     DB_PORT=5432
@@ -21,13 +21,13 @@ ENV NODE_ENV=production \
 # Set working directory
 WORKDIR /app
 
-# Copy package files first (for better caching)
+# Copy package files
 COPY package*.json ./
 
-# Install dependencies (this ensures bcrypt is compiled for the container's architecture)
+# Install dependencies
 RUN npm ci --only=production
 
-# Copy source code (node_modules should be excluded via .dockerignore)
+# Copy source code
 COPY . .
 
 # Create non-root user
