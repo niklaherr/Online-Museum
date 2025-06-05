@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { Pool } = require("pg");
+require("dotenv").config();
 
 // Import routes
 const authRoutes = require("./routes/auth");
@@ -24,10 +25,10 @@ app.use(bodyParser.json());
 
 // PostgreSQL connection pool setup - exported so routes can use it
 const pool = new Pool({
-    user: process.env.DB_USER || "user",
-    host: process.env.DB_HOST || "localhost",
-    database: process.env.DB_NAME || "mydatabase",
-    password: process.env.DB_PASSWORD || "password",
+    user: process.env.DB_USER || "",
+    host: process.env.DB_HOST || "",
+    database: process.env.DB_NAME || "",
+    password: process.env.DB_PASSWORD || "",
     port: process.env.DB_PORT || 5432,
 });
 
