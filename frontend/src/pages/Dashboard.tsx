@@ -71,20 +71,36 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
   };
 
   const getMessage = () => {
-    const baseMessage = activity.category === 'ITEM' ? 'Item' : 
-                       activity.category === 'ITEM_LIST' ? 'Liste' : 'Element';
+    const baseMessage = activity.category === 'ITEM' ? 'Es wurde ein Item' : 
+                       activity.category === 'ITEM_LIST' ? 'Es wurde eine Liste' : 'Es wurde Element';
     
     switch (activity.type) {
       case 'CREATE':
-        return `${baseMessage} erstellt`;
+        return `${baseMessage} mit der ID ${activity.element_id} erstellt.`;
       case 'UPDATE':
-        return `${baseMessage} bearbeitet`;
+        return `${baseMessage} mit der ID ${activity.element_id} bearbeitet.`;
       case 'DELETE':
-        return `${baseMessage} gelöscht`;
+        return `${baseMessage} mit der ID ${activity.element_id} gelöscht.`;
       default:
-        return `${baseMessage} verändert`;
+        return `${baseMessage} mit der ID ${activity.element_id} verändert.`;
     }
   };
+
+  const getType = () => {
+    
+    switch (activity.type) {
+      case 'CREATE':
+        return `ERSTELLEN`;
+      case 'UPDATE':
+        return `BEARBEITUNG`;
+      case 'DELETE':
+        return `$LÖSCHEN`;
+      default:
+        return `VERÄNDERUNG`;
+    }
+  };
+
+  
   
   return (
     <Card className="group hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500">
@@ -97,14 +113,11 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
           <div>
             <div className="flex items-center space-x-2 mb-1">
               <Badge color={getBadgeColor()} size="xs">
-                {getMessage()}
+                {getType()}
               </Badge>
-              <Text className="text-xs text-gray-500">
-                ID: {activity.element_id}
-              </Text>
             </div>
             <Text className="text-sm font-medium text-gray-700">
-              {activity.category.toLowerCase().replace('_', ' ')} Aktivität
+              {getMessage()}
             </Text>
           </div>
         </div>

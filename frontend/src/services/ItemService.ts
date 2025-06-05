@@ -487,7 +487,7 @@ class ItemService {
   
     const headers = { Authorization: `Bearer ${token}` };
     try {
-      const url = new URL(`${this.baseUrl}/items`);
+      const url = new URL(`${this.baseUrl}/item-lists`);
       url.searchParams.append("user_id", userID.toString());
 
       const res = await fetch(url.toString(), {
