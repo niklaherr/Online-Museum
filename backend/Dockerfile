@@ -1,11 +1,14 @@
 # backend/Dockerfile
 FROM node:18-slim
 
-# Install curl for health checks
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Install system dependencies including build tools for native modules
+RUN apt-get update && apt-get install -y \
+    curl \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
-#set envs
-# Set environment variables
 # Set environment variables
 ENV NODE_ENV=production \
     PORT=3001 \
@@ -18,13 +21,13 @@ ENV NODE_ENV=production \
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files first (for better caching)
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies (this ensures bcrypt is compiled for the container's architecture)
 RUN npm ci --only=production
 
-# Copy source code
+# Copy source code (node_modules should be excluded via .dockerignore)
 COPY . .
 
 # Create non-root user
