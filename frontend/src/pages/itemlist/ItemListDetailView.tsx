@@ -155,8 +155,11 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
                     </Title>
                     
                     {list?.description && (
-                      <Subtitle className={`text-lg leading-relaxed max-w-3xl ${list?.main_image ? 'text-blue-100' : 'text-blue-700'}`}>
-                        {list.description}
+                      <Subtitle className={`text-lg leading-relaxed max-w-3xl ${list?.main_image ? 'text-blue-100' : 'text-blue-700'} line-clamp-2`}>
+                        {list.description.length > 120 
+                          ? `${list.description.substring(0, 120)}...` 
+                          : list.description
+                        }
                       </Subtitle>
                     )}
                   </div>
