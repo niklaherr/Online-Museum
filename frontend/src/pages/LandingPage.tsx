@@ -22,6 +22,7 @@ import { GalleryItem } from "interfaces/Item";
 import NotyfService from "services/NotyfService";
 import NoResults from "../components/helper/NoResults";
 import Loading from "components/helper/Loading";
+import { userService } from "services/UserService";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -59,6 +60,7 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
   };
 
   useEffect(() => {
+    if (userService.isLoggedIn()) onNavigate('dashboard'); 
     loadItems();
   }, []);
 
