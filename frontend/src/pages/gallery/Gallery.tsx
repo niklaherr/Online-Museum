@@ -43,71 +43,60 @@ const groupItemsByCategory = (items: GalleryItem[]) => {
 const ItemCard = ({ item, onClick }: { item: GalleryItem; onClick: () => void }) => {
   return (
     <Card
-      className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden bg-white border-0 shadow-lg"
+      className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
       onClick={onClick}
     >
-      {/* Image Section */}
-      <div className="relative aspect-square w-full overflow-hidden bg-gray-100">
+      {/* Image */}
+      <div className="aspect-square w-full overflow-hidden bg-gray-100 mb-4">
         {item.image ? (
           <img
             src={item.image}
             alt={item.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-            <PhotoIcon className="w-16 h-16 text-gray-400 opacity-50" />
-          </div>
-        )}
-        
-        {/* Overlay with badges */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
-        {/* Status badges */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2">
-          {item.isprivate && (
-            <Badge color="red" icon={LockClosedIcon} size="xs">
-              Privat
-            </Badge>
-          )}
-        </div>
-
-        {/* Category badge */}
-        {item.category && (
-          <div className="absolute top-3 left-3">
-            <Badge color="blue" icon={TagIcon} size="xs">
-              {item.category}
-            </Badge>
+          <div className="w-full h-full flex items-center justify-center text-gray-400">
+            <PhotoIcon className="w-12 h-12 opacity-50" />
           </div>
         )}
       </div>
 
-      {/* Content Section */}
+      {/* Content */}
       <div className="p-4 space-y-3">
+        {/* Category & Privacy Badge */}
+        <div className="flex justify-between items-start">
+          {item.category && (
+            <Badge color="blue" icon={TagIcon} size="xs" className="max-w-[120px] truncate">
+              {item.category.length > (item.isprivate ? 12 : 15) 
+                ? `${item.category.substring(0, item.isprivate ? 12 : 15)}...` 
+                : item.category}
+            </Badge>
+          )}
+          
+          {item.isprivate && (
+            <div className="p-1 bg-red-100 rounded">
+              <LockClosedIcon className="w-4 h-4 text-red-500" />
+            </div>
+          )}
+        </div>
+
         {/* Title */}
-        <Title className="text-lg line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 leading-tight">
+        <Title className="text-lg line-clamp-2 group-hover:text-blue-600 transition-colors">
           {item.title}
         </Title>
 
         {/* Date */}
-        <div className="flex items-center text-xs text-gray-500">
+        <Text className="text-xs text-gray-500 flex items-center">
           <CalendarIcon className="w-4 h-4 mr-1" />
-          <span>{new Date(item.entered_on).toLocaleDateString('de-DE')}</span>
-        </div>
+          {new Date(item.entered_on).toLocaleDateString('de-DE')}
+        </Text>
 
         {/* Author */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-          <div className="flex items-center">
-            <UserIcon className="w-4 h-4 text-gray-400 mr-2" />
-            <Text className="text-sm text-gray-600 font-medium">
-              {item.username}
-            </Text>
-          </div>
-          
-          {/* View indicator */}
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <EyeIcon className="w-4 h-4 text-blue-500" />
-          </div>
+        <div className="flex items-center pt-2 border-t border-gray-100">
+          <UserIcon className="w-4 h-4 text-gray-400 mr-2" />
+          <Text className="text-sm text-gray-600 font-medium">
+            {item.username}
+          </Text>
         </div>
       </div>
     </Card>
@@ -217,7 +206,6 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
 
   const totalPublicItems = filteredItems.length;
   const totalUserItems = filteredUserItems.length;
-  const totalCategories = categories.length;
 
   const clearSearch = () => {
     setSearchQuery('');
@@ -338,15 +326,12 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
       </Badge>
     </div>
 
-    {/* Group user items by category */}
-    {Object.keys(groupItemsByCategory(filteredUserItems)).sort().map((category) => (
-      <CategorySection
-        key={`user-${category}`}
-        category={`${category} (Meine Items)`}
-        items={groupItemsByCategory(filteredUserItems)[category]}
-        onNavigate={onNavigate}
-      />
-    ))}
+    {/* Display all user items together without category grouping */}
+    <CategorySection
+      category="Alle meine Items"
+      items={filteredUserItems}
+      onNavigate={onNavigate}
+    />
   </div>
 )}
 
