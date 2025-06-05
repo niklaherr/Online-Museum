@@ -34,6 +34,33 @@ const pool = new Pool({
 // Make the pool available to all route modules
 app.locals.pool = pool;
 
+// Health check endpoint für Docker (MUSS vor anderen routes stehen!)
+app.get('/health', async (req, res) => {
+    try {
+        // Teste Datenbank-Verbindung
+        const result = await pool.query('SELECT NOW()');
+        
+        res.status(200).json({ 
+            status: 'OK', 
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            environment: process.env.NODE_ENV || 'development',
+            database: 'connected',
+            db_time: result.rows[0].now
+        });
+    } catch (error) {
+        console.error('Health check failed:', error);
+        res.status(503).json({ 
+            status: 'ERROR', 
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            environment: process.env.NODE_ENV || 'development',
+            database: 'disconnected',
+            error: error.message
+        });
+    }
+});
+
 // Register routes
 app.use("/", authRoutes);
 app.use("/", userRoutes);
@@ -53,6 +80,7 @@ app.use((err, req, res, next) => {
 // Start the server
 app.listen(port, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${port}`);
+    console.log(`Health check available at http://localhost:${port}/health`);
 });
 
 module.exports = app;
