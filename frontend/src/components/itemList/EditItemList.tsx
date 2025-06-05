@@ -153,19 +153,19 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
     setIsGenerating(true);
 
     try {
-      let promptText = `Erstelle eine ansprechende Beschreibung für eine Sammlung mit dem Titel "${title}". `;
+      let promptText = `Erstelle eine Beschreibung für eine redaktionelle Sammlung mit dem Titel "${title}". `;
       promptText += "Die Sammlung enthält folgende Elemente:\n";
 
-      selectedItems.forEach((item) => {
-        promptText += `- ${item.title}`;
+      selectedItems.forEach((item, index) => {
+        promptText += `${index + 1}. "${item.title}"`;
         if (item.category) promptText += ` (Kategorie: ${item.category})`;
-        if (item.description) promptText += `: ${item.description}`;
-        promptText += "\n";
+        if (item.description) promptText += ` - ${item.description}`;
+        promptText += `\n`;
       });
 
-      promptText +=
-        "\nBitte erstelle basierend auf diesen Informationen eine zusammenfassende Beschreibung, die die Einzigartigkeit dieser Sammlung in 2-3 Sätzen hervorhebt.";
-
+      promptText += `\nBitte erstelle basierend auf dem Titel "${title}" und diesen ${selectedItems.length} Inhalten eine, `;
+      promptText += "zusammenfassende Beschreibung, die die thematische Verbindung dieser redaktionellen Sammlung in 2-3 Sätzen hervorhebt.";
+      
       const generatedText = await itemAssistantService.generateDescription(
         title,
         promptText
