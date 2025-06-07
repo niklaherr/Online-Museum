@@ -153,9 +153,12 @@ npm start
 * Bei Item-Erstellung auf **"KI-Beschreibung generieren"** klicken
 ---
 
-## 📚 API-Dokumentation
+## Architektur
 
-# Museum Management System - Backend
+![Architekturdiagramm](./documentation/image.png)
+
+
+## 📚 API-Dokumentation - Backend
 
 Ein Express.js-basiertes Backend für ein digitales Museum-Management-System mit Benutzerauthentifizierung, Item-Management und administrativen Funktionen.
 
