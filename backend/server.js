@@ -23,7 +23,7 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(bodyParser.json());
 
-// PostgreSQL connection pool setup - exported so routes can use it
+
 const pool = new Pool({
     user: process.env.DB_USER || "",
     host: process.env.DB_HOST || "",
@@ -34,6 +34,42 @@ const pool = new Pool({
 
 // Make the pool available to all route modules
 app.locals.pool = pool;
+
+// Health check endpoint
+app.get('/health', async (req, res) => {
+    try {
+        // Teste nur die grundlegende Funktionalität, nicht die DB
+        res.status(200).json({ 
+            status: 'OK', 
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            environment: process.env.NODE_ENV || 'development'
+        });
+    } catch (error) {
+        console.error('Health check failed:', error);
+        res.status(503).json({ 
+            status: 'ERROR', 
+            error: error.message
+        });
+    }
+});
+
+// Separater DB Health Check
+app.get('/health/db', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT NOW()');
+        res.status(200).json({ 
+            status: 'DB OK', 
+            db_time: result.rows[0].now
+        });
+    } catch (error) {
+        console.error('DB Health check failed:', error);
+        res.status(503).json({ 
+            status: 'DB ERROR', 
+            error: error.message
+        });
+    }
+});
 
 // Register routes
 app.use("/", authRoutes);
@@ -54,6 +90,8 @@ app.use((err, req, res, next) => {
 // Start the server
 app.listen(port, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${port}`);
+    console.log(`Health check available at http://localhost:${port}/health`);
+    console.log(`DB Health check available at http://localhost:${port}/health/db`);
 });
 
 module.exports = app;

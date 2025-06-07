@@ -1,7 +1,8 @@
+# frontend/Dockerfile - PRODUCTION VERSION mit Build-Time ENV
+FROM node:18-slim as build
 
-# frontend/Dockerfile
-FROM node:18-slim
 
+# Set environment variables (override at runtime or in docker-compose)
 ENV REACT_APP_BACKEND_API_URL=http://localhost:3001
 ENV REACT_APP_MISTRAL_API_KEY=SpbqZllg57jFyYGIT0PnvGzn8QPAX5Hs
 # Set working directory
@@ -16,13 +17,20 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Create non-root user
-RUN groupadd -r museum && useradd -r -g museum museum
-RUN chown -R museum:museum /app
-USER museum
+# Build for production (Environment Variable wird eingebaut)
+RUN npm run build
 
-# Expose port
-EXPOSE 3000
+# Production stage with nginx
+FROM nginx:alpine
 
-# Start the development server
-CMD ["npm", "start"]
+# Copy built app to nginx
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80 for nginx server
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

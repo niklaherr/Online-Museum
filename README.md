@@ -85,6 +85,16 @@ Ein digitales Museum, das Benutzern ermöglicht, kulturelle und kreative Inhalte
 
 ## 🚀 Installation & Setup
 
+### Docker Compose als einfache Alternative, ansonsten ab Schritt 1 folgen
+
+```bash
+# Alle Services starten
+docker-compose up -d
+
+# Logs anzeigen
+docker-compose logs -f
+```
+
 ### 1. Repository klonen
 
 ```bash
@@ -117,19 +127,9 @@ npm install
 npm start
 ```
 
-### Alternativ mit Docker Compose
-
-```bash
-# Alle Services starten
-docker-compose up -d
-
-# Logs anzeigen
-docker-compose logs -f
-```
-
 **Zugänglichkeit:**
 
-* Frontend: `http://localhost:3000`
+* Frontend: `http://localhost:3000` -> `http://localhost:80` bei der Nutzung von Docker oder Docker Compose
 * Backend: `http://localhost:3001`
 * DB: `localhost:5432`
 
@@ -145,9 +145,8 @@ docker-compose logs -f
 
 ### Admin-Zugang aktivieren
 
-```sql
-UPDATE users SET "isadmin" = true WHERE id = 1;
-```
+1. Mit dem Nutzer adminuser und dem Passwort 1234567 anmelden
+2. Den selbst erstellten Nutzer als Admin hinzufügen und dann den adminuser löschen über die normale Löschfunktion
 
 ### KI-Funktionen nutzen
 
@@ -157,11 +156,13 @@ UPDATE users SET "isadmin" = true WHERE id = 1;
 
 ## 📚 API-Dokumentation
 
+Die API wird verwendet, um sich als Backend mit der Datenbank zu verbinden.
+
 ### 🔐 Authentifizierung
 
 * `POST /register` – Benutzer registrieren
 * `POST /login` – Login
-* `GET /security-question/:username`
+* `GET /security-question/:username` 
 * `POST /verify-security-question`
 * `POST /reset-password`
 
