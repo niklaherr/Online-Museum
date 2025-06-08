@@ -162,7 +162,7 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
           <div className="aspect-video w-full overflow-hidden rounded-xl">
             <iframe
               className="w-full h-full rounded-xl"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ" // Replace with your actual video
+              src="https://lumen5.com/user/henri-herdel/online-museum-share-g6q75/" // Replace with your actual video
               title="YouTube video player"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

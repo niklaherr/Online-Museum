@@ -255,7 +255,10 @@ const Roadmap = () => {
         </div>
         
         <div className="text-sm text-gray-500 mt-8">
-          <p>Letzte Aktualisierung: 21. Mai 2025</p>
+          <Text className="text-sm text-gray-500 mt-6">
+            Stand: {new Date().toLocaleDateString('de-DE')} | 
+            Letzte Aktualisierung: {new Date().toLocaleDateString('de-DE')}
+          </Text>
           <p className="mt-1 italic">
             Hinweis: Diese Roadmap stellt unsere aktuellen Pläne dar und kann sich basierend auf Nutzerfeedback, technologischen Entwicklungen und Ressourcenverfügbarkeit ändern.
           </p>
