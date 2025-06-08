@@ -1,9 +1,12 @@
-# backend/Dockerfile
+#Railway Version mit PRIVATER DB-URL
 FROM node:18-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
+    python3 \
+    make \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
