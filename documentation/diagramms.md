@@ -9,11 +9,12 @@
 5. [Klassendiagramm (Backend Services)](#5-klassendiagramm-backend-services)
 6. [Datenbankschema](#6-datenbankschema)
 7. [Beschreibung der Anwendungsfälle](#beschreibung-der-anwendungsfälle)
-8. [Installation und Deployment](#installation-und-deployment)
 
 ---
 
 ## 1. Anwendungsfalldiagramm
+
+**Beschreibung**: Dieses Diagramm zeigt alle Hauptfunktionen des Online-Museums und deren Zuordnung zu den drei Benutzerrollen. Es visualisiert die Vererbungsbeziehungen zwischen Gast, registriertem Benutzer und Administrator, sowie die verschiedenen Funktionsbereiche wie Authentifizierung, Item-Management, Listen-Verwaltung und Administration.
 
 ```mermaid
 graph TB
@@ -95,6 +96,8 @@ graph TB
 ---
 
 ## 2. Systemarchitektur-Diagramm
+
+**Beschreibung**: Diese 3-Schichten-Architektur zeigt die technische Struktur des Systems. Die Client-Schicht (React Frontend) kommuniziert über REST-APIs mit der Server-Schicht (Express.js Backend), welche wiederum mit der Datenbank-Schicht (PostgreSQL) und externen Services (Mistral AI) interagiert. Middleware-Komponenten sorgen für Sicherheit und Authentifizierung.
 
 ```mermaid
 graph TB
@@ -200,57 +203,60 @@ graph TB
 
 ## 3. Komponentendiagramm
 
+**Beschreibung**: Dieses Diagramm stellt die detaillierte Komponentenstruktur dar, von Frontend-UI-Komponenten über Service-Layer bis zu Backend-APIs. Es zeigt die Abhängigkeiten zwischen React-Komponenten, TypeScript-Services und REST-Endpunkten. Die Darstellung kann bei der komplexen Vernetzung in GitHub abgeschnitten werden - in diesem Fall die Services als zentrale Vermittler zwischen Frontend und Backend verstehen.
+
 ```mermaid
-graph LR
-    subgraph "Frontend Components"
-        subgraph "Layout Components"
-            Header[Header]
-            Sidebar[Sidebar]
-            Footer[Footer]
-        end
-        
-        subgraph "Page Components"
-            Dashboard[Dashboard]
-            Gallery[Gallery]
-            ItemList[ItemList Views]
-            Auth[Authentication Pages]
-            Admin[Admin Pages]
+graph TD
+    subgraph "Frontend Layer"
+        subgraph "UI Components"
+            Header[Header - Navigation & User Menu]
+            Sidebar[Sidebar - Main Navigation]
+            Footer[Footer - Legal Links]
+            Dashboard[Dashboard - Overview & Stats]
+            Gallery[Gallery - Item Browse & Search]
+            ItemList[ItemList - Collection Views]
+            Auth[Auth Pages - Login/Register]
+            Admin[Admin Pages - User & Content Management]
         end
         
         subgraph "Feature Components"
-            CreateItem[CreateItem]
-            EditItem[EditItem]
-            CreateList[CreateItemList]
-            EditList[EditItemList]
+            CreateItem[CreateItem - Upload & Metadata]
+            EditItem[EditItem - Item Modification]
+            CreateList[CreateItemList - Collection Creation]
+            EditList[EditItemList - Collection Management]
         end
         
-        subgraph "Helper Components"
-            Loading[Loading]
-            NoResults[NoResults]
-            NotFound[NotFound]
+        subgraph "Utility Components"
+            Loading[Loading - Spinner Component]
+            NoResults[NoResults - Empty State]
+            NotFound[NotFound - 404 Page]
         end
     end
     
-    subgraph "Services Layer"
-        UserService[UserService]
-        ItemService[ItemService]
-        EditorialService[EditorialService]
-        AdminService[AdminService]
-        ContactFormService[ContactFormService]
-        ItemAssistantService[ItemAssistantService]
-        NotyfService[NotyfService]
+    subgraph "Service Layer"
+        UserService[UserService - Auth & Profile]
+        ItemService[ItemService - CRUD Operations]
+        EditorialService[EditorialService - Curated Content]
+        AdminService[AdminService - User Management]
+        ContactService[ContactFormService - Support]
+        AIService[ItemAssistantService - AI Integration]
+        NotifyService[NotyfService - Notifications]
     end
     
-    subgraph "Backend Routes"
-        AuthAPI[/auth]
-        ItemAPI[/items]
-        ListAPI[/item-lists]
-        EditorialAPI[/editorial]
-        AdminAPI[/admin]
-        ContactAPI[/contact-form]
+    subgraph "Backend API"
+        AuthAPI[Auth Endpoints - /auth/*]
+        ItemAPI[Item Endpoints - /items/*]
+        ListAPI[List Endpoints - /item-lists/*]
+        EditorialAPI[Editorial Endpoints - /editorial/*]
+        AdminAPI[Admin Endpoints - /admin/*]
+        ContactAPI[Contact Endpoints - /contact-form/*]
     end
     
-    %% Frontend zu Services
+    subgraph "External APIs"
+        MistralAI[Mistral AI - Description Generation]
+    end
+    
+    %% Component Dependencies
     Dashboard --> UserService
     Dashboard --> ItemService
     Gallery --> ItemService
@@ -258,31 +264,28 @@ graph LR
     Auth --> UserService
     Admin --> AdminService
     CreateItem --> ItemService
-    CreateItem --> ItemAssistantService
-    EditItem --> ItemService
-    CreateList --> ItemService
-    EditList --> ItemService
+    CreateItem --> AIService
     
-    %% Services zu Backend
+    %% Service to API Mapping
     UserService --> AuthAPI
     ItemService --> ItemAPI
     ItemService --> ListAPI
     EditorialService --> EditorialAPI
     AdminService --> AdminAPI
-    ContactFormService --> ContactAPI
-    ItemAssistantService -.->|External API| MistralAI[Mistral AI]
+    ContactService --> ContactAPI
+    AIService --> MistralAI
     
     %% Error Handling
-    UserService --> NotyfService
-    ItemService --> NotyfService
-    EditorialService --> NotyfService
-    AdminService --> NotyfService
-    ContactFormService --> NotyfService
+    UserService --> NotifyService
+    ItemService --> NotifyService
+    EditorialService --> NotifyService
 ```
 
 ---
 
 ## 4. Verteilungsdiagramm (Deployment)
+
+**Beschreibung**: Das Deployment-Diagramm zeigt die Infrastruktur-Architektur des Systems. In der Production-Umgebung läuft alles auf Railway Cloud Platform mit separaten Containern für Frontend (Nginx), Backend (Node.js) und Datenbank (PostgreSQL). Die Entwicklungsumgebung spiegelt diese Struktur lokal wider. CI/CD-Pipeline automatisiert den Deployment-Prozess.
 
 ```mermaid
 graph TB
@@ -364,6 +367,8 @@ graph TB
 ---
 
 ## 5. Klassendiagramm (Backend Services)
+
+**Beschreibung**: Das Klassendiagramm visualisiert die objektorientierte Struktur der TypeScript-Services im Frontend. Jeder Service kapselt spezifische Geschäftslogik und API-Aufrufe. Die Abhängigkeiten zeigen, dass alle Services den NotyfService für Benachrichtigungen und den UserService für Authentifizierung nutzen. Jeder Service folgt dem Single-Responsibility-Prinzip.
 
 ```mermaid
 classDiagram
@@ -451,6 +456,8 @@ classDiagram
 ---
 
 ## 6. Datenbankschema
+
+**Beschreibung**: Das Entity-Relationship-Diagramm stellt die PostgreSQL-Datenbankstruktur dar. Zentrale Entitäten sind `users`, `item` und `item_list` mit ihren Beziehungen. Many-to-Many-Beziehungen werden über Verbindungstabellen (`item_itemlist`, `item_editorial`) abgebildet. Das Schema unterstützt sowohl private Nutzersammlungen als auch öffentliche redaktionelle Inhalte.
 
 ```mermaid
 erDiagram
@@ -574,192 +581,3 @@ erDiagram
 - **UC19 - Hilfe-Seiten anzeigen**: Dokumentation und FAQ-System
 
 ---
-
-## Installation und Deployment
-
-### 🔧 Lokale Entwicklungsumgebung
-
-#### Voraussetzungen
-```bash
-Node.js >= 18.0.0
-PostgreSQL >= 13.0
-npm >= 8.0.0
-Git
-```
-
-#### Backend Setup
-```bash
-# Repository klonen
-git clone <repository-url>
-cd online-museum
-
-# Backend-Dependencies installieren
-cd backend
-npm install
-
-# Umgebungsvariablen konfigurieren
-cp .env.example .env
-# .env-Datei mit lokalen Werten befüllen
-
-# Datenbank initialisieren
-createdb mydatabase
-# SQL-Schema importieren (falls vorhanden)
-
-# Development Server starten
-npm run dev
-```
-
-#### Frontend Setup
-```bash
-# Frontend-Dependencies installieren
-cd ../frontend
-npm install
-
-# Umgebungsvariablen konfigurieren
-cp .env.example .env
-# .env-Datei mit Backend-URL befüllen
-
-# Development Server starten
-npm start
-```
-
-#### Datenbank Setup
-```sql
--- PostgreSQL Datenbank erstellen
-CREATE DATABASE mydatabase;
-CREATE USER user WITH ENCRYPTED PASSWORD 'password';
-GRANT ALL PRIVILEGES ON DATABASE mydatabase TO user;
-
--- Schema-Tabellen erstellen (vereinfacht)
--- users, item, item_list, editorial, activities, contact_form
--- (Vollständiges Schema siehe Datenbankschema-Diagramm)
-```
-
-### 🚀 Production Deployment (Railway)
-
-#### Docker Configuration
-```dockerfile
-# Frontend Dockerfile (Multi-Stage Build)
-FROM node:18-slim as build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-```dockerfile
-# Backend Dockerfile
-FROM node:18-slim
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-EXPOSE 3001
-CMD ["npm", "start"]
-```
-
-#### Umgebungsvariablen (Production)
-```env
-# Backend (.env)
-NODE_ENV=production
-PORT=3001
-DB_HOST=railway-postgres-url
-DB_PORT=5432
-DB_NAME=railway
-DB_USER=postgres
-DB_PASSWORD=railway-generated-password
-JWT_SECRET=production-secret-key
-
-# Frontend (Build-Zeit)
-REACT_APP_BACKEND_API_URL=https://your-backend-domain.railway.app
-REACT_APP_MISTRAL_API_KEY=your-mistral-api-key
-```
-
-#### Railway Deployment Steps
-1. **Repository mit Railway verbinden**
-2. **Services konfigurieren**:
-   - Frontend Service (Nginx)
-   - Backend Service (Node.js)
-   - PostgreSQL Database
-3. **Umgebungsvariablen setzen**
-4. **Automatic Deployment aktivieren**
-
-### 🗄️ Testdaten
-
-#### Beispiel-Benutzer
-```sql
--- Admin-Benutzer (Passwort: admin123)
-INSERT INTO users (username, password, security_question, security_answer, isadmin) 
-VALUES ('admin', '$2b$10$hashedpassword', 'Lieblingsstadt?', '$2b$10$hashedanswer', true);
-
--- Standard-Benutzer (Passwort: user123)
-INSERT INTO users (username, password, security_question, security_answer, isadmin) 
-VALUES ('testuser', '$2b$10$hashedpassword', 'Erstes Haustier?', '$2b$10$hashedanswer', false);
-```
-
-#### Beispiel-Items und Listen
-```sql
--- Sample Items
-INSERT INTO item (user_id, title, description, category, isprivate) 
-VALUES 
-(1, 'Vintage Kamera', 'Klassische Analogkamera aus den 1970ern', 'Fotografie', false),
-(1, 'Gemälde Landschaft', 'Impressionistische Landschaftsmalerei', 'Malerei', false);
-
--- Sample Item-Liste
-INSERT INTO item_list (title, description, user_id, isprivate) 
-VALUES ('Meine Kunstsammlung', 'Persönliche Sammlung verschiedener Kunstwerke', 1, false);
-```
-
-### 🔐 Sicherheitskonfiguration
-
-#### JWT-Konfiguration
-- **Expiration**: 1 Stunde
-- **Algorithm**: HS256
-- **Secret**: Starkes, zufälliges Secret (mindestens 256 Bit)
-
-#### SQL-Injection-Schutz
-- Parametrisierte Queries mit pg-Pool
-- Input-Validation auf allen Endpunkten
-- Custom Injection-Detection-Service
-
-#### Passwort-Sicherheit
-- bcrypt mit Salt-Rounds: 10
-- Mindestlänge: 6 Zeichen
-- Sichere Speicherung von Sicherheitsfragen
-
-#### CORS-Konfiguration
-```javascript
-// Production CORS-Settings
-const corsOptions = {
-  origin: ['https://your-frontend-domain.railway.app'],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-```
-
----
-
-### 📚 Zusätzliche Ressourcen
-
-- **Live Demo**: [Online-Museum App](https://your-app-url.railway.app)
-- **API Documentation**: Siehe `/backend/routes/` für detaillierte Endpunkt-Beschreibungen
-- **Component Library**: Tremor React Documentation
-- **Deployment Platform**: [Railway.app](https://railway.app)
-
----
-
-### 👥 Entwicklerteam
-
-- **Niklas Herrmann** - Projektleitung/Entwicklung
-- **Hendrik Steen** - Projektleitung/Entwicklung  
-- **Malte Beissel** - Entwicklung
-
-**Studiengang**: Wirtschaftsinformatik, DHSH  
-**Betreuung**: Prof. Dr. Sven Niemand
