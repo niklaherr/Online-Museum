@@ -1,4 +1,4 @@
-# backend/Dockerfile - Railway Version mit PRIVATE Network
+#Railway Version mit PRIVATER DB-URL
 FROM node:18-slim
 
 # Install system dependencies
@@ -9,11 +9,11 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables für Railway PRIVATE Network
+# Set hardcoded environment variables für Railway (PRIVATE NETWORKING)
 ENV NODE_ENV=production \
     PORT=3001 \
     DB_USER=user \
-    DB_HOST=museum-db-production.up.railway.app \
+    DB_HOST=museum-db.railway.internal \
     DB_NAME=mydatabase \
     DB_PASSWORD=password \
     DB_PORT=5432
