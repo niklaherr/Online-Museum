@@ -21,10 +21,6 @@ ENV REACT_APP_MISTRAL_API_KEY=SpbqZllg57jFyYGIT0PnvGzn8QPAX5Hs
 ENV REACT_APP_BACKEND_API_URL=http://localhost:3001
 ENV REACT_APP_MISTRAL_API_KEY=SpbqZllg57jFyYGIT0PnvGzn8QPAX5Hs
 
-# Set environment variables (override at runtime or in docker-compose)
-ENV REACT_APP_BACKEND_API_URL=http://localhost:3001
-ENV REACT_APP_MISTRAL_API_KEY=SpbqZllg57jFyYGIT0PnvGzn8QPAX5Hs
-
 # Build for production (Environment Variable wird eingebaut)
 RUN npm run build
 
