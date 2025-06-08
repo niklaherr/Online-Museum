@@ -1,4 +1,3 @@
-// server.js - Main application file
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -35,38 +34,42 @@ const pool = new Pool({
 // Make the pool available to all route modules
 app.locals.pool = pool;
 
-// Health check endpoint
+// Health check endpoint mit verbessertem DB-Test
 app.get('/health', async (req, res) => {
     try {
-        // Teste nur die grundlegende Funktionalität, nicht die DB
+        // Teste Datenbank-Verbindung
+        const result = await pool.query('SELECT NOW(), version()');
+        
         res.status(200).json({ 
             status: 'OK', 
             timestamp: new Date().toISOString(),
             uptime: process.uptime(),
-            environment: process.env.NODE_ENV || 'development'
+            environment: process.env.NODE_ENV || 'development',
+            database: 'connected',
+            db_time: result.rows[0].now,
+            db_version: result.rows[0].version,
+            db_config: {
+                host: process.env.DB_HOST,
+                port: process.env.DB_PORT,
+                database: process.env.DB_NAME,
+                user: process.env.DB_USER
+            }
         });
     } catch (error) {
         console.error('Health check failed:', error);
         res.status(503).json({ 
             status: 'ERROR', 
-            error: error.message
-        });
-    }
-});
-
-// Separater DB Health Check
-app.get('/health/db', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT NOW()');
-        res.status(200).json({ 
-            status: 'DB OK', 
-            db_time: result.rows[0].now
-        });
-    } catch (error) {
-        console.error('DB Health check failed:', error);
-        res.status(503).json({ 
-            status: 'DB ERROR', 
-            error: error.message
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            environment: process.env.NODE_ENV || 'development',
+            database: 'disconnected',
+            error: error.message,
+            db_config: {
+                host: process.env.DB_HOST,
+                port: process.env.DB_PORT,
+                database: process.env.DB_NAME,
+                user: process.env.DB_USER
+            }
         });
     }
 });
@@ -91,7 +94,7 @@ app.use((err, req, res, next) => {
 app.listen(port, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${port}`);
     console.log(`Health check available at http://localhost:${port}/health`);
-    console.log(`DB Health check available at http://localhost:${port}/health/db`);
+    console.log(`DB Config: ${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
 });
 
 module.exports = app;
