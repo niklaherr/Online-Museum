@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dialog, DialogPanel, Button } from '@tremor/react';
 import SnakeGame from './SnakeGame';
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 interface SnakeGameModalProps {
   isOpen: boolean;
@@ -33,7 +34,21 @@ const SnakeGameModal: React.FC<SnakeGameModalProps> = ({ isOpen, onClose }) => {
           </p>
         </div>
         
-        <SnakeGame />
+        
+
+        <div>
+          {/* Content visible only on large screens and up */}
+          <div className="hidden lg:block">
+            <SnakeGame />
+          </div>
+
+          {/* Message for smaller screens */}
+          <div className="block lg:hidden flex flex-col items-center justify-center text-center p-6">
+            <ExclamationCircleIcon className="w-12 h-12 text-yellow-500 mb-4" />
+            <p className="text-lg font-semibold">Bitte verwenden Sie einen größeren Bildschirm, um diese Funktion zu nutzen.</p>
+          </div>
+        </div>
+
         
         <div className="flex justify-end mt-4">
           <Button onClick={onClose}>
