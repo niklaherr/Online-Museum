@@ -22,13 +22,17 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(bodyParser.json());
 
-
+// PostgreSQL connection pool setup mit SSL-Fix
 const pool = new Pool({
-    user: process.env.DB_USER || "",
-    host: process.env.DB_HOST || "",
-    database: process.env.DB_NAME || "",
-    password: process.env.DB_PASSWORD || "",
+    user: process.env.DB_USER || "user",
+    host: process.env.DB_HOST || "localhost",
+    database: process.env.DB_NAME || "mydatabase",
+    password: process.env.DB_PASSWORD || "password",
     port: process.env.DB_PORT || 5432,
+    // SSL-Konfiguration für Railway
+    ssl: process.env.NODE_ENV === 'production' ? false : false, // SSL deaktiviert
+    // Alternative: SSL aktiviert aber ohne Zertifikatsprüfung
+    // ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 // Make the pool available to all route modules
