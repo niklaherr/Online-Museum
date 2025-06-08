@@ -579,5 +579,3 @@ erDiagram
 - **UC17 - KI-Beschreibung generieren**: Mistral AI-Integration für Content-Generation
 - **UC18 - Kontakt-Formular senden**: Support-Anfragen von Benutzern
 - **UC19 - Hilfe-Seiten anzeigen**: Dokumentation und FAQ-System
-
----
