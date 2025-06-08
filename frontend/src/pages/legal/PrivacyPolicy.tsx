@@ -101,7 +101,10 @@ const PrivacyPolicy = () => {
               unser Angebot ändern. Über wesentliche Änderungen informieren wir Sie auf unserer Website.
             </Text>
           </div>
-             <Text className="text-sm text-gray-500 mb-6">Stand: 07. Mai 2025</Text>
+             <Text className="text-sm text-gray-500 mt-6">
+            Stand: {new Date().toLocaleDateString('de-DE')} | 
+            Letzte Aktualisierung: {new Date().toLocaleDateString('de-DE')}
+          </Text>
         </div>
       </Card>
     </div>

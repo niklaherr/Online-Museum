@@ -10,69 +10,101 @@ const Impressum = () => {
           {/* Provider */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">1. Anbieterinformationen</h2>
-            <Text className="mb-2 font-medium">Online Museum GmbH</Text>
-            <Text>Fleethörn 1-7</Text>
-            <Text>24103 Kiel</Text>
+            <Text className="mb-2 font-medium">Universitätsprojekt - Online Museum</Text>
+            <Text className="mb-2">Studierende der Dualen Hochschule Schleswig-Holstein</Text>
+            <Text>Wirtschaftsakademie Schleswig-Holstein GmbH (Gesellschaft mit beschränkter Haftung)</Text>
+            <Text>Hans-Detlev-Prien-Str. 10</Text>
+            <Text>24106 Kiel</Text>
             <Text>Deutschland</Text>
           </div>
 
           {/* Contact */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Kontakt</h2>
-            <Text className="mb-2">Telefon: +49 (0)30 123456789</Text>
-            <Text className="mb-2">E-Mail: kontakt@online-museum.com</Text>
-            <Text>Website: www.online-museum.com</Text>
+            <Text className="mb-2">E-Mail: niklas.herrmann@std.dhsh.de</Text>
+            <Text>Website: www.museum-frontend-production.up.railway.app</Text>
           </div>
 
-          {/* Authorized representatives */}
+          {/* Project team */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">3. Vertretungsberechtigte Geschäftsführer</h2>
-            <Text>Niklas Herrmann</Text>
-            <Text>Hendrik Steen</Text>
-            <Text>Malte Beissel</Text>
-          </div>
-
-          {/* Companies House */}
-          <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">4. Registereintrag</h2>
-            <Text className="mb-2">Handelsregister: Amtsgericht Kiel</Text>
-            <Text>Registernummer: HRB 1234 KI</Text>
-          </div>
-
-          {/* VAT-ID */}
-          <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">5. Umsatzsteuer-ID</h2>
-            <Text>Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz: DE123456789</Text>
-          </div>
-
-          {/* Responsible for content */}
-          <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
-            <Text>Niklas Herrmann</Text>
-            <Text>Hendrik Steen</Text>
-            <Text>c/o Online Museum GmbH</Text>
-            <Text>Fleethörn 1-7, 24103 Kiel</Text>
-          </div>
-
-          {/* Disclaimer */}
-          <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Haftung für Inhalte</h2>
-            <Text>
-              Wir bemühen uns, die Inhalte dieser Website aktuell und korrekt zu halten. Dennoch können wir keine Gewähr
-              für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte übernehmen.
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">3. Projektverantwortliche</h2>
+            <Text className="mb-2">Niklas Herrmann (Projektleitung/Entwicklung)</Text>
+            <Text className="mb-2">Hendrik Steen (Projektleitung/Entwicklung)</Text>
+            <Text>Malte Beissel (Entwicklung)</Text>
+            <Text className="mt-2 text-sm text-gray-600">
+              Studierende im Studiengang Wirtschaftsinformatik an der DHSH
             </Text>
           </div>
 
-          {/* Extern Links */}
+          {/* Academic context */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">8. Haftung für externe Links</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">4. Akademischer Kontext</h2>
+            <Text className="mb-2">Betreuende Hochschule: DHSH</Text>
+            <Text className="mb-2">Fachbereich: Webtechnologien</Text>
+            <Text className="mb-2">Art des Projekts: Klausurersatzleistung / Studienprojekt</Text>
+            <Text className="mb-2">Semester: 4. Fachsemester</Text>
+            <Text>Betreuende Dozent:in: Prof. Dr. Sven Niemand</Text>
+          </div>
+
+          {/* Project purpose */}
+          <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">5. Zweck der Anwendung</h2>
+            <Text className="mb-2">
+              Diese Webanwendung wurde im Rahmen eines Studienprojekts entwickelt und dient 
+              ausschließlich Lehr- und Lernzwecken an der DHSH.
+            </Text>
+            <Text className="mb-2">
+              Das Projekt ist eine Klausurersatzleistung und hat keinen kommerziellen Hintergrund.
+            </Text>
             <Text>
-              Unsere Website enthält Links zu externen Websites Dritter. Auf deren Inhalte haben wir keinen Einfluss.
-              Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich.
+              Die Anwendung demonstriert die praktische Umsetzung von Webentwicklungskonzepten 
+              und Datenbankmanagement.
             </Text>
           </div>
 
-          <Text className="text-sm text-gray-500 mt-6">Stand: 04. Juni 2025</Text>
+          {/* Disclaimer for university project */}
+          <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Haftungsausschluss</h2>
+            <Text className="mb-2">
+              Diese Anwendung wurde zu Bildungszwecken erstellt. Wir übernehmen keine Gewähr 
+              für die Richtigkeit, Vollständigkeit oder Aktualität der bereitgestellten Inhalte.
+            </Text>
+            <Text className="mb-2">
+              Die Nutzung erfolgt auf eigene Verantwortung. Eine kommerzielle Nutzung ist 
+              nicht vorgesehen.
+            </Text>
+            <Text>
+              Hochgeladene Inhalte dienen ausschließlich Demonstrationszwecken und spiegeln 
+              nicht zwangsläufig die Meinung der Entwickler oder der Hochschule wider.
+            </Text>
+          </div>
+
+          {/* Data protection reference */}
+          <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Datenschutz</h2>
+            <Text>
+              Informationen zum Umgang mit personenbezogenen Daten finden Sie in unserer 
+              Datenschutzerklärung. Diese Anwendung verarbeitet Daten ausschließlich im Rahmen 
+              des Studienprojekts und zu Lernzwecken.
+            </Text>
+          </div>
+
+          {/* Hosting information */}
+          <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">8. Hosting</h2>
+            <Text className="mb-2">Diese Anwendung wird gehostet über:</Text>
+            <Text className="mb-2">Railway Corp.</Text>
+            <Text className="mb-2">Cloud-Hosting-Service</Text>
+            <Text>
+              Der Hosting-Dienst dient ausschließlich der technischen Bereitstellung 
+              der Lehr-/Lernanwendung.
+            </Text>
+          </div>
+
+          <Text className="text-sm text-gray-500 mt-6">
+            Stand: {new Date().toLocaleDateString('de-DE')} | 
+            Letzte Aktualisierung: {new Date().toLocaleDateString('de-DE')}
+          </Text>
         </div>
       </Card>
     </div>
