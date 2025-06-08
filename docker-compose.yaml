@@ -1,33 +1,71 @@
-version: '3.8'
-
 services:
   db:
     build: ./db
     image: museum-db:latest
     container_name: museum-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
     ports:
-      - "5432:5432" 
+      - "5432:5432"
+    volumes:
+      - museum_db_data:/var/lib/postgresql/data
     networks:
       - backend-db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydatabase"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   backend:
     build: ./backend
     image: museum-backend:latest
     container_name: museum-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_USER: user
+      DB_HOST: museum-db
+      DB_NAME: mydatabase
+      DB_PASSWORD: password
+      DB_PORT: 5432
     ports:
-      - "3001:3001" 
+      - "3001:3001"
     networks:
       - backend-db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s 
 
   frontend:
     build: ./frontend
     image: museum-frontend:latest
     container_name: museum-frontend
+    environment:
+      REACT_APP_BACKEND_API_URL: http://localhost:3001
+      REACT_APP_MISTRAL_API_KEY: SpbqZllg57jFyYGIT0PnvGzn8QPAX5Hs
     ports:
-      - "3000:3000"
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  museum_db_data:
+    driver: local
 
 networks:
   backend-db:
-
+    driver: bridge

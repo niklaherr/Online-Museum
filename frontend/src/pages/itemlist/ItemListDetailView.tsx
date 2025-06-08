@@ -12,10 +12,10 @@ import {
   Flex,
   Badge
 } from "@tremor/react";
-import { 
-  UserIcon, 
-  TrashIcon, 
-  LockClosedIcon, 
+import {
+  UserIcon,
+  TrashIcon,
+  LockClosedIcon,
   EyeIcon,
   CalendarIcon,
   PencilIcon,
@@ -68,7 +68,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
         await itemService.deleteItemList(list.id);
         NotyfService.showSuccess("Item List erfolgreich gelöscht");
         setIsDeleteModalOpen(false);
-        onNavigate('/item-list'); 
+        onNavigate("/item-list");
       } catch (error) {
         let errorMessage = "Fehler beim Löschen der Item List";
         if (error instanceof Error) {
@@ -79,7 +79,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
     }
   };
 
-  if (isLoading) return <Loading />
+  if (isLoading) return <Loading />;
 
   const isOwner = list?.user_id === userService.getUserID();
 
@@ -97,144 +97,111 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
         </Button>
       </div>
 
-      {/* Header Card */}
-      <Card className="relative overflow-hidden rounded-xl">
-        {/* Background with main image or gradient */}
-        <div className="relative h-64 w-full overflow-hidden rounded-xl">
+      <Card className="overflow-hidden">
+        {/* Header Image */}
+        <div className="relative w-full h-72 bg-gray-100 border-b-2 border-gray-200">
           {list?.main_image ? (
-            <>
-              <img
-                src={list.main_image}
-                alt={list.title}
-                className="w-full h-full object-cover"
-              />
-              {/* Dark overlay for text readability */}
-              <div className="absolute inset-0 bg-black/40"></div>
-            </>
+            <img
+              src={list.main_image}
+              alt={list.title}
+              className="w-full h-full object-cover"
+            />
           ) : (
-            <>
-              {/* Gradient Background Pattern */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"></div>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full -translate-y-16 translate-x-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200/20 rounded-full translate-y-12 -translate-x-12"></div>
-            </>
-          )}
-          
-          {/* Content overlay */}
-          <div className="absolute inset-0 flex items-end">
-            <div className="p-8 w-full">
-              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-                <div className="flex-1 space-y-4">
-                  {/* Title & Description */}
-                  <div className="space-y-3">
-                    <Title className={`text-3xl leading-tight ${list?.main_image ? 'text-white drop-shadow-lg' : 'text-blue-900'}`}>
-                      {list?.title}
-                    </Title>
-                    
-                    {list?.description && (
-                      <Subtitle className={`text-lg leading-relaxed max-w-3xl ${list?.main_image ? 'text-white drop-shadow' : 'text-blue-700'} line-clamp-2`}>
-                        {list.description.length > 120 
-                          ? `${list.description.substring(0, 120)}...` 
-                          : list.description
-                        }
-                      </Subtitle>
-                    )}
-                  </div>
-
-                  {/* Meta Info */}
-                  <div className={`flex items-center space-x-4 ${list?.main_image ? 'text-white' : 'text-blue-600'}`}>
-                    <div className="flex items-center">
-                      <CalendarIcon className="w-5 h-5 mr-2" />
-                      <Text className={`font-medium ${list?.main_image ? 'text-white drop-shadow' : 'text-blue-600'}`}>
-                        Erstellt am {list ? new Date(list.entered_on).toLocaleDateString('de-DE', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        }) : "/"}
-                      </Text>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                {isOwner && (
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button
-                      icon={PencilIcon}
-                      onClick={() => onNavigate(`/item-list/${id}/edit`)}
-                      color="blue"
-                    >
-                      Bearbeiten
-                    </Button>
-                    
-                    <Button
-                      variant="light"
-                      color="red"
-                      icon={TrashIcon}
-                      onClick={() => setIsDeleteModalOpen(true)}
-                    >
-                      Löschen
-                    </Button>
-                  </div>
-                )}
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
+              <div className="text-center">
+                <EyeIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                <Text>Kein Bild verfügbar</Text>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Badges below image - Enhanced Design */}
-        <div className="relative rounded-b-xl overflow-hidden">
-          {/* Gradient Background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-50/80 via-indigo-50/80 to-purple-50/80"></div>
-          
-          {/* Content */}
-          <div className="relative p-6">
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Items Count Badge */}
-              <div className="group relative">
-                <Badge color="blue" icon={RectangleStackIcon} className="shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                  {items.length} {items.length === 1 ? "Item" : "Items"}
-                </Badge>
-                <div className="absolute inset-0 bg-blue-500/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
-              </div>
-              
-              {/* Privacy Badge */}
-              <div className="group relative">
-                {list?.isprivate ? (
-                  <>
-                    <Badge color="red" icon={LockClosedIcon} className="shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                      Privat
-                    </Badge>
-                    <div className="absolute inset-0 bg-red-500/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
-                  </>
-                ) : (
-                  <>
-                    <Badge color="green" icon={EyeIcon} className="shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                      Öffentlich
-                    </Badge>
-                    <div className="absolute inset-0 bg-green-500/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
-                  </>
-                )}
-              </div>
+        {/* Content Section */}
+        <div className="p-6 space-y-6">
+          {/* Header with badges */}
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge color="blue" icon={RectangleStackIcon}>
+                {items.length} {items.length === 1 ? "Item" : "Items"}
+              </Badge>
 
-              {/* Owner Badge */}
-              {isOwner && (
-                <div className="group relative">
-                  <Badge color="gray" className="shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-300">
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></div>
-                      Eigene Liste
-                    </div>
-                  </Badge>
-                  <div className="absolute inset-0 bg-yellow-500/20 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
-                </div>
+              {list?.isprivate ? (
+                <Badge color="red" icon={LockClosedIcon}>
+                  Privat
+                </Badge>
+              ) : (
+                <Badge color="green" icon={EyeIcon}>
+                  Öffentlich
+                </Badge>
               )}
+
+              {isOwner && <Badge color="gray">Eigenes Item</Badge>}
             </div>
-            
-            {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-16 h-16 bg-blue-200/30 rounded-full -translate-y-8 translate-x-8 blur-xl"></div>
-            <div className="absolute bottom-0 left-0 w-12 h-12 bg-purple-200/30 rounded-full translate-y-6 -translate-x-6 blur-xl"></div>
+
+            <div>
+              <Title className="text-3xl text-gray-900 mb-2 leading-tight">
+                {list?.title}
+              </Title>
+            </div>
           </div>
+
+          {/* Meta Information */}
+          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+            <div className="flex items-center text-gray-600">
+              <CalendarIcon className="w-5 h-5 mr-3 text-blue-500" />
+              <Text className="font-medium">Erstellt am:</Text>
+              <Text className="ml-2">
+                {new Date(list?.entered_on ?? Date.now()).toLocaleDateString(
+                  "de-DE",
+                  {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                  }
+                )}
+              </Text>
+            </div>
+          </div>
+
+          {/* Description */}
+          {list?.description && (
+            <div className="space-y-2">
+              <Title className="text-lg text-gray-800">Beschreibung</Title>
+              <div className="bg-white border border-gray-200 rounded-lg p-4">
+                <Text className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {list.description}
+                </Text>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          {isOwner && (
+            <div className="pt-6 border-t border-gray-200">
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  icon={PencilIcon}
+                  onClick={() => onNavigate(`/item-list/${id}/edit`)}
+                  color="blue"
+                  className="flex-1 sm:flex-none"
+                >
+                  Bearbeiten
+                </Button>
+
+                <Button
+                  variant="light"
+                  color="red"
+                  icon={TrashIcon}
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  className="flex-1 sm:flex-none"
+                >
+                  Löschen
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -244,7 +211,8 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
           <div className="flex items-center justify-between">
             <Title className="text-xl text-gray-900">Enthaltene Items</Title>
             <Text className="text-gray-500">
-              {items.length} {items.length === 1 ? "Item" : "Items"} in dieser Liste
+              {items.length} {items.length === 1 ? "Item" : "Items"} in dieser
+              Liste
             </Text>
           </div>
 
@@ -279,7 +247,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
                         {item.category}
                       </Badge>
                     )}
-                    
+
                     {item.isprivate && (
                       <Badge color="red" icon={LockClosedIcon} size="xs">
                         Privat
@@ -295,7 +263,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
                   {/* Date */}
                   <Text className="text-xs text-gray-500 flex items-center">
                     <CalendarIcon className="w-4 h-4 mr-1" />
-                    {new Date(item.entered_on).toLocaleDateString('de-DE')}
+                    {new Date(item.entered_on).toLocaleDateString("de-DE")}
                   </Text>
 
                   {/* Author */}
@@ -338,25 +306,25 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
               <TrashIcon className="h-6 w-6 text-red-600" />
             </div>
-            
+
             <Title className="text-lg font-semibold text-gray-900 mb-2">
               Liste wirklich löschen?
             </Title>
-            
+
             <Text className="text-gray-500 mb-6">
               Diese Aktion kann nicht rückgängig gemacht werden. Die Liste "{list?.title}" wird permanent gelöscht.
             </Text>
-            
+
             <Flex justifyContent="end" className="space-x-3">
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="px-4"
               >
                 Abbrechen
               </Button>
-              <Button 
-                color="red" 
+              <Button
+                color="red"
                 onClick={handleDeleteItemList}
                 className="px-4"
               >

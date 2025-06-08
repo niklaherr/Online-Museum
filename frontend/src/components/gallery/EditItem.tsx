@@ -210,23 +210,29 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
           {/* Description Card */}
           <Card>
             <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <DocumentTextIcon className="w-6 h-6 text-blue-600" />
-                  <Title className="text-xl">Beschreibung</Title>
-                </div>
-                <Button
-                  icon={SparklesIcon}
-                  size="xs"
-                  color="blue"
-                  onClick={handleGenerateDescription}
-                  loading={isGenerating}
-                  disabled={!title || !category}
-                  className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
-                >
-                  KI-Beschreibung
-                </Button>
-              </div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+  <div className="flex items-center space-x-3">
+    <DocumentTextIcon className="w-6 h-6 text-blue-600" />
+    <Title className="text-xl">Beschreibung</Title>
+    <Badge size="xs" color="blue">
+      Empfohlen
+    </Badge>
+  </div>
+  <div className="sm:ml-auto">
+    <Button
+      icon={SparklesIcon}
+      size="xs"
+      color="blue"
+      onClick={handleGenerateDescription}
+      loading={isGenerating}
+      disabled={!title || !category}
+      className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
+    >
+      KI-Beschreibung
+    </Button>
+  </div>
+</div>
+
               
               <Textarea
                 placeholder="Beschreiben Sie Ihr Item detailliert..."

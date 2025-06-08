@@ -1,12 +1,12 @@
 # backend/Dockerfile
 FROM node:18-slim
 
-# Install curl for health checks
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-#set envs
-# Set environment variables
-# Set environment variables
+# Set environment variables (override at runtime or in docker-compose)
 ENV NODE_ENV=production \
     PORT=3001 \
     DB_USER=user \
