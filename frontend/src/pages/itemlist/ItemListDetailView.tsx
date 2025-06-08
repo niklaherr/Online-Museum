@@ -97,111 +97,116 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
         </Button>
       </div>
 
-      {/* Header Card */}
-      <Card className="relative overflow-hidden rounded-xl">
-        {/* Background with main image or gradient */}
-        <div className="relative h-64 w-full overflow-hidden rounded-xl">
-          {list?.main_image ? (
-            <>
-              <img
-                src={list.main_image}
-                alt={list.title}
-                className="w-full h-full object-cover"
-              />
-              {/* Dark overlay for text readability */}
-              <div className="absolute inset-0 bg-black/40"></div>
-            </>
-          ) : (
-            <>
-              {/* Gradient Background Pattern */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50"></div>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full -translate-y-16 translate-x-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200/20 rounded-full translate-y-12 -translate-x-12"></div>
-            </>
-          )}
-          
-          {/* Content overlay */}
-          <div className="absolute inset-0 flex items-end">
-            <div className="p-8 w-full">
-              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-                <div className="flex-1 space-y-4">
-                  {/* Badges */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge color="blue" icon={RectangleStackIcon}>
-                      {items.length} {items.length === 1 ? "Item" : "Items"}
-                    </Badge>
-                    
-                    {list?.isprivate ? (
-                      <Badge color="red" icon={LockClosedIcon}>
-                        Privat
-                      </Badge>
-                    ) : (
-                      <Badge color="green" icon={EyeIcon}>
-                        Öffentlich
-                      </Badge>
-                    )}
-
-                    {isOwner && (
-                      <Badge color="gray">
-                        Eigene Liste
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Title & Description */}
-                  <div className="space-y-3">
-                    <Title className={`text-3xl leading-tight ${list?.main_image ? 'text-white' : 'text-blue-900'}`}>
-                      {list?.title}
-                    </Title>
-                    
-                    {list?.description && (
-                      <Subtitle className={`text-lg leading-relaxed max-w-3xl ${list?.main_image ? 'text-blue-100' : 'text-blue-700'} line-clamp-2`}>
-                        {list.description.length > 120 
-                          ? `${list.description.substring(0, 120)}...` 
-                          : list.description
-                        }
-                      </Subtitle>
-                    )}
-                  </div>
-
-                  {/* Meta Info */}
-                  <div className={`flex items-center space-x-4 ${list?.main_image ? 'text-blue-200' : 'text-blue-600'}`}>
-                    <div className="flex items-center">
-                      <CalendarIcon className="w-5 h-5 mr-2" />
-                      <Text className={`font-medium ${list?.main_image ? 'text-blue-200' : 'text-blue-600'}`}>
-                        Erstellt am {list ? new Date(list.entered_on).toLocaleDateString('de-DE', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        }) : "/"}
-                      </Text>
-                    </div>
+      <Card className="overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
+          {/* Image Section */}
+          <div className="space-y-4">
+            <div className="aspect-square w-full overflow-hidden rounded-xl bg-gray-100 border-2 border-gray-200">
+              {list?.main_image ? (
+                <img
+                  src={list?.main_image}
+                  alt={list?.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="text-center">
+                    <EyeIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                    <Text>Kein Bild verfügbar</Text>
                   </div>
                 </div>
+              )}
+            </div>
+          </div>
 
-                {/* Action Buttons */}
+          {/* Content Section */}
+          <div className="space-y-6">
+            {/* Header with badges */}
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge color="blue" icon={RectangleStackIcon}>
+                      {items.length} {items.length === 1 ? "Item" : "Items"}
+                </Badge>
+                
+                {list?.isprivate ? (
+                  <Badge color="red" icon={LockClosedIcon}>
+                    Privat
+                  </Badge>
+                ) : (
+                  <Badge color="green" icon={EyeIcon}>
+                    Öffentlich
+                  </Badge>
+                )}
+
                 {isOwner && (
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button
-                      icon={PencilIcon}
-                      onClick={() => onNavigate(`/item-list/${id}/edit`)}
-                      color="blue"
-                    >
-                      Bearbeiten
-                    </Button>
-                    
-                    <Button
-                      variant="light"
-                      color="red"
-                      icon={TrashIcon}
-                      onClick={() => setIsDeleteModalOpen(true)}
-                    >
-                      Löschen
-                    </Button>
-                  </div>
+                  <Badge color="gray">
+                    Eigenes Item
+                  </Badge>
                 )}
               </div>
+
+              <div>
+                <Title className="text-3xl text-gray-900 mb-2 leading-tight">
+                  {list?.title}
+                </Title>
+              </div>
             </div>
+
+            {/* Meta Information */}
+            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+              <div className="flex items-center text-gray-600">
+                <CalendarIcon className="w-5 h-5 mr-3 text-blue-500" />
+                <Text className="font-medium">Erstellt am:</Text>
+                <Text className="ml-2">
+                  {new Date(list?.entered_on ?? Date.now()).toLocaleDateString('de-DE', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </Text>
+              </div>
+
+            </div>
+
+            {/* Description */}
+            {list?.description && (
+              <div className="space-y-2">
+                <Title className="text-lg text-gray-800">Beschreibung</Title>
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <Text className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {list?.description}
+                  </Text>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            {isOwner && (
+              <div className="pt-6 border-t border-gray-200">
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    icon={PencilIcon}
+                    onClick={() => onNavigate(`/item-list/${id}/edit`)}
+                    color="blue"
+                    className="flex-1 sm:flex-none"
+                  >
+                    Bearbeiten
+                  </Button>
+                  
+                  <Button
+                    variant="light"
+                    color="red"
+                    icon={TrashIcon}
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    className="flex-1 sm:flex-none"
+                  >
+                    Löschen
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Card>
