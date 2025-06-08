@@ -13,6 +13,9 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Set environment variable für BUILD-TIME
+ENV REACT_APP_BACKEND_API_URL=https://museum-backend-production.up.railway.app
+
 # Build for production (Environment Variable wird eingebaut)
 RUN npm run build
 
@@ -25,8 +28,8 @@ COPY --from=build /app/build /usr/share/nginx/html
 # Copy nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose port 80 for nginx server
-EXPOSE 80
+# Expose port 3000 (für Railway)
+EXPOSE 3000
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
