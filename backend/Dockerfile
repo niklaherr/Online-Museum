@@ -1,5 +1,4 @@
 #Railway Version mit PRIVATER DB-URL
-#Railway Version mit PRIVATER DB-URL
 FROM node:18-slim
 
 # Install system dependencies
