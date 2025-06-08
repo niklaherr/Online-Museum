@@ -46,7 +46,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s 
+      start_period: 60s  # Mehr Zeit zum Starten
 
   frontend:
     build: ./frontend
@@ -54,9 +54,11 @@ services:
     container_name: museum-frontend
     environment:
       REACT_APP_BACKEND_API_URL: http://localhost:3001
-      REACT_APP_MISTRAL_API_KEY: SpbqZllg57jFyYGIT0PnvGzn8QPAX5Hs
+      GENERATE_SOURCEMAP: "false"
+      HOST: 0.0.0.0
+      BROWSER: none
     ports:
-      - "80:80"
+      - "3000:3000"
     depends_on:
       backend:
         condition: service_healthy

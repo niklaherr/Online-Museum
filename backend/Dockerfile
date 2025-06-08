@@ -1,16 +1,19 @@
-# backend/Dockerfile
+#Railway Version mit PRIVATER DB-URL
 FROM node:18-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
+    python3 \
+    make \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables (override at runtime or in docker-compose)
+# Set hardcoded environment variables für Railway (PRIVATE NETWORKING)
 ENV NODE_ENV=production \
     PORT=3001 \
     DB_USER=user \
-    DB_HOST=museum-db \
+    DB_HOST=museum-db.railway.internal \
     DB_NAME=mydatabase \
     DB_PASSWORD=password \
     DB_PORT=5432
