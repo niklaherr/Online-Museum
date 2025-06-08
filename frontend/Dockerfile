@@ -31,6 +31,8 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 3000 (für Railway)
 EXPOSE 3000
+# Expose port 3000 (für Railway)
+EXPOSE 3000
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
