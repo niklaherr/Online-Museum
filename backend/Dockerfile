@@ -4,6 +4,9 @@ FROM node:18-slim
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
+    python3 \
+    make \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
 # Set hardcoded environment variables für Railway (PRIVATE NETWORKING)

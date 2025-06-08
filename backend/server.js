@@ -2,7 +2,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { Pool } = require("pg");
-require("dotenv").config();
 
 // Import routes
 const authRoutes = require("./routes/auth");

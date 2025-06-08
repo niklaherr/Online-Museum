@@ -1,0 +1,8 @@
+# Erstelle diese Datei: Online-Museum-1/railway.toml
+
+[build]
+builder = "dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 300
