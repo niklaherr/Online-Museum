@@ -104,12 +104,14 @@ npm start
 
 ### KI-Funktionen nutzen
 
-* Bei Item-Erstellung auf **"KI-Beschreibung generieren"** klicken
+* Bei Item oder Item Listen Erstellung auf **"KI-Beschreibung generieren"** klicken
 ---
 
 ## Architektur
 
 ![Architekturdiagramm](./documentation/image.png)
+Weitere Informationen findest du ![bei anderen Diagrammen](./documentation/diagramms.md).
+
 
 
 ## 📚 Dokumentation - Frontend

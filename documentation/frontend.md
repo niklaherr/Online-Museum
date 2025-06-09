@@ -4,18 +4,6 @@
 
 Das Online Museum Frontend ist eine moderne React-Webanwendung, die als digitale Plattform für kulturelle und kreative Inhalte dient. Benutzer können ihre eigenen "Items" (Kunstwerke, Sammlungen) hochladen, in Listen organisieren und die Inhalte anderer Nutzer entdecken.
 
-## 🛠 Technologie-Stack
-
-- **Framework**: React 18.2.0 mit TypeScript
-- **Styling**: Tailwind CSS 3.4.17
-- **UI-Komponenten**: Tremor React 3.18.7
-- **Icons**: Heroicons 2.2.0
-- **Routing**: React Router DOM 7.5.3
-- **HTTP-Client**: Axios 1.9.0
-- **Animationen**: Framer Motion 12.11.0
-- **Notifications**: Notyf 3.10.0
-- **Datumsbehandlung**: date-fns 3.6.0
-
 ## 🏗 Projektstruktur
 
 ```
@@ -36,6 +24,8 @@ src/
 │   └── legal/          # Rechtliche Seiten
 └── services/           # API-Services und Business Logic
 ```
+
+---
 
 ## 🎯 Hauptfunktionen
 
@@ -86,13 +76,11 @@ src/
 ### Design-Prinzipien
 - **Modern & Clean**: Gradients, Shadows, abgerundete Ecken
 - **Responsive Design**: Mobile-first Ansatz
-- **Accessibility**: Semantic HTML, Keyboard-Navigation
 - **Loading States**: Spinner und Skeleton-Loading
-- **Error Handling**: Benutzerfreundliche Fehlermeldungen
+- **Error Handling**: Benutzerfreundliche Fehlermeldungen über die Notyf Library
 
 ### Interaktive Elemente
 - **Hover-Effekte**: Scale-Transformationen, Farbwechsel
-- **Animationen**: Framer Motion für smooth Transitions
 - **Toast-Notifications**: Erfolgs- und Fehlermeldungen
 - **Modal-Dialoge**: Bestätigungen und Formulare
 - **Progress-Tracking**: Status-Anzeigen für mehrstufige Prozesse
@@ -144,8 +132,6 @@ src/
 - **Mobile-First**: Optimiert für Smartphones
 - **Tablet-Support**: Angepasste Layouts für mittlere Bildschirme
 - **Desktop**: Vollständige Feature-Unterstützung
-- **Touch-friendly**: Große Buttons und Gestures
-- **Cross-Browser**: Unterstützung für moderne Browser
 
 ## 🎮 Easter Eggs
 
@@ -154,14 +140,6 @@ src/
 - Versteckt hinter dem "PDF-Download" Link in der Hilfe
 - Responsive Design mit Warnung für kleine Bildschirme
 - Retro-Gaming Nostalgie als Überraschung für Nutzer
-
-## 🚀 Performance-Optimierungen
-
-- **Code-Splitting**: Lazy Loading für Routes
-- **Image-Optimierung**: Responsive Images, WebP-Support
-- **Caching**: Browser-Caching für statische Assets
-- **Bundle-Optimierung**: Tree-shaking, minimierte Builds
-- **Error Boundaries**: Graceful Degradation bei Fehlern
 
 ## 🔄 State Management
 

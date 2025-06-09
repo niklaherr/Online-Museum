@@ -1,7 +1,5 @@
 ## 📚 API-Dokumentation - Backend
 
-Ein Express.js-basiertes Backend für ein digitales Museum-Management-System mit Benutzerauthentifizierung, Item-Management und administrativen Funktionen.
-
 ## 🚀 Features
 
 - **Benutzerauthentifizierung** mit JWT-Tokens
@@ -210,18 +208,15 @@ curl http://localhost:3001/health
 
 ## 🚨 Bekannte Limitierungen
 
-1. **File Storage**: Bilder werden in der Datenbank als BYTEA gespeichert (nicht optimal für große Dateien)
-2. **SQL Injection Protection**: Pattern-basiert, könnte fortgeschrittene Angriffe übersehen
-3. **Rate Limiting**: Nicht implementiert
-4. **Logging**: Rudimentär, könnte strukturierter sein
-5. **Testing**: Keine automatisierten Tests vorhanden
+1. **SQL Injection Protection**: Pattern-basiert, könnte fortgeschrittene Angriffe übersehen
+2. **Rate Limiting**: Nicht implementiert
+3. **Logging**: Rudimentär, könnte strukturierter sein
+4. **Testing**: Keine automatisierten Tests vorhanden
 
 ## 🔮 Mögliche Erweiterungen
 
 - **File Storage**: Migration zu Cloud Storage (AWS S3, etc.)
-- **Caching**: Redis für häufig abgerufene Daten
-- **Search**: Elasticsearch für erweiterte Suchfunktionen
-- **Real-time**: WebSocket-Support für Live-Updates
+- **Caching**: Für häufig abgerufene Daten
 - **API Documentation**: OpenAPI/Swagger Integration
 - **Monitoring**: Prometheus/Grafana Integration
 - **Testing**: Unit- und Integration-Tests

@@ -97,7 +97,7 @@ graph TB
 
 ## 2. Systemarchitektur-Diagramm
 
-**Beschreibung**: Diese 3-Schichten-Architektur zeigt die technische Struktur des Systems. Die Client-Schicht (React Frontend) kommuniziert über REST-APIs mit der Server-Schicht (Express.js Backend), welche wiederum mit der Datenbank-Schicht (PostgreSQL) und externen Services (Mistral AI) interagiert. Middleware-Komponenten sorgen für Sicherheit und Authentifizierung.
+**Beschreibung**: Diese 3-Schichten-Architektur zeigt die technische Struktur des Systems. Die Client-Schicht (React Frontend) kommuniziert über REST-APIs mit der Server-Schicht (Express.js Backend), welche wiederum mit der Datenbank-Schicht (PostgreSQL) kommuniziert. Zu dem kann mit externen Services kommuniziert werden, wie zum Beispiel der Mistral API. Middleware-Komponenten sorgen für Sicherheit und Authentifizierung.
 
 ```mermaid
 graph TB
@@ -285,7 +285,7 @@ graph TD
 
 ## 4. Verteilungsdiagramm (Deployment)
 
-**Beschreibung**: Das Deployment-Diagramm zeigt die Infrastruktur-Architektur des Systems. In der Production-Umgebung läuft alles auf Railway Cloud Platform mit separaten Containern für Frontend (Nginx), Backend (Node.js) und Datenbank (PostgreSQL). Die Entwicklungsumgebung spiegelt diese Struktur lokal wider. CI/CD-Pipeline automatisiert den Deployment-Prozess.
+**Beschreibung**: Das Deployment-Diagramm zeigt die Infrastruktur-Architektur des Systems. In der Production-Umgebung läuft alles auf Railway Cloud Platform mit separaten Containern für Frontend (Nginx), Backend (Node.js) und Datenbank (PostgreSQL). Die Entwicklungsumgebung spiegelt diese Struktur lokal wider. In Railway wird die Inter-Container Kommunikation nicht unterstützt, sodass die einzelnen Container über die von Railway bereitgestellt URL kommunizieren. Lokal findet eine Inter-Container Kommunikation statt.
 
 ```mermaid
 graph TB
