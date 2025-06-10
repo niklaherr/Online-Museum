@@ -49,7 +49,7 @@ src/
 - **Sichtbarkeits-Kontrolle**: Private/öffentliche Listen
 
 ### 4. Redaktionelle Inhalte (Admin)
-- **Kuratierte Sammlungen**: Administratoren können Items verschiedener Nutzer zusammenstellen
+- **Kuratierte Sammlungen**: Administratoren können verschiedene Items zusammenstellen und als redaktionellen Inhalt veröffentlichen
 - **Suchfunktion**: Durchsuchung aller öffentlichen Items
 - **Editorial-Management**: Erstellung und Verwaltung redaktioneller Listen
 
