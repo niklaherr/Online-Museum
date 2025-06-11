@@ -1,11 +1,6 @@
-import React, { useEffect } from 'react';
 import { Card, Title, Text, Divider } from '@tremor/react';
 
 const Roadmap = () => {
-  // Scroll to top on component mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">

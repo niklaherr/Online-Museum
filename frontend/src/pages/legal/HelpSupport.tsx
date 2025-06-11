@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, Title, Text, Divider, Button, TextInput, Textarea } from '@tremor/react';
 import { Link } from 'react-router-dom';
 import NotyfService from '../../services/NotyfService';
@@ -6,10 +6,6 @@ import { contactFormService, ContactFormData } from '../../services/ContactFormS
 import SnakeGameModal from '../../components/easter-eggs/SnakeGameModal';
 
 const HelpSupport = () => {
-  // Scroll to top on component mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const [contactForm, setContactForm] = useState<ContactFormData>({
     name: '',
