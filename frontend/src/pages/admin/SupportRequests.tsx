@@ -128,9 +128,9 @@ const SupportRequests = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <Title>Support-Anfragen</Title>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 ">Support-Anfragen</h1>
         <Text>Verwalten Sie eingehende Kontaktanfragen von Benutzern.</Text>
       </div>
 

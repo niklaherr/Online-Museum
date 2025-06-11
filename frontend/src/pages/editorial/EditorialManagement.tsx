@@ -209,7 +209,7 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 mt-8">Redaktionelle Listen verwalten</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 ">Redaktionelle Listen verwalten</h1>
         <Text>Erstellen und verwalten Sie kuratierte Listen mit Items von verschiedenen Benutzern.</Text>
       </div>
       
