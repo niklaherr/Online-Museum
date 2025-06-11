@@ -5,6 +5,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
 import Footer from './components/layout/Footer';
+import ScrollToTop from './components/helper/ScrollToTop'; // ScrollToTop hinzugefügt
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -19,7 +20,7 @@ import Gallery from './pages/gallery/Gallery';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import HelpSupport from 'pages/legal/HelpSupport';
 import TermsOfUse  from 'pages/legal/TermsOfUse';
-import Roadmap from './pages/legal/Roadmap'; // Neue Import-Anweisung
+import Roadmap from './pages/legal/Roadmap';
 import SupportRequests from 'pages/admin/SupportRequests';
 
 import { userService } from './services/UserService';
@@ -80,7 +81,6 @@ function App() {
     return children;
   };
 
-
   return (
     <div className="h-screen bg-gray-100 flex">
       {currentUser && (
@@ -97,133 +97,134 @@ function App() {
         <div className="flex-1 overflow-y-auto">
           <div className="min-h-full flex flex-col">
             <main className="flex-1 p-4 md:p-6">
+              <ScrollToTop /> {/* ScrollToTop-Komponente hier hinzugefügt */}
               <Routes>
-          <Route
-              path="/"
-              element={
-                <LandingPage
-                  onNavigate={(route) => navigate(route)}
+                <Route
+                  path="/"
+                  element={
+                    <LandingPage
+                      onNavigate={(route) => navigate(route)}
+                    />
+                  }
                 />
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <LoginPage onNavigate={(route) => navigate(route)} />
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <RegisterPage onNavigate={(route) => navigate(route)} />
-              }
-            />
-            <Route
-              path="/forgot-password"
-              element={
-                <ForgotPassword
-                  onNavigate={(route) => navigate(route)}
+                <Route
+                  path="/login"
+                  element={
+                    <LoginPage onNavigate={(route) => navigate(route)} />
+                  }
                 />
-              }
-            />
+                <Route
+                  path="/register"
+                  element={
+                    <RegisterPage onNavigate={(route) => navigate(route)} />
+                  }
+                />
+                <Route
+                  path="/forgot-password"
+                  element={
+                    <ForgotPassword
+                      onNavigate={(route) => navigate(route)}
+                    />
+                  }
+                />
 
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/item-list"
-              element={
-                <ProtectedRoute>
-                  <ItemListView
-                    onNavigate={(route) => navigate(route)}
-                    onViewSpace={(id) => navigate(`/item-list/${id}`)}
-                  />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/item-list"
+                  element={
+                    <ProtectedRoute>
+                      <ItemListView
+                        onNavigate={(route) => navigate(route)}
+                        onViewSpace={(id) => navigate(`/item-list/${id}`)}
+                      />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/item-list/:id"
-              element={
-                <ProtectedRoute>
-                  <ItemListDetailView
-                    onNavigate={(route) => navigate(route)}
-                  />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/item-list/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ItemListDetailView
+                        onNavigate={(route) => navigate(route)}
+                      />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/item-list/:id/edit"
-              element={
-                <ProtectedRoute>
-                  <EditItemList
-                    onNavigate={(route) => navigate(route)}
-                  />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/item-list/:id/edit"
+                  element={
+                    <ProtectedRoute>
+                      <EditItemList
+                        onNavigate={(route) => navigate(route)}
+                      />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/item-list/create"
-              element={
-                <ProtectedRoute>
-                  <CreateItemList onNavigate={(route) => navigate(route)} />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/item-list/create"
+                  element={
+                    <ProtectedRoute>
+                      <CreateItemList onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/items"
-              element={
-                <ProtectedRoute>
-                  <Gallery onNavigate={(route) => navigate(route)} />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/items"
+                  element={
+                    <ProtectedRoute>
+                      <Gallery onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/items/:id"
-              element={
-                <ProtectedRoute>
-                  <ItemDetailView onNavigate={(route) => navigate(route)} />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/items/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ItemDetailView onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/items/:id/edit"
-              element={
-                <ProtectedRoute>
-                  <EditItem onNavigate={(route) => navigate(route)} />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/items/create"
-              element={
-                <ProtectedRoute>
-                  <CreateItem onNavigate={(route) => navigate(route)} />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/items/:id/edit"
+                  element={
+                    <ProtectedRoute>
+                      <EditItem onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/items/create"
+                  element={
+                    <ProtectedRoute>
+                      <CreateItem onNavigate={(route) => navigate(route)} />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
+                <Route
                   path="/editorial/:id"
                   element={
                     <ProtectedRoute>
@@ -232,63 +233,60 @@ function App() {
                   }
                 />
 
-            {userService.isadmin() && (
-              <>
-                <Route
-                  path="/editorial"
-                  element={
-                    <ProtectedRoute>
-                      <EditorialManagement onNavigate={(route) => navigate(route)} />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                <Route
-                  path="/editorial/:id/edit"
-                  element={
-                    <ProtectedRoute>
-                      <EditEditorial onNavigate={(route) => navigate(route)} />
-                    </ProtectedRoute>
-                  }
-                />
+                {userService.isadmin() && (
+                  <>
+                    <Route
+                      path="/editorial"
+                      element={
+                        <ProtectedRoute>
+                          <EditorialManagement onNavigate={(route) => navigate(route)} />
+                        </ProtectedRoute>
+                      }
+                    />
+                    
+                    <Route
+                      path="/editorial/:id/edit"
+                      element={
+                        <ProtectedRoute>
+                          <EditEditorial onNavigate={(route) => navigate(route)} />
+                        </ProtectedRoute>
+                      }
+                    />
 
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute>
-                      <AdminManagement/>
-                    </ProtectedRoute>
-                  }
-                />
-                
-                <Route
-                  path="/support-requests"
-                  element={
-                    <ProtectedRoute>
-                      <SupportRequests />
-                    </ProtectedRoute>
-                  }
-                />
-              </>
-               
-            )}
-           
-            
+                    <Route
+                      path="/admin"
+                      element={
+                        <ProtectedRoute>
+                          <AdminManagement/>
+                        </ProtectedRoute>
+                      }
+                    />
+                    
+                    <Route
+                      path="/support-requests"
+                      element={
+                        <ProtectedRoute>
+                          <SupportRequests />
+                        </ProtectedRoute>
+                      }
+                    />
+                  </>
+                )}
 
-            {/* Legal Pages */}
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/helpsupport" element={<HelpSupport />} />
-            <Route path="/termsofuse" element={<TermsOfUse />} />
-            <Route path="/roadmap" element={<Roadmap />} />
-            <Route path="/impressum" element={<Impressum />} />
-            <Route
-               path="*"
-               element={
-                 <ProtectedRoute>
-                   <NotFound/>
-                 </ProtectedRoute>
-               }
-             />
+                {/* Legal Pages */}
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/helpsupport" element={<HelpSupport />} />
+                <Route path="/termsofuse" element={<TermsOfUse />} />
+                <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/impressum" element={<Impressum />} />
+                <Route
+                  path="*"
+                  element={
+                    <ProtectedRoute>
+                      <NotFound/>
+                    </ProtectedRoute>
+                  }
+                />
               </Routes>
             </main>
             
