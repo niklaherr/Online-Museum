@@ -37,28 +37,17 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
               </button>
             )}
 
-            {!isLoggedIn ? (
-              <div className="flex items-center space-x-2 sm:space-x-3 p-1 sm:p-2">
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-1 sm:p-2">
-                <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-black" />
+            {!isLoggedIn && (
+              <Link to="/" className="flex items-center space-x-2 sm:space-x-4">
+              <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-md group-hover:shadow-lg transition-all duration-200 group-hover:scale-105">
+                <SparklesIcon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <span className="text-base sm:text-lg md:text-xl font-bold">
+                <div className="lg:text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   Online-Museum
-                </span>
+                </div>
               </div>
-            </div>
-            ) : (
-              <div className="lg:hidden md:hidden flex items-center space-x-2 sm:space-x-3 p-1 sm:p-2">
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-1 sm:p-2">
-                <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6 text-black" />
-              </div>
-              <div>
-                <span className="text-base sm:text-lg md:text-xl font-bold">
-                  Online-Museum
-                </span>
-              </div>
-            </div>
+            </Link>
             )}
           </Flex>
 
