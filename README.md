@@ -60,10 +60,13 @@ cd online-museum
 ```bash
 cd db
 docker build -t online-museum-db .
-docker run --name museum-db -dp 5432:5432 museum-db
+docker run --name museum-db -dp 5432:5432 \
+  -e POSTGRES_USER=user \
+  -e POSTGRES_PASSWORD=password \
+  -e POSTGRES_DB=mydatabase \
+  online-museum-db
 ```
-Wenn die PostgreSQl-Datenbank nicht über Docker gestartet werden sollen, müssen die Daten für die Verbindung zur Datenbank im Backend angepasst werden. Die Datei ist zu finden unter /backend/server.js
-In der Dockerfile unter /db können ebenfalls eigene Passwörter angegeben werden. Welche dann ebenfalls im Backend angepasst werden müssen. Wenn die Dockerfile nicht verwendet wird, dann muss ebenfalls die /db/init_db.sql Datei als Initialisierungsskript der Datenbank ausgeführt werden. Ebenso werden dann keine Beispieldaten über /db/test_data.sql automatisch geladen
+Wenn die PostgreSQl-Datenbank nicht über Docker gestartet werden sollen, müssen die Daten für die Verbindung zur Datenbank im Backend angepasst werden. Die Datei ist zu finden unter /backend/.env Wenn die Dockerfile nicht verwendet wird, dann muss ebenfalls die /db/init_db.sql Datei als Initialisierungsskript der Datenbank ausgeführt werden.
 
 ### 3. Backend starten
 
