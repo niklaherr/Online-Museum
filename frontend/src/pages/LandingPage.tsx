@@ -60,7 +60,6 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
   };
 
   useEffect(() => {
-    if (userService.isLoggedIn()) onNavigate('dashboard'); 
     loadItems();
   }, []);
 
