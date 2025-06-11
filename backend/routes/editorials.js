@@ -136,7 +136,7 @@ router.post("/editorial-lists", authenticateJWT, async (req, res) => {
     }
 });
 
-// Update an existing editorial list
+// Update an existing editorial list, this function also updates the relation between items and editorials
 router.put("/editorial-lists/:id", authenticateJWT, async (req, res) => {
     const editorialId = parseInt(req.params.id, 10);
     const { title, description, item_ids } = req.body;
@@ -259,6 +259,8 @@ router.delete("/editorial-lists/:id", authenticateJWT, async (req, res) => {
     }
 });
 
+
+//endpoint to get all items related to an editorial
 router.get("/editorial-lists/:editorial_id/items", authenticateJWT, async (req, res) => {
     const { editorial_id } = req.params;
     const userId = req.user.id;

@@ -23,16 +23,16 @@ import Roadmap from './pages/legal/Roadmap'; // Neue Import-Anweisung
 import SupportRequests from 'pages/admin/SupportRequests';
 
 import { userService } from './services/UserService';
-import CreateItemList from 'components/itemList/CreateItemList';
-import { CreateItem } from 'components/gallery/CreateItem';
-import ItemDetailView from 'components/gallery/ItemDetailView';
-import { EditItem } from 'components/gallery/EditItem';
-import EditItemList from 'components/itemList/EditItemList';
+import CreateItemList from 'pages/itemlist/CreateItemList';
+import { CreateItem } from 'pages/gallery/CreateItem';
+import ItemDetailView from 'pages/gallery/ItemDetailView';
+import { EditItem } from 'pages/gallery/EditItem';
+import EditItemList from 'pages/itemlist/EditItemList';
 import LandingPage from 'pages/LandingPage';
-import EditorialManagement from 'pages/EditorialManagement';
-import EditEditorial from 'components/editorial/EditEditorial';
-import AdminManagement from 'pages/AdminManagement';
-import EditorialDetailView from 'components/editorial/EditorialDetailView';
+import EditorialManagement from 'pages/editorial/EditorialManagement';
+import EditEditorial from 'pages/editorial/EditEditorial';
+import AdminManagement from 'pages/admin/AdminManagement';
+import EditorialDetailView from 'pages/editorial/EditorialDetailView';
 import Impressum from 'pages/legal/Impressum';
 
 function App() {

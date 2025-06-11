@@ -9,8 +9,4 @@ ENV POSTGRES_DB=mydatabase
 # This script will be executed automatically by the official entrypoint
 COPY init_db.sql /docker-entrypoint-initdb.d/
 
-# Copy SQL-Init-Skript and Images
-COPY image*.jpeg /docker-entrypoint-initdb.d/
-COPY test_data.sql /docker-entrypoint-initdb.d/
-
 

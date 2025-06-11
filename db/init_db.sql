@@ -91,3 +91,7 @@ CREATE TABLE item_editorial (
         ON DELETE CASCADE,
     CONSTRAINT unique_item_editorial UNIQUE (editorial_id, item_id)
 );
+
+-- Erstellen eines Admin Nutzers
+INSERT INTO users (username, password, isadmin, security_question, security_answer)
+VALUES ('adminuser', '$2b$10$cAFNNcm1WnTwFbNU2sAHAOrGcSxJqrsJYMCzItaHelV7KuORv60VC', TRUE, 'Familienname der Mutter?', '$2b$10$czEkB4Hj0D9fUnZC8xt1sOZQZAw/zzuh/npMG5vX78CeWamViZqg2');
