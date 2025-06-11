@@ -10,15 +10,13 @@ Das Online Museum Frontend ist eine moderne React-Webanwendung, die als digitale
 src/
 ├── components/           # Wiederverwendbare Komponenten
 │   ├── easter-eggs/     # Snake Game Easter Egg
-│   ├── editorial/       # Redaktionelle Listen
-│   ├── gallery/         # Item-Galerie Komponenten
 │   ├── helper/          # Utility-Komponenten (Loading, NoResults)
-│   ├── itemList/        # Item-Listen Verwaltung
 │   └── layout/          # Layout-Komponenten (Header, Footer, Sidebar)
 ├── interfaces/          # TypeScript Interface-Definitionen
 ├── pages/              # Hauptseiten der Anwendung
 │   ├── admin/          # Admin-Funktionen
 │   ├── auth/           # Authentifizierung
+│   ├── editorial/      # Funktionen für kuratierte Listen
 │   ├── gallery/        # Galerie-Ansichten
 │   ├── itemlist/       # Listen-Verwaltung
 │   └── legal/          # Rechtliche Seiten
