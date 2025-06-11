@@ -42,6 +42,10 @@ Ein digitales Museum, das Benutzern ermöglicht, kulturelle und kreative Inhalte
 ### Docker Compose als einfache Alternative, ansonsten ab Schritt 1 folgen
 
 ```bash
+#Projekt herunterladen
+git clone https://github.com/your-username/online-museum.git
+cd online-museum
+
 # Alle Services starten
 docker-compose up -d
 
