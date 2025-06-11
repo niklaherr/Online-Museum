@@ -5,11 +5,12 @@ const TermsOfUse = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
+      {/* Main card container for the Terms of Use */}
       <Card>
         <Title className="text-2xl mb-6">Nutzungsbedingungen</Title>
 
         <div className="space-y-6">
-          {/* Abschnitt 1 */}
+          {/* Section 1: Scope of Terms */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">1. Geltungsbereich</h2>
             <Text>
@@ -17,7 +18,7 @@ const TermsOfUse = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 2 */}
+          {/* Section 2: Registration and User Account */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Registrierung und Benutzerkonto</h2>
             <Text className="mb-2">
@@ -28,7 +29,7 @@ const TermsOfUse = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 3 */}
+          {/* Section 3: Usage Rights */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">3. Nutzungsrechte</h2>
             <Text className="mb-2">
@@ -39,7 +40,7 @@ const TermsOfUse = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 4 */}
+          {/* Section 4: User Content */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">4. Nutzerinhalte</h2>
             <Text className="mb-2">
@@ -50,7 +51,7 @@ const TermsOfUse = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 5 */}
+          {/* Section 5: Platform Availability and Changes */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">5. Verfügbarkeit und Änderungen der Plattform</h2>
             <Text>
@@ -58,7 +59,7 @@ const TermsOfUse = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 6 */}
+          {/* Section 6: Data Protection */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Datenschutz</h2>
             <Text>
@@ -66,7 +67,7 @@ const TermsOfUse = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 7 */}
+          {/* Section 7: Termination and Suspension */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Kündigung und Sperrung</h2>
             <Text className="mb-2">
@@ -77,7 +78,7 @@ const TermsOfUse = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 8 */}
+          {/* Section 8: Limitation of Liability */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">8. Haftungsbeschränkung</h2>
             <Text className="mb-2">
@@ -88,7 +89,7 @@ const TermsOfUse = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 9 */}
+          {/* Section 9: Intellectual Property */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">9. Geistiges Eigentum</h2>
             <Text>
@@ -96,7 +97,7 @@ const TermsOfUse = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 10 */}
+          {/* Section 10: Changes to Terms of Use */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">10. Änderungen der Nutzungsbedingungen</h2>
             <Text className="mb-2">
@@ -107,14 +108,15 @@ const TermsOfUse = () => {
             </Text>
           </div>
 
-          {/* Abschnitt 11 */}
+          {/* Section 11: Governing Law and Jurisdiction */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">11. Anwendbares Recht und Gerichtsstand</h2>
             <Text>
               Diese Nutzungsbedingungen unterliegen dem Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts. Gerichtsstand für alle Streitigkeiten aus oder im Zusammenhang mit diesen Nutzungsbedingungen ist, soweit gesetzlich zulässig, München.
             </Text>
           </div>
-            <Text className="text-sm text-gray-500 mt-6">
+          {/* Footer: Last updated information */}
+          <Text className="text-sm text-gray-500 mt-6">
             Stand: {new Date().toLocaleDateString('de-DE')} | 
             Letzte Aktualisierung: {new Date().toLocaleDateString('de-DE')}
           </Text>

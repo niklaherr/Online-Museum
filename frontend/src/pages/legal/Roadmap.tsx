@@ -7,6 +7,7 @@ const Roadmap = () => {
       <Card>
         <Title className="text-2xl mb-6">Online-Museum Roadmap 2025-2026</Title>
         
+        {/* Introductory text about the roadmap */}
         <Text className="mb-6">
           Das Online-Museum strebt danach, eine umfassende digitale Plattform für kulturelle und kreative Inhalte zu sein. 
           Diese Roadmap zeigt unsere geplanten Entwicklungen für die kommenden 12-18 Monate. 
@@ -15,13 +16,14 @@ const Roadmap = () => {
         
         <Divider />
         
-        {/* Q2 2025 */}
+        {/* Q2 2025: Current phase features */}
         <div className="mb-8">
           <div className="flex items-center mb-4">
             <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg font-semibold mr-3">Q2 2025</div>
             <Text className="text-gray-500 italic">Aktuelle Phase</Text>
           </div>
           
+          {/* Advanced search features */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🔍</span>
@@ -34,6 +36,7 @@ const Roadmap = () => {
             </ul>
           </div>
           
+          {/* Data management improvements */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">💾</span>
@@ -46,6 +49,7 @@ const Roadmap = () => {
             </ul>
           </div>
           
+          {/* Security enhancements */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🔐</span>
@@ -61,12 +65,13 @@ const Roadmap = () => {
         
         <Divider />
         
-        {/* Q3 2025 */}
+        {/* Q3 2025: Social, UI/UX, and statistics features */}
         <div className="mb-8">
           <div className="flex items-center mb-4">
             <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg font-semibold mr-3">Q3 2025</div>
           </div>
           
+          {/* Social features */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🌐</span>
@@ -79,6 +84,7 @@ const Roadmap = () => {
             </ul>
           </div>
           
+          {/* UI/UX improvements */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🎨</span>
@@ -91,6 +97,7 @@ const Roadmap = () => {
             </ul>
           </div>
           
+          {/* Advanced statistics */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">📊</span>
@@ -106,12 +113,13 @@ const Roadmap = () => {
         
         <Divider />
         
-        {/* Q4 2025 */}
+        {/* Q4 2025: API, integrations, internationalization, AI features */}
         <div className="mb-8">
           <div className="flex items-center mb-4">
             <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg font-semibold mr-3">Q4 2025</div>
           </div>
           
+          {/* API and integrations */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🔄</span>
@@ -124,6 +132,7 @@ const Roadmap = () => {
             </ul>
           </div>
           
+          {/* Internationalization */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🌍</span>
@@ -136,6 +145,7 @@ const Roadmap = () => {
             </ul>
           </div>
           
+          {/* AI-powered features */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🤖</span>
@@ -151,12 +161,13 @@ const Roadmap = () => {
         
         <Divider />
         
-        {/* Q1-Q2 2026 */}
+        {/* Q1-Q2 2026: Mobile apps, virtual exhibitions, premium features */}
         <div className="mb-8">
           <div className="flex items-center mb-4">
             <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg font-semibold mr-3">Q1-Q2 2026</div>
           </div>
           
+          {/* Native mobile apps */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">📱</span>
@@ -169,6 +180,7 @@ const Roadmap = () => {
             </ul>
           </div>
           
+          {/* Virtual exhibitions */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🎭</span>
@@ -181,6 +193,7 @@ const Roadmap = () => {
             </ul>
           </div>
           
+          {/* Premium features */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">💫</span>
@@ -196,12 +209,13 @@ const Roadmap = () => {
         
         <Divider />
         
-        {/* Langfristige Vision */}
+        {/* Long-term vision: 2026+ */}
         <div className="mb-8">
           <div className="flex items-center mb-4">
             <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg font-semibold mr-3">Langfristige Vision (2026+)</div>
           </div>
           
+          {/* Blockchain integration */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🔗</span>
@@ -214,6 +228,7 @@ const Roadmap = () => {
             </ul>
           </div>
           
+          {/* AR/VR experiences */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🥽</span>
@@ -226,6 +241,7 @@ const Roadmap = () => {
             </ul>
           </div>
           
+          {/* Community-driven development */}
           <div className="mb-4">
             <div className="flex items-center">
               <span className="text-xl mr-2">🌱</span>
@@ -241,7 +257,7 @@ const Roadmap = () => {
         
         <Divider />
         
-        {/* Feedback */}
+        {/* Feedback section */}
         <div className="mb-4">
           <h3 className="text-lg font-semibold mb-2">Feedback</h3>
           <Text>
@@ -249,6 +265,7 @@ const Roadmap = () => {
           </Text>
         </div>
         
+        {/* Footer with last update info */}
         <div className="text-sm text-gray-500 mt-8">
           <Text className="text-sm text-gray-500 mt-6">
             Stand: {new Date().toLocaleDateString('de-DE')} | 
