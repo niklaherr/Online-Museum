@@ -133,7 +133,7 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
         variants={fadeUp}
         className="space-y-6"
       >
-        <Title className="text-center">So funktioniert’s</Title>
+        <Title className="text-center">So funktioniert's</Title>
         <Grid numItemsSm={1} numItemsMd={3} className="gap-6">
           {[
             "Konto erstellen & anmelden",
@@ -162,8 +162,8 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
           <div className="aspect-video w-full overflow-hidden rounded-xl">
             <iframe
               className="w-full h-full rounded-xl"
-              src="https://lumen5.com/user/henri-herdel/online-museum-share-g6q75/" // Replace with your actual video
-              title="YouTube video player"
+              src="https://www.youtube.com/embed/5RLlBxIccqQ"
+              title="Online Museum Vorstellung"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
