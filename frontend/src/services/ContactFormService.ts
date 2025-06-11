@@ -2,6 +2,7 @@ import NotyfService from "./NotyfService";
 import { userService } from "./UserService";
 import ContactForm from "../interfaces/ContactForm";
 
+// Interface for the contact form data sent by the user
 export interface ContactFormData {
   name: string;
   email: string;
@@ -12,10 +13,12 @@ export interface ContactFormData {
 class ContactFormService {
   private baseUrl: string;
 
+  // Set the base URL for API requests
   constructor() {
     this.baseUrl = process.env.REACT_APP_BACKEND_API_URL || "http://localhost:3001";
   }
 
+  // Submit a contact form to the backend
   async submitContactForm(formData: ContactFormData): Promise<boolean> {
     try {
       const response = await fetch(`${this.baseUrl}/contact-form`, {
@@ -31,6 +34,7 @@ class ContactFormService {
 
       return true;
     } catch (error) {
+      // Show error notification if submission fails
       if (error instanceof Error) {
         NotyfService.showError(error.message);
       } else {
@@ -40,6 +44,7 @@ class ContactFormService {
     }
   }
   
+  // Fetch all contact forms (admin only)
   async fetchContactForms(): Promise<ContactForm[]> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
@@ -56,6 +61,7 @@ class ContactFormService {
         },
       });
       
+      // Handle unauthorized or forbidden responses
       if (response.status === 401) {
         userService.logout();
         throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
@@ -72,6 +78,7 @@ class ContactFormService {
       
       return await response.json();
     } catch (error) {
+      // Propagate error to caller
       if (error instanceof Error) {
         throw error;
       } else {
@@ -80,6 +87,7 @@ class ContactFormService {
     }
   }
   
+  // Update the status of a contact form (admin only)
   async updateContactFormStatus(id: number, status: 'new' | 'in_progress' | 'completed'): Promise<ContactForm> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
@@ -98,6 +106,7 @@ class ContactFormService {
         body: JSON.stringify({ status }),
       });
       
+      // Handle unauthorized or forbidden responses
       if (response.status === 401) {
         userService.logout();
         throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
@@ -114,6 +123,7 @@ class ContactFormService {
       
       return await response.json();
     } catch (error) {
+      // Propagate error to caller
       if (error instanceof Error) {
         throw error;
       } else {
@@ -123,4 +133,5 @@ class ContactFormService {
   }
 }
 
+// Export a singleton instance of the service
 export const contactFormService = new ContactFormService();

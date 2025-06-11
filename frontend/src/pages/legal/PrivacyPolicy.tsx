@@ -1,5 +1,6 @@
 import { Card, Title, Text } from '@tremor/react';
 
+// Privacy Policy page component
 const PrivacyPolicy = () => {
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
@@ -7,7 +8,7 @@ const PrivacyPolicy = () => {
         <Title className="text-2xl mb-6">Datenschutzerklärung</Title>
         <div className="space-y-6">
 
-          {/* Section 1 */}
+          {/* Section 1: Introduction and overview */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">1. Einleitung und Übersicht</h2>
             <Text className="mb-2">
@@ -20,7 +21,7 @@ const PrivacyPolicy = () => {
             <Text>Alle Formulierungen gelten geschlechtsneutral.</Text>
           </div>
 
-          {/* Section 2 */}
+          {/* Section 2: Scope of the privacy policy */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Anwendungsbereich</h2>
             <Text className="mb-2">
@@ -32,7 +33,7 @@ const PrivacyPolicy = () => {
             </Text>
           </div>
 
-          {/* Section 3 */}
+          {/* Section 3: Legal basis for data processing */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">3. Rechtsgrundlagen</h2>
             <Text className="mb-2">Die Verarbeitung Ihrer Daten erfolgt auf Basis folgender Rechtsgrundlagen:</Text>
@@ -47,7 +48,7 @@ const PrivacyPolicy = () => {
             </Text>
           </div>
 
-          {/* Section 4 */}
+          {/* Section 4: What data is collected and retention period */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">4. Welche Daten wir erheben und wie lange sie gespeichert werden</h2>
             <Text className="mb-2">
@@ -66,7 +67,7 @@ const PrivacyPolicy = () => {
             </Text>
           </div>
 
-          {/* Section 5 */}
+          {/* Section 5: User rights under GDPR */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">5. Ihre Rechte</h2>
             <Text className="mb-2">Laut DSGVO haben Sie folgende Rechte:</Text>
@@ -84,7 +85,7 @@ const PrivacyPolicy = () => {
             </Text>
           </div>
 
-          {/* Section 6 */}
+          {/* Section 6: Contact information for privacy inquiries */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Kontakt</h2>
             <Text className="mb-2">
@@ -93,7 +94,7 @@ const PrivacyPolicy = () => {
             <Text className="font-medium">datenschutz@online-museum.com</Text>
           </div>
 
-          {/* Section 7 */}
+          {/* Section 7: Changes to the privacy policy */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Änderungen dieser Datenschutzerklärung</h2>
             <Text className="mb-2">
@@ -101,7 +102,9 @@ const PrivacyPolicy = () => {
               unser Angebot ändern. Über wesentliche Änderungen informieren wir Sie auf unserer Website.
             </Text>
           </div>
-             <Text className="text-sm text-gray-500 mt-6">
+
+          {/* Footer: Last updated date */}
+          <Text className="text-sm text-gray-500 mt-6">
             Stand: {new Date().toLocaleDateString('de-DE')} | 
             Letzte Aktualisierung: {new Date().toLocaleDateString('de-DE')}
           </Text>
