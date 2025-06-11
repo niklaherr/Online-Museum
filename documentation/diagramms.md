@@ -284,7 +284,6 @@ graph TD
 ---
 
 ## 4. Verteilungsdiagramm (Deployment)
-
 **Beschreibung**: Das Deployment-Diagramm zeigt die Infrastruktur-Architektur des Systems. In der Production-Umgebung läuft alles auf Railway Cloud Platform mit separaten Containern für Frontend (Nginx), Backend (Node.js) und Datenbank (PostgreSQL). Die Entwicklungsumgebung spiegelt diese Struktur lokal wider. In Railway wird die Inter-Container Kommunikation nicht unterstützt, sodass die einzelnen Container über die von Railway bereitgestellt URL kommunizieren. Lokal findet eine Inter-Container Kommunikation statt.
 
 ```mermaid
@@ -336,14 +335,18 @@ graph TB
     end
     
     %% Production Connections
-    Browser -.->|HTTPS| NginxServer
-    Mobile -.->|HTTPS| NginxServer
-    NginxServer -.->|API Calls| NodeServer
+    Browser -.->|HTTPS Static Files| NginxServer
+    Mobile -.->|HTTPS Static Files| NginxServer
+    Browser -.->|API Calls| NodeServer
+    Mobile -.->|API Calls| NodeServer
     NodeServer -.->|SQL| PostgreSQLDB
     NodeServer -.->|REST API| MistralAPI
     
     %% Development Connections
-    ReactDev -.->|API Calls| NodeDev
+    Browser -.->|HTTP Static Files| ReactDev
+    Mobile -.->|HTTP Static Files| ReactDev
+    Browser -.->|API Calls| NodeDev
+    Mobile -.->|API Calls| NodeDev
     NodeDev -.->|SQL| PostgreSQLLocal
     
     %% Deployment Flow
@@ -363,7 +366,6 @@ graph TB
     class MistralAPI,Railway external
     class Browser,Mobile client
 ```
-
 ---
 
 ## 5. Klassendiagramm (Backend Services)
