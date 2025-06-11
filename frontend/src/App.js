@@ -81,6 +81,18 @@ function App() {
     return children;
   };
 
+  const AnonymousRoute = ({ children }) => {
+    if (loading) return <div className="text-center p-4">Lädt...</div>;
+
+    if (currentUser) {
+      return <Navigate to="/dashboard" />;
+    }
+
+    return children;
+  };
+
+
+
   return (
     <div className="h-screen bg-gray-100 flex">
       {currentUser && (
@@ -102,40 +114,50 @@ function App() {
                 <Route
                   path="/"
                   element={
-                    <LandingPage
+                    <AnonymousRoute>
+                      <LandingPage
                       onNavigate={(route) => navigate(route)}
-                    />
+                      />
+                    </AnonymousRoute>
                   }
                 />
                 <Route
                   path="/login"
                   element={
-                    <LoginPage onNavigate={(route) => navigate(route)} />
+                    <AnonymousRoute>
+                      <LoginPage onNavigate={(route) => navigate(route)} />
+                    </AnonymousRoute>
+                    
                   }
                 />
                 <Route
                   path="/register"
                   element={
-                    <RegisterPage onNavigate={(route) => navigate(route)} />
+                    <AnonymousRoute>
+                      <RegisterPage onNavigate={(route) => navigate(route)} />
+                    </AnonymousRoute>
+                    
                   }
                 />
                 <Route
                   path="/forgot-password"
                   element={
-                    <ForgotPassword
+                    <AnonymousRoute>
+                      <ForgotPassword
                       onNavigate={(route) => navigate(route)}
                     />
+                    </AnonymousRoute>
+                    
                   }
                 />
-
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
                 <Route
                   path="/profile"

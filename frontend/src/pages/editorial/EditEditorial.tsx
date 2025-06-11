@@ -173,7 +173,7 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
   
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2 mt-8">Redaktionelle Listen bearbeiten</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Redaktionelle Listen bearbeiten</h1>
       
       <Card>
         <Title className="mb-4">Redaktionelle Liste bearbeiten</Title>

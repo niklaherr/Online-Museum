@@ -131,7 +131,7 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 mt-8">Administratoren verwalten</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Administratoren verwalten</h1>
         <Text>Suchen Sie nach Benutzern und weisen Sie Administratorrechte zu oder entfernen Sie diese.</Text>
       </div>
       
@@ -199,7 +199,7 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
         )}
         
         {searchResults.length === 0 && searchQuery && !isSearching && (
-          <Text className="text-gray-500 italic mb-4">Keine Benutzer gefunden. Versuchen Sie eine andere Suchanfrage.</Text>
+          <Text className="text-gray-500 italic mb-4">Keine Benutzer gefunden. Senden Sie die Suchanfrage ab oder versuchen Sie eine andere Suchanfrage.</Text>
         )}
       </Card>
       
