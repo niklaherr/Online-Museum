@@ -6,7 +6,7 @@ const ScrollToTop = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      // Smooth scroll für alle möglichen Container
+      // Smooth scroll for all containers
       const scrollActions = [
         () => {
           const container = document.querySelector('.overflow-y-auto');
@@ -18,7 +18,7 @@ const ScrollToTop = () => {
                 behavior: 'smooth'
               });
             } catch (error) {
-              // Fallback für ältere Browser
+              // Fallback for older browsers
               container.scrollTop = 0;
             }
           }
@@ -72,12 +72,12 @@ const ScrollToTop = () => {
         }
       ];
 
-      // Führe alle Scroll-Aktionen aus
+      // Do all scroll actions
       scrollActions.forEach(action => {
         try {
           action();
         } catch (error) {
-          // Ignoriere Fehler
+          // ignore errors
         }
       });
     }, 0);

@@ -5,7 +5,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
 import Footer from './components/layout/Footer';
-import ScrollToTop from './components/helper/ScrollToTop'; // ScrollToTop hinzugefügt
+import ScrollToTop from './components/helper/ScrollToTop';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -97,7 +97,7 @@ function App() {
         <div className="flex-1 overflow-y-auto">
           <div className="min-h-full flex flex-col">
             <main className="flex-1 p-4 md:p-6">
-              <ScrollToTop /> {/* ScrollToTop-Komponente hier hinzugefügt */}
+              <ScrollToTop /> {/* Ensure ScrollToTop is always rendered to reset scroll position on route change */}
               <Routes>
                 <Route
                   path="/"
