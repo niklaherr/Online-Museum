@@ -335,16 +335,16 @@ graph TB
     end
     
     %% Production Connections
-    Browser -.->|HTTPS Static Files| NginxServer
-    Mobile -.->|HTTPS Static Files| NginxServer
+    Browser -.->|HTTPS| NginxServer
+    Mobile -.->|HTTPS| NginxServer
     Browser -.->|API Calls| NodeServer
     Mobile -.->|API Calls| NodeServer
     NodeServer -.->|SQL| PostgreSQLDB
     NodeServer -.->|REST API| MistralAPI
     
     %% Development Connections
-    Browser -.->|HTTP Static Files| ReactDev
-    Mobile -.->|HTTP Static Files| ReactDev
+    Browser -.->|HTTP| ReactDev
+    Mobile -.->|HTTP| ReactDev
     Browser -.->|API Calls| NodeDev
     Mobile -.->|API Calls| NodeDev
     NodeDev -.->|SQL| PostgreSQLLocal
