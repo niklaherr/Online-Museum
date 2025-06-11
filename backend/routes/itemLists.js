@@ -7,8 +7,8 @@ const { isSQLInjection } = require("../services/injectionService");
 
 const router = express.Router();
 const upload = multer(); // Files will be stored as Buffer in memory
-// Get one item list by ID
 
+// Get one item list by ID
 router.get("/item-lists/:id", authenticateJWT, async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;

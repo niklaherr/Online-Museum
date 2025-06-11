@@ -33,6 +33,7 @@ services:
       DB_NAME: mydatabase
       DB_PASSWORD: password
       DB_PORT: 5432
+      JWT_SECRET: your-secret-key
     ports:
       - "3001:3001"
     networks:

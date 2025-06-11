@@ -35,6 +35,7 @@ router.post("/register", async (req, res) => {
     }
 });
 
+//Function used to log user in and load user data
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;
     const pool = req.app.locals.pool;
@@ -62,6 +63,8 @@ router.post("/login", async (req, res) => {
     }
 });
 
+
+//Endpoint to verify answer of security question
 router.post("/verify-security-question", async (req, res) => {
     const pool = req.app.locals.pool;
     const { username, securityAnswer } = req.body;
@@ -172,7 +175,7 @@ router.post("/reset-password", async (req, res) => {
     }
 });
 
-// Reset password with old password
+// Endpoint to reset password with old password
 router.put("/reset-password-with-old-password", authenticateJWT, async (req, res) => {
     
     const { oldPassword, newPassword, reNewPassword } = req.body;

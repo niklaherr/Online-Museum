@@ -43,7 +43,7 @@ router.get("/items/no-auth", async (req, res) => {
     }
 });
 
-// GET get items filtered
+// get items filtered
 router.get("/items", authenticateJWT, async (req, res) => {
     const pool = req.app.locals.pool;
     const userId = req.user.id;

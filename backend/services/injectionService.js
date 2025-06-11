@@ -1,3 +1,4 @@
+//Function to check for sql injection, can be used before every sql command, returns true, if comman injection patterns exist inside the string
 function isSQLInjection(queryString) {
     if (typeof queryString !== 'string') return false;
 

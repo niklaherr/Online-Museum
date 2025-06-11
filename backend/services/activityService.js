@@ -1,4 +1,6 @@
 // services/activityService.js
+
+//function used to create activities for a user, e.g when creating an item you will call this function after creating it
 async function createActivity(pool, { category, element_id, type, user_id }) {
     if (!category || !element_id || !type || !user_id) {
         throw new Error("Missing required fields: category, element_id, type, and user_id");

@@ -13,7 +13,8 @@ ENV NODE_ENV=production \
     DB_HOST=museum-db \
     DB_NAME=mydatabase \
     DB_PASSWORD=password \
-    DB_PORT=5432
+    DB_PORT=5432 \
+    JWT_SECRET=your-secret-key
 
 # Set working directory
 WORKDIR /app
