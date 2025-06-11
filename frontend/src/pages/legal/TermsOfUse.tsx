@@ -2,9 +2,6 @@ import React from 'react';
 import { Card, Title, Text } from '@tremor/react';
 
 const TermsOfUse = () => {
-  React.useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
