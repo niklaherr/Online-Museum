@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, Title, TextInput, Textarea, Button, Grid, Text, Flex, Dialog, DialogPanel } from "@tremor/react";
 import { XMarkIcon, PlusIcon, MagnifyingGlassIcon, TrashIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent} from "@radix-ui/react-tooltip";
 import { GalleryItem } from "interfaces/Item";
 import { editorialService } from "services/EditorialService";
 import { itemAssistantService } from "services/ItemAssistantService";
@@ -224,9 +225,14 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
             required
           />
           
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <Text>Beschreibung</Text>
+          <TooltipProvider>
+  <div>
+    <div className="flex justify-between items-center mb-2">
+      <Text>Beschreibung</Text>
+      {selectedItems.length === 0 || !title.trim() ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>
               <Button
                 icon={SparklesIcon}
                 size="xs"
@@ -237,14 +243,50 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
               >
                 KI-Beschreibung generieren
               </Button>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs p-4 bg-white border border-gray-200 shadow-lg rounded-lg">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="text-sm">
+                <p className="font-medium text-gray-800 mb-1">Fehlende Informationen</p>
+                <p className="text-gray-600 leading-relaxed">
+                  {selectedItems.length === 0 && !title.trim()
+                    ? "Bitte fülle den Titel aus und wähle mindestens ein Item aus, um eine KI-Beschreibung zu generieren."
+                    : selectedItems.length === 0
+                    ? "Bitte wähle mindestens ein Item aus, um eine KI-Beschreibung zu generieren."
+                    : "Bitte fülle den Titel aus, um eine KI-Beschreibung zu generieren."
+                  }
+                </p>
+              </div>
             </div>
-            <Textarea
-              placeholder="Beschreibung (optional)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-            />
-          </div>
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        <Button
+          icon={SparklesIcon}
+          size="xs"
+          color="blue"
+          onClick={handleGenerateDescription}
+          loading={isGenerating}
+          disabled={selectedItems.length === 0 || !title.trim()}
+        >
+          KI-Beschreibung generieren
+        </Button>
+      )}
+    </div>
+    <Textarea
+      placeholder="Beschreibung (optional)"
+      value={description}
+      onChange={(e) => setDescription(e.target.value)}
+      rows={3}
+    />
+  </div>
+</TooltipProvider>
         </div>
         
         {/* Search for items */}

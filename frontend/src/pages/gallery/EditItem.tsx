@@ -1,29 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Card,
-  TextInput,
-  Textarea,
-  Button,
-  Title,
-  Text,
-  Dialog,
-  DialogPanel,
-  Flex,
-  Badge,
-} from "@tremor/react";
-import { 
-  SparklesIcon, 
-  ArrowLeftIcon,
-  PhotoIcon,
-  TagIcon,
-  DocumentTextIcon,
-  EyeIcon,
-  LockClosedIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  CloudArrowUpIcon
-} from "@heroicons/react/24/outline";
+import { Card, TextInput, Textarea, Button, Title, Text, Dialog, DialogPanel, Flex, Badge } from "@tremor/react";
+import { SparklesIcon, ArrowLeftIcon, PhotoIcon, TagIcon, DocumentTextIcon, EyeIcon, LockClosedIcon, CheckCircleIcon, XCircleIcon, CloudArrowUpIcon } from "@heroicons/react/24/outline";
+import {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent} from "@radix-ui/react-tooltip";
 import { itemService } from "../../services/ItemService";
 import { itemAssistantService } from "../../services/ItemAssistantService";
 import NotyfService from "services/NotyfService";
@@ -218,19 +197,61 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
       Empfohlen
     </Badge>
   </div>
+ <TooltipProvider>
   <div className="sm:ml-auto">
-    <Button
-      icon={SparklesIcon}
-      size="xs"
-      color="blue"
-      onClick={handleGenerateDescription}
-      loading={isGenerating}
-      disabled={!title || !category}
-      className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
-    >
-      KI-Beschreibung
-    </Button>
+    {!title || !category ? (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span>
+            <Button
+              icon={SparklesIcon}
+              size="xs"
+              color="blue"
+              onClick={handleGenerateDescription}
+              loading={isGenerating}
+              disabled={!title || !category}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
+            >
+              KI-Beschreibung
+            </Button>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs p-4 bg-white border border-gray-200 shadow-lg rounded-lg">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 mt-0.5">
+              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="text-sm">
+              <p className="font-medium text-gray-800 mb-1">Fehlende Informationen</p>
+              <p className="text-gray-600 leading-relaxed">
+                {!title && !category 
+                  ? "Bitte fülle Titel und Kategorie aus, um eine KI-Beschreibung zu generieren."
+                  : !title 
+                  ? "Bitte fülle den Titel aus, um eine KI-Beschreibung zu generieren."
+                  : "Bitte fülle die Kategorie aus, um eine KI-Beschreibung zu generieren."
+                }
+              </p>
+            </div>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    ) : (
+      <Button
+        icon={SparklesIcon}
+        size="xs"
+        color="blue"
+        onClick={handleGenerateDescription}
+        loading={isGenerating}
+        disabled={!title || !category}
+        className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
+      >
+        KI-Beschreibung
+      </Button>
+    )}
   </div>
+</TooltipProvider>
 </div>
 
               

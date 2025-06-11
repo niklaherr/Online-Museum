@@ -1,31 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  Card,
-  Title,
-  TextInput,
-  Textarea,
-  Button,
-  Text,
-  Dialog,
-  DialogPanel,
-  Flex,
-  Badge,
-} from "@tremor/react";
-import { 
-  SparklesIcon,
-  ArrowLeftIcon,
-  RectangleStackIcon,
-  DocumentTextIcon,
-  EyeIcon,
-  LockClosedIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  CalendarIcon,
-  TagIcon,
-  XMarkIcon,
-  PhotoIcon,
-  CloudArrowUpIcon
-} from "@heroicons/react/24/outline";
+import { Card, Title, TextInput, Textarea, Button, Text, Dialog, DialogPanel, Flex, Badge } from "@tremor/react";
+import { SparklesIcon, ArrowLeftIcon, RectangleStackIcon, DocumentTextIcon, EyeIcon, LockClosedIcon, CheckCircleIcon, XCircleIcon, CalendarIcon, TagIcon, XMarkIcon, PhotoIcon, CloudArrowUpIcon } from "@heroicons/react/24/outline";
+import {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent} from "@radix-ui/react-tooltip";
 import Item, { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
 import { itemAssistantService } from "services/ItemAssistantService";
@@ -238,20 +214,62 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <Text className="font-medium text-gray-700">Beschreibung</Text>
-                    <Button
-                      icon={SparklesIcon}
-                      size="xs"
-                      color="blue"
-                      onClick={handleGenerateDescription}
-                      loading={isGenerating}
-                      disabled={selectedItems.length === 0 || !title.trim()}
-                      className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
-                    >
-                      KI-Beschreibung
-                    </Button>
-                  </div>
+                  <TooltipProvider>
+  <div className="flex items-center justify-between mb-2">
+    <Text className="font-medium text-gray-700">Beschreibung</Text>
+    {selectedItems.length === 0 || !title.trim() ? (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span>
+            <Button
+              icon={SparklesIcon}
+              size="xs"
+              color="blue"
+              onClick={handleGenerateDescription}
+              loading={isGenerating}
+              disabled={selectedItems.length === 0 || !title.trim()}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
+            >
+              KI-Beschreibung
+            </Button>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs p-4 bg-white border border-gray-200 shadow-lg rounded-lg">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 mt-0.5">
+              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="text-sm">
+              <p className="font-medium text-gray-800 mb-1">Fehlende Informationen</p>
+              <p className="text-gray-600 leading-relaxed">
+                {selectedItems.length === 0 && !title.trim()
+                  ? "Bitte fülle den Titel aus und wähle mindestens ein Item aus, um eine KI-Beschreibung zu generieren."
+                  : selectedItems.length === 0
+                  ? "Bitte wähle mindestens ein Item aus, um eine KI-Beschreibung zu generieren."
+                  : "Bitte fülle den Titel aus, um eine KI-Beschreibung zu generieren."
+                }
+              </p>
+            </div>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    ) : (
+      <Button
+        icon={SparklesIcon}
+        size="xs"
+        color="blue"
+        onClick={handleGenerateDescription}
+        loading={isGenerating}
+        disabled={selectedItems.length === 0 || !title.trim()}
+        className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
+      >
+        KI-Beschreibung
+      </Button>
+    )}
+  </div>
+</TooltipProvider>
                   <Textarea
                     placeholder="Beschreibung (optional)"
                     value={description}
