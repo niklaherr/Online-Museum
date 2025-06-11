@@ -30,137 +30,73 @@ src/
 ## 🎯 Hauptfunktionen
 
 ### 1. Authentifizierung & Benutzerverwaltung
-- **Registrierung/Anmeldung**: Benutzerkonten mit Sicherheitsfragen
-- **Passwort-Reset**: Über Sicherheitsfragen oder mit altem Passwort
-- **Profilverwaltung**: Bearbeitung von Benutzerdaten
-- **Rollenverwaltung**: Unterscheidung zwischen normalen Benutzern und Administratoren
+Das Authentifizierungssystem bietet umfassende Benutzerkonten-Verwaltung mit Sicherheitsfragen für die Registrierung und einen robusten Passwort-Reset-Mechanismus. Benutzer können ihr Passwort sowohl über Sicherheitsfragen als auch mit dem aktuellen Passwort zurücksetzen. Die Profilverwaltung ermöglicht die Bearbeitung von Benutzerdaten, während die Rollenverwaltung zwischen normalen Benutzern und Administratoren unterscheidet.
 
 ### 2. Item-Management
-- **Item-Erstellung**: Upload von Bildern mit Titel, Kategorie und Beschreibung
-- **KI-unterstützte Beschreibungen**: Automatische Generierung via Mistral AI
-- **Datenschutz-Einstellungen**: Private/öffentliche Items
-- **CRUD-Operationen**: Vollständige Verwaltung der eigenen Items
-- **Bildformat-Unterstützung**: PNG, JPG, GIF bis 10MB
+Das Herzstück der Anwendung ermöglicht den Upload von Bildern mit Titel, Kategorie und Beschreibung. Ein besonderes Feature ist die KI-unterstützte Beschreibungsgenerierung über Mistral AI, die automatisch relevante Beschreibungen basierend auf Titel und Kategorie erstellt. Das System unterstützt:
+
+- Datenschutz-Einstellungen für private/öffentliche Items
+- Vollständige CRUD-Operationen für eigene Items
+- Bildformat-Unterstützung: PNG, JPG, GIF bis 10MB
 
 ### 3. Listen-System
-- **Item-Listen**: Organisierung eigener Items in thematischen Sammlungen
-- **Banner-Bilder**: Upload von Hauptbildern für Listen
-- **Beschreibungen**: Mit KI-Unterstützung basierend auf enthaltenen Items
-- **Sichtbarkeits-Kontrolle**: Private/öffentliche Listen
+Das innovative Listen-System organisiert Items in thematischen Sammlungen, die als digitale Erinnerungsräume fungieren. Benutzer können Banner-Bilder für ihre Listen hochladen und Beschreibungen mit KI-Unterstützung erstellen lassen. Die Sichtbarkeits-Kontrolle ermöglicht private oder öffentliche Listen, wobei die KI-Beschreibungen basierend auf den enthaltenen Items generiert werden.
 
 ### 4. Redaktionelle Inhalte (Admin)
-- **Kuratierte Sammlungen**: Administratoren können verschiedene Items zusammenstellen und als redaktionellen Inhalt veröffentlichen
-- **Suchfunktion**: Durchsuchung aller öffentlichen Items
-- **Editorial-Management**: Erstellung und Verwaltung redaktioneller Listen
+Administratoren können kuratierte Sammlungen erstellen, die verschiedene Items zusammenstellen und als redaktionellen Inhalt veröffentlichen. Eine umfassende Suchfunktion durchsucht alle öffentlichen Items, während das Editorial-Management die Erstellung und Verwaltung redaktioneller Listen ermöglicht.
 
 ### 5. Galerie & Entdeckung
-- **Kategorisierte Ansicht**: Items nach Kategorien gruppiert
-- **Suchfunktion**: Volltextsuche in Titeln, Kategorien und Benutzernamen
-- **Responsive Grid**: Anpassung an verschiedene Bildschirmgrößen
-- **Item-Details**: Detailansichten mit Metadaten
+Die Galerie präsentiert Items in einer kategorisierten Ansicht mit responsivem Grid-Layout, das sich automatisch an verschiedene Bildschirmgrößen anpasst. Eine Volltextsuche durchsucht Titel, Kategorien und Benutzernamen, während Item-Details umfassende Metadaten anzeigen.
 
 ### 6. Dashboard & Analytics
-- **Persönliches Dashboard**: Übersicht über eigenen Aktivitäten
-- **Statistiken**: Diagramme für Item- und Listen-Entwicklung
-- **Aktivitäts-Feed**: Chronologische Übersicht aller Aktionen
-- **Schnellaktionen**: Direkte Links zu häufig genutzten Funktionen
+Das personalisierte Dashboard bietet eine zentrale Übersicht mit Statistiken und interaktiven Diagrammen für Item- und Listen-Entwicklung. Ein chronologischer Aktivitäts-Feed dokumentiert alle Benutzeraktionen, während Schnellaktionen direkten Zugang zu häufig genutzten Funktionen bieten.
 
 ### 7. Admin-Funktionen
-- **Benutzerverwaltung**: Suche und Verwaltung von Benutzern
-- **Rechtevergabe**: Admin-Status zuweisen/entfernen
-- **Support-System**: Verwaltung von Kontaktanfragen
-- **Redaktions-Tools**: Erstellung kuratierter Inhalte
+Das umfassende Admin-Panel ermöglicht Benutzerverwaltung mit Such- und Verwaltungsfunktionen, Rechtevergabe für Admin-Status, ein Support-System für Kontaktanfragen und Redaktions-Tools für kuratierte Inhalte.
 
 ## 🎨 UI/UX Features
 
 ### Design-Prinzipien
-- **Modern & Clean**: Gradients, Shadows, abgerundete Ecken
-- **Responsive Design**: Mobile-first Ansatz
-- **Loading States**: Spinner und Skeleton-Loading
-- **Error Handling**: Benutzerfreundliche Fehlermeldungen über die Notyf Library
+Das Design folgt modernen Prinzipien mit Gradients, Schatten und abgerundeten Ecken für eine zeitgemäße Ästhetik. Der Mobile-First-Ansatz gewährleistet optimale Darstellung auf allen Geräten, während Loading States mit Spinner und Skeleton-Loading für wahrgenommene Performance-Verbesserung sorgen. Das Error Handling über die Notyf Library bietet benutzerfreundliche Fehlermeldungen.
 
 ### Interaktive Elemente
-- **Hover-Effekte**: Scale-Transformationen, Farbwechsel
-- **Toast-Notifications**: Erfolgs- und Fehlermeldungen
-- **Modal-Dialoge**: Bestätigungen und Formulare
-- **Progress-Tracking**: Status-Anzeigen für mehrstufige Prozesse
+- Hover-Effekte mit Scale-Transformationen und Farbwechseln
+- Toast-Notifications für Erfolgs- und Fehlermeldungen
+- Modal-Dialoge für Bestätigungen und Formulare
+- Progress-Tracking mit Status-Anzeigen für mehrstufige Prozesse
 
 ## 🔧 Services & API Integration
 
-### UserService
-- Authentifizierung und Session-Management
-- Token-basierte Autorisierung
-- Benutzerprofil-Verwaltung
+Die Service-Layer abstrahiert die gesamte Business Logic von den UI-Komponenten und stellt eine saubere Trennung zwischen Datenverarbeitung und Präsentation sicher. Der **UserService** handhabt Authentifizierung und Session-Management mit Token-basierter Autorisierung und Benutzerprofil-Verwaltung. Der **ItemService** verwaltet CRUD-Operationen für Items, Listen-Management, Datei-Upload mit FormData und Aktivitäts-Tracking.
 
-### ItemService
-- CRUD-Operationen für Items
-- Listen-Management
-- Datei-Upload mit FormData
-- Aktivitäts-Tracking
-
-### EditorialService
-- Admin-spezifische Funktionen
-- Item-Suche über alle Benutzer
-- Redaktionelle Listen-Verwaltung
-
-### ItemAssistantService
-- KI-Integration mit Mistral AI
-- Automatische Beschreibungsgenerierung
-- Prompt-Engineering für verschiedene Kontexte
-
-### AdminService
-- Benutzerverwaltung
-- Rechtevergabe
-- System-Administration
-
-### ContactFormService
-- Support-Anfragen
-- Status-Tracking
-- Admin-Benachrichtigungen
+Der **EditorialService** stellt Admin-spezifische Funktionen bereit, einschließlich Item-Suche über alle Benutzer und redaktionelle Listen-Verwaltung. Die KI-Integration erfolgt über den **ItemAssistantService** mit Mistral AI für automatische Beschreibungsgenerierung und Prompt-Engineering für verschiedene Kontexte. Weitere Services umfassen **AdminService** für Benutzerverwaltung und **ContactFormService** für Support-Anfragen.
 
 ## 🔒 Sicherheitsfeatures
 
-- **JWT-basierte Authentifizierung**
-- **Role-based Access Control (RBAC)**
-- **Input-Validierung** auf Frontend und Backend
-- **XSS-Schutz** durch React's eingebauten Schutz
-- **Sichere Datei-Uploads** mit Typ- und Größenvalidierung
-- **Session-Management** mit automatischem Logout
+Das Sicherheitskonzept basiert auf JWT-basierter Authentifizierung mit Role-based Access Control (RBAC) für verschiedene Benutzerrollen. Input-Validierung erfolgt sowohl auf Frontend- als auch Backend-Ebene, während React's eingebauter XSS-Schutz zusätzliche Sicherheit bietet. Sichere Datei-Uploads mit Typ- und Größenvalidierung verhindern schädliche Uploads, und das Session-Management mit automatischem Logout sorgt für sichere Benutzersitzungen.
 
 ## 📱 Responsive Design
 
-- **Mobile-First**: Optimiert für Smartphones
-- **Tablet-Support**: Angepasste Layouts für mittlere Bildschirme
-- **Desktop**: Vollständige Feature-Unterstützung
+Die Anwendung ist vollständig responsive gestaltet und folgt einem Mobile-First-Ansatz für optimale Smartphone-Nutzung. Tablet-Support bietet angepasste Layouts für mittlere Bildschirme, während Desktop-Versionen vollständige Feature-Unterstützung gewährleisten.
 
 ## 🎮 Easter Eggs
 
 ### Snake Game
-- Vollständig spielbares Snake-Spiel in TypeScript
-- Versteckt hinter dem "PDF-Download" Link in der Hilfe
-- Responsive Design mit Warnung für kleine Bildschirme
-- Retro-Gaming Nostalgie als Überraschung für Nutzer
+Ein vollständig spielbares Snake-Spiel in TypeScript ist als Easter Egg hinter dem "PDF-Download" Link in der Hilfe versteckt. Das responsive Design warnt vor kleinen Bildschirmen und bietet Retro-Gaming-Nostalgie als Überraschung für Nutzer.
 
 ## 🔄 State Management
 
-- **React Hooks**: useState, useEffect für lokalen State
-- **Context API**: Benutzer-Authentifizierung
-- **Service Layer**: Zentrale Business Logic
-- **Local Storage**: Session-Persistierung
-- **Error Handling**: Einheitliche Fehlerbehandlung
+Das State Management nutzt React Hooks (useState, useEffect) für lokalen State und die Context API für Benutzer-Authentifizierung. Die Service Layer stellt zentrale Business Logic bereit, während Local Storage für Session-Persistierung und einheitliches Error Handling für konsistente Fehlerbehandlung sorgt.
 
 ## 📝 Entwicklungsrichtlinien
 
 ### Code-Organisation
-- **Komponenten-basiert**: Modulare, wiederverwendbare Komponenten
-- **TypeScript**: Typsichere Entwicklung
-- **Consistent Naming**: Klare Benennungskonventionen
-- **Comments**: Dokumentation komplexer Logik
+Die Entwicklung folgt bewährten Praktiken mit komponenten-basierter, modularer Architektur und wiederverwendbaren Komponenten. TypeScript gewährleistet typsichere Entwicklung, während konsistente Benennungskonventionen und Kommentierung die Code-Qualität sicherstellen.
 
 ### Best Practices
 - **Single Responsibility**: Eine Aufgabe pro Komponente
 - **Props Interface**: Typisierte Komponenten-Props
-- **Error Boundaries**: Fehler-Isolation
-- **Accessibility**: WCAG-konforme Entwicklung
+- **Error Boundaries**: Fehler-Isolation für robuste Anwendungen
+- **Accessibility**: WCAG-konforme Entwicklung für barrierefreie Nutzung
 
 Das Online Museum Frontend bietet eine umfassende, moderne Lösung für eine digitale Kulturplattform mit professionellem UI/UX Design, robuster Architektur und erweiterbaren Features.
