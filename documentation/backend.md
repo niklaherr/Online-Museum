@@ -1,19 +1,72 @@
-## 📚 API-Dokumentation - Backend
+# Online Museum Backend - API-Dokumentation
 
-## 🚀 Features
+## Überblick
 
-- **Benutzerauthentifizierung** mit JWT-Tokens
-- **Item-Management** mit Bild-Upload-Funktionalität
-- **Item-Listen** für die Organisation von Items
-- **Redaktionelle Listen** (Admin-Feature)
-- **Aktivitätsverfolgung** für Audit-Zwecke
-- **Kontaktformular-System**
-- **Administrative Funktionen** für Benutzerverwaltung
-- **SQL-Injection-Schutz** durch Pattern-Erkennung
-- **Datenschutz** durch private/öffentliche Item-Einstellungen
+Das Online Museum Backend bildet das technische Rückgrat der digitalen Kulturplattform und stellt eine robuste Node.js-basierte API bereit, die umfassende Funktionalitäten für Benutzerauthentifizierung, Content-Management und administrative Verwaltung bietet. Die Architektur basiert auf Express.js und PostgreSQL, wobei besonderer Fokus auf Sicherheit, Skalierbarkeit und Benutzerfreundlichkeit gelegt wurde.
 
+## 🚀 Kern-Features
 
-## 📁 Aufbau
+Das Backend implementiert eine JWT-basierte Benutzerauthentifizierung mit erweiterten Sicherheitsfeatures, ein umfassendes Item-Management-System mit Bild-Upload-Funktionalität und ein flexibles Listen-System für die Organisation von Inhalten. Redaktionelle Listen ermöglichen Administratoren die Kuratierung hochwertiger Sammlungen, während ein integriertes Aktivitätsverfolgungssystem für Transparenz und Audit-Zwecke sorgt.
+
+Ein Kontaktformular-System erleichtert die Kommunikation zwischen Benutzern und Administratoren. Administrative Funktionen bieten umfassende Benutzerverwaltung, während SQL-Injection-Schutz durch Pattern-Erkennung und granulare Datenschutz-Einstellungen für private und öffentliche Items die Sicherheit gewährleisten.
+
+## 👥 Benutzertypen und Berechtigungen
+
+### Berechtigungsübersicht
+
+| Funktion | Anonyme Benutzer | Registrierte Benutzer | Administratoren |
+|----------|:----------------:|:--------------------:|:---------------:|
+| **Authentifizierung & Zugang** |
+| Landing Page betrachten | ✅ | ✅ | ✅ |
+| Registrierung | ✅ | ❌ | ❌ |
+| Anmeldung | ✅ | ✅ | ✅ |
+| Passwort-Reset (Sicherheitsfragen) | ✅ | ✅ | ✅ |
+| Passwort ändern (mit altem Passwort) | ❌ | ✅ | ✅ |
+| **Item-Management** |
+| Öffentliche Items ansehen | ✅ | ✅ | ✅ |
+| Items erstellen | ❌ | ✅ | ✅ |
+| Items bearbeiten | ❌ | 🔒 | 🔒 |
+| Items löschen | ❌ | 🔒 | 🔒 |
+| Items durchsuchen | ❌ | ✅ | ✅ |
+| Private Items ansehen | ❌ | 🔒 | 🔒 |
+| **Listen-Management** |
+| Öffentliche Listen ansehen | ❌ | ✅ | ✅ |
+| Listen erstellen | ❌ | ✅ | ✅ |
+| Listen bearbeiten | ❌ | 🔒 | 🔒 |
+| Listen löschen | ❌ | 🔒 | 🔒 |
+| Private Listen ansehen | ❌ | 🔒 | 🔒 |
+| **Redaktionelle Listen** |
+| Redaktionelle Listen ansehen | ❌ | ✅ | ✅ |
+| Redaktionelle Listen erstellen | ❌ | ❌ | ✅ |
+| Redaktionelle Listen bearbeiten | ❌ | ❌ | ✅ |
+| Redaktionelle Listen löschen | ❌ | ❌ | ✅ |
+| **Profil & Account** |
+| Profil bearbeiten | ❌ | 🔒 | 🔒 |
+| Account löschen | ❌ | 🔒 | 🔒 |
+| Aktivitätshistorie einsehen | ❌ | 🔒 | 🔒 |
+| **Kommunikation** |
+| Kontaktformular einreichen | ✅ | ✅ | ✅ |
+| Kontaktanfragen verwalten | ❌ | ❌ | ✅ |
+| **Administrative Funktionen** |
+| Benutzer suchen | ❌ | ❌ | ✅ |
+| Admin-Rechte vergeben/entziehen | ❌ | ❌ | ✅ |
+| Alle Administratoren anzeigen | ❌ | ❌ | ✅ |
+| Support-Anfragen bearbeiten | ❌ | ❌ | ✅ |
+
+**Legende:**
+- ✅ = Vollzugriff verfügbar
+- ❌ = Nicht verfügbar
+- 🔒 = Nur eigene Inhalte/beschränkter Zugriff
+
+### Detaillierte Beschreibung der Benutzertypen
+
+**Anonyme Benutzer** können die Landing Page mit öffentlichen Items betrachten, Kontaktformulare einreichen und sich registrieren oder anmelden. Zudem steht ihnen der Passwort-Reset über Sicherheitsfragen zur Verfügung.
+
+**Registrierte Benutzer** erhalten umfassende Content-Management-Funktionalitäten. Sie können Items erstellen, bearbeiten und löschen, eigene Item-Listen verwalten und zwischen privaten und öffentlichen Inhalten wählen. Das System ermöglicht das Durchsuchen aller öffentlichen Inhalte anderer Benutzer, die Verwaltung des eigenen Profils und das Zurücksetzen des Passworts. Zusätzlich können sie ihre Aktivitätshistorie einsehen und ihr Konto selbstständig löschen.
+
+**Administratoren** verfügen über alle Funktionen registrierter Benutzer plus erweiterte administrative Rechte. Sie können redaktionelle Listen erstellen und verwalten, alle Benutzer suchen und deren Status verwalten, Admin-Rechte vergeben oder entziehen und Kontaktformular-Anfragen bearbeiten. Zusätzlich haben sie Zugriff auf erweiterte Such- und Verwaltungsfunktionen für die gesamte Plattform.
+
+## 📁 Projektstruktur
 
 ```
 backend/
@@ -68,6 +121,8 @@ POST /register
 
 ### 🎨 Item-Management (`/routes/items.js`)
 
+Das Item-Management bildet das Herzstück der Content-Verwaltung und bietet umfassende CRUD-Operationen für digitale Inhalte mit erweiterten Such- und Filterfunktionen.
+
 | Methode | Endpunkt | Beschreibung | Auth erforderlich |
 |---------|----------|--------------|-------------------|
 | `GET` | `/items/no-auth` | Öffentliche Items für Landing Page | ❌ |
@@ -97,6 +152,8 @@ image: [file]
 
 ### 📝 Item-Listen (`/routes/itemLists.js`)
 
+Das Listen-System ermöglicht die Organisation von Items in thematischen Sammlungen mit flexiblen Verwaltungsoptionen und Datenschutz-Einstellungen.
+
 | Methode | Endpunkt | Beschreibung | Auth erforderlich |
 |---------|----------|--------------|-------------------|
 | `GET` | `/item-lists` | Alle Item-Listen mit Filtern | ✅ |
@@ -120,6 +177,8 @@ main_image: [file]
 
 ### 📰 Redaktionelle Listen (`/routes/editorials.js`)
 
+Redaktionelle Listen bieten Administratoren die Möglichkeit, kuratierte Sammlungen zu erstellen, die hochwertige, thematisch zusammenhängende Inhalte präsentieren.
+
 | Methode | Endpunkt | Beschreibung | Auth erforderlich | Admin erforderlich |
 |---------|----------|--------------|-------------------|--------------------|
 | `GET` | `/editorial-lists` | Alle redaktionellen Listen | ✅ | ❌ |
@@ -131,11 +190,15 @@ main_image: [file]
 
 ### 📊 Aktivitäten (`/routes/activities.js`)
 
+Das Aktivitätssystem dokumentiert Benutzeraktionen für Transparenz und ermöglicht die Nachverfolgung von Änderungen am Content.
+
 | Methode | Endpunkt | Beschreibung | Auth erforderlich |
 |---------|----------|--------------|-------------------|
 | `GET` | `/activities` | Letzte 5 Aktivitäten des Benutzers | ✅ |
 
 ### 📧 Kontaktformular (`/routes/contact-form.js`)
+
+Das Kontaktformular-System erleichtert die Kommunikation zwischen Benutzern und dem Support-Team mit Status-Tracking und administrativer Verwaltung.
 
 | Methode | Endpunkt | Beschreibung | Auth erforderlich | Admin erforderlich |
 |---------|----------|--------------|-------------------|--------------------|
@@ -147,21 +210,21 @@ main_image: [file]
 
 ### 👑 Administrative Funktionen (`/routes/admin.js`)
 
+Administrative Funktionen bieten umfassende Benutzerverwaltung und erweiterte Systemkontrolle für Plattform-Administratoren.
+
 | Methode | Endpunkt | Beschreibung | Auth erforderlich | Admin erforderlich |
 |---------|----------|--------------|-------------------|--------------------|
 | `GET` | `/admin/search` | Benutzer suchen | ✅ | ✅ |
 | `PUT` | `/admin/:id` | Admin-Status setzen | ✅ | ✅ |
 | `GET` | `/admin` | Alle Administratoren | ✅ | ✅ |
 
-## 🔒 Sicherheitsfeatures
+## 🔒 Sicherheitsarchitektur
 
 ### JWT-Authentifizierung
-- Tokens laufen nach 1 Stunde ab
-- Sichere Passwort-Hashing mit bcrypt
-- Middleware-basierte Authentifizierung
+Das Authentifizierungssystem basiert auf JSON Web Tokens mit einer Gültigkeitsdauer von einer Stunde für optimale Sicherheit bei gleichzeitiger Benutzerfreundlichkeit. Passwörter werden mit bcrypt sicher gehasht und gesalzen, während eine Middleware-basierte Authentifizierung konsistente Sicherheitsprüfungen gewährleistet.
 
 ### SQL-Injection-Schutz
-Das System verwendet einen Pattern-basierten Ansatz zur Erkennung von SQL-Injection-Versuchen:
+Das System implementiert einen mehrstufigen Schutz gegen SQL-Injection-Angriffe durch Pattern-basierte Erkennung verdächtiger Eingaben:
 
 ```javascript
 // Erkannte Patterns:
@@ -175,48 +238,41 @@ Das System verwendet einen Pattern-basierten Ansatz zur Erkennung von SQL-Inject
 - load_file(), into outfile
 ```
 
-### Datenschutz
-- Private/Öffentliche Items
-- Benutzer sehen nur eigene private Items
-- Cascading Deletes für Datenintegrität
+### Datenschutz und Zugriffskontrollen
+Das granulare Datenschutzsystem ermöglicht private und öffentliche Items, wobei Benutzer nur ihre eigenen privaten Inhalte sehen können. Cascading Deletes gewährleisten Datenintegrität bei der Löschung von Benutzern oder Inhalten, während rollenbasierte Zugriffskontrolle verschiedene Berechtigungsebenen implementiert.
 
-## 🏗 Datenbankschema
+## 🏗 Datenbankarchitektur
 
 ### Haupttabellen
-- `users` - Benutzerinformationen mit Sicherheitsfragen
-- `item` - Items mit Bildern und Kategorien
-- `item_list` - Benutzerdefinierte Item-Sammlungen
-- `editorial` - Redaktionelle Kuratierungen (Admin)
-- `activities` - Audit-Trail für Benutzeraktionen
-- `contact_form` - Kontaktanfragen
+Das Datenbankschema ist auf Skalierbarkeit und Datenintegrität ausgelegt. Die `users`-Tabelle speichert Benutzerinformationen mit Sicherheitsfragen für Passwort-Recovery. Die `item`-Tabelle verwaltet alle digitalen Inhalte mit Bildern und Kategorisierung, während `item_list` benutzerdefinierte Sammlungen organisiert.
+
+Die `editorial`-Tabelle ermöglicht redaktionelle Kuratierungen durch Administratoren. Das `activities`-System erstellt einen umfassenden Audit-Trail für alle Benutzeraktionen, und die `contact_form`-Tabelle verwaltet Support-Anfragen mit Status-Tracking.
 
 ### Verknüpfungstabellen
-- `item_itemlist` - Items ↔ Item-Listen
-- `item_editorial` - Items ↔ Redaktionelle Listen
+- `item_itemlist` - Many-to-Many-Beziehung zwischen Items und Item-Listen
+- `item_editorial` - Many-to-Many-Beziehung zwischen Items und redaktionellen Listen
 
 ## 🐛 Debugging & Monitoring
 
-### Health Check
+### Health Check und Systemüberwachung
+Ein einfacher Health-Check-Endpunkt ermöglicht die Überwachung der Systemverfügbarkeit:
+
 ```bash
 curl http://localhost:3001/health
 ```
 
-### Logging
-- Console-basiertes Logging für Errors
-- Aktivitätsverfolgung in der Datenbank
-- SQL-Injection-Versuche werden geloggt
+Das Logging-System umfasst Console-basiertes Error-Logging, Aktivitätsverfolgung in der Datenbank für Audit-Zwecke und automatische Protokollierung von SQL-Injection-Versuchen für Sicherheitsanalysen.
 
-## 🚨 Bekannte Limitierungen
+## 🚨 Bekannte Limitierungen und Verbesserungspotential
 
-1. **SQL Injection Protection**: Pattern-basiert, könnte fortgeschrittene Angriffe übersehen
-2. **Rate Limiting**: Nicht implementiert
-3. **Logging**: Rudimentär, könnte strukturierter sein
-4. **Testing**: Keine automatisierten Tests vorhanden
+### Aktuelle Einschränkungen
+Der SQL-Injection-Schutz basiert auf Pattern-Erkennung und könnte fortgeschrittene Angriffe übersehen. Rate Limiting ist nicht implementiert, was potenzielle DDoS-Vulnerabilitäten schafft. Das Logging-System ist rudimentär und könnte strukturierter und umfassender gestaltet werden. Automatisierte Tests fehlen vollständig, was die Code-Qualität und Wartbarkeit beeinträchtigt.
 
-## 🔮 Mögliche Erweiterungen
+## 🔮 Erweiterungsmöglichkeiten
 
-- **File Storage**: Migration zu Cloud Storage (AWS S3, etc.)
-- **Caching**: Für häufig abgerufene Daten
-- **API Documentation**: OpenAPI/Swagger Integration
-- **Monitoring**: Prometheus/Grafana Integration
-- **Testing**: Unit- und Integration-Tests
+### Geplante Verbesserungen
+Die Migration zu Cloud Storage (AWS S3, Azure Blob) würde Skalierbarkeit und Performance verbessern. Caching-Mechanismen für häufig abgerufene Daten könnten die Antwortzeiten erheblich reduzieren. Eine OpenAPI/Swagger-Integration würde die API-Dokumentation automatisieren und verbessern.
+
+Prometheus/Grafana-Integration würde umfassende Monitoring- und Alerting-Funktionen bieten. Die Implementierung von Unit- und Integration-Tests würde Code-Qualität und Zuverlässigkeit sicherstellen. Rate Limiting und erweiterte Sicherheitsfeatures würden die Plattform gegen verschiedene Angriffsvektoren absichern.
+
+Das Online Museum Backend bietet eine solide, sicherheitsorientierte Grundlage für die digitale Kulturplattform mit klaren Erweiterungsmöglichkeiten für zukünftige Anforderungen.
