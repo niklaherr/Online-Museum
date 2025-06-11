@@ -16,14 +16,23 @@ function requireAdmin(req, res, next) {
 router.get("/admin/search", authenticateJWT, requireAdmin, async (req, res) => {
     const pool = req.app.locals.pool;
     const { q } = req.query;
+    const currentUserId = req.user.id; // Assuming req.user is set by your auth middleware
 
-    const query = "SELECT * FROM users WHERE username ILIKE $1 OR id::TEXT ILIKE $1 ORDER BY username ASC";
+    const query = `
+        SELECT * 
+        FROM users 
+        WHERE (username ILIKE $1 OR id::TEXT ILIKE $1) 
+        AND id != $2 
+        ORDER BY username ASC
+    `;
+
+    const values = [`%${q}%`, currentUserId];
+
     if (isSQLInjection(query)) {
         return res.status(401).send("Access denied");
     }
-
     try {
-        const result = await pool.query(query, [`%${q}%`]);
+        const result = await pool.query(query, values);
         res.json(result.rows);
     } catch (err) {
         console.error(err);

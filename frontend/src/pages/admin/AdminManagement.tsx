@@ -199,7 +199,7 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
         )}
         
         {searchResults.length === 0 && searchQuery && !isSearching && (
-          <Text className="text-gray-500 italic mb-4">Keine Benutzer gefunden. Versuchen Sie eine andere Suchanfrage.</Text>
+          <Text className="text-gray-500 italic mb-4">Keine Benutzer gefunden. Senden Sie die Suchanfrage ab oder versuchen Sie eine andere Suchanfrage.</Text>
         )}
       </Card>
       
