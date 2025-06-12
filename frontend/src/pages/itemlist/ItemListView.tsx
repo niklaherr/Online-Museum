@@ -62,16 +62,6 @@ const ItemListCard = ({ list, onView }: ItemListCardProps) => {
           </div>
         )}
 
-        {/* Status Badge */}
-        <div className="absolute top-4 right-4">
-          <Badge color={isEditorial ? "indigo" : 
-            ('isprivate' in list && list.isprivate) ? "red" : "green"} 
-            size="sm">
-            {isEditorial ? 'Redaktionell' : 
-             ('isprivate' in list && list.isprivate) ? 'Privat' : 'Öffentlich'}
-          </Badge>
-        </div>
-
         {/* Overlay Gradient */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/20 to-transparent h-16"></div>
       </div>
