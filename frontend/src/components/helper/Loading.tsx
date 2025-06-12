@@ -41,8 +41,8 @@ const Loading = () => {
       ) : (
         <div className="text-gray-500 flex flex-col items-center">
           <ExclamationCircleIcon className="w-10 h-10 mb-2 text-gray-400" />
-          <p className="text-lg font-semibold">Nothing loaded</p>
-          <p className="text-sm text-gray-400 mt-1">Try refreshing or check your connection.</p>
+          <p className="text-lg font-semibold">Fehler beim Laden</p>
+          <p className="text-sm text-gray-400 mt-1">Versuche, die Seite neu zu laden oder prüfe deine Verbindung.</p>
         </div>
       )}
     </div>
