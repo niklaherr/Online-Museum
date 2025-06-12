@@ -1,9 +1,13 @@
 #Railway Version mit PRIVATER DB-URL
+#Railway Version mit PRIVATER DB-URL
 FROM node:18-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
+    python3 \
+    make \
+    g++ \
     python3 \
     make \
     g++ \
