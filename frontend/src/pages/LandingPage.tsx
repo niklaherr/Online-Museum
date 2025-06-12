@@ -1,21 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Grid,
-  Title,
-  Text,
-  Flex,
-  Metric,
-  Icon,
-  Button,
-} from "@tremor/react";
-import {
-  AcademicCapIcon,
-  PlusCircleIcon,
-  StarIcon,
-  ClockIcon,
-  ArrowRightIcon,
-} from "@heroicons/react/24/outline";
+import { Card, Grid, Title, Text, Flex, Metric, Icon, Button } from "@tremor/react";
+import { AcademicCapIcon, PlusCircleIcon, StarIcon, ClockIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 import { itemService } from "services/ItemService";
 import { GalleryItem } from "interfaces/Item";
@@ -24,6 +9,7 @@ import NoResults from "../components/helper/NoResults";
 import Loading from "components/helper/Loading";
 import { userService } from "services/UserService";
 
+// Animation variants for fade-up effect
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: (i = 0) => ({
@@ -41,10 +27,13 @@ type LandingPageProps = {
   onNavigate: (route: string) => void;
 };
 
+// Main landing page component
 const LandingPage = ({ onNavigate }: LandingPageProps) => {
+  // State for museum items and loading status
   const [museumItems, setMuseumItems] = useState<GalleryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch latest items for the landing page
   const loadItems = async () => {
     try {
       const items = await itemService.fetchLandingPageItems();
@@ -59,15 +48,17 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
     }
   };
 
+  // Redirect logged-in users and load items on mount
   useEffect(() => {
     loadItems();
-  }, []);
+  }, [onNavigate]);
 
+  // Show loading spinner while fetching data
   if (isLoading) return <Loading />;
 
   return (
     <div className="px-4 py-10 md:py-16 max-w-7xl mx-auto space-y-16">
-      {/* Hero Section */}
+      {/* Hero Section: Main headline and CTA */}
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -86,7 +77,7 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
         </div>
       </motion.div>
 
-      {/* Feature Cards */}
+      {/* Feature Cards: Highlight main features */}
       <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
         <Grid numItemsSm={2} numItemsMd={3} className="gap-6">
           {[
@@ -124,7 +115,7 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
         </Grid>
       </motion.div>
 
-      {/* How it Works Section */}
+      {/* How it Works Section: Step-by-step instructions */}
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -132,7 +123,7 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
         variants={fadeUp}
         className="space-y-6"
       >
-        <Title className="text-center">So funktioniert’s</Title>
+        <Title className="text-center">So funktioniert's</Title>
         <Grid numItemsSm={1} numItemsMd={3} className="gap-6">
           {[
             "Konto erstellen & anmelden",
@@ -149,7 +140,7 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
         </Grid>
       </motion.div>
 
-      {/* Embedded YouTube Video */}
+      {/* Embedded YouTube Video: Introduction video */}
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -161,8 +152,8 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
           <div className="aspect-video w-full overflow-hidden rounded-xl">
             <iframe
               className="w-full h-full rounded-xl"
-              src="https://lumen5.com/user/henri-herdel/online-museum-share-g6q75/" // Replace with your actual video
-              title="YouTube video player"
+              src="https://www.youtube.com/embed/5RLlBxIccqQ"
+              title="Online Museum Vorstellung"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
@@ -170,7 +161,7 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
         </Card>
       </motion.div>
 
-      {/* Latest Entries */}
+      {/* Latest Entries: Show latest museum items */}
       <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
         <Flex justifyContent="between" alignItems="center" className="mb-4">
           <Title>Neueste Einträge</Title>
@@ -205,11 +196,12 @@ const LandingPage = ({ onNavigate }: LandingPageProps) => {
             ))}
           </div>
         ) : (
+          // Show if there are no items
           <NoResults />
         )}
       </motion.div>
 
-      {/* CTA */}
+      {/* Call to Action: Encourage user registration/contribution */}
       <motion.div
         initial="hidden"
         whileInView="visible"
