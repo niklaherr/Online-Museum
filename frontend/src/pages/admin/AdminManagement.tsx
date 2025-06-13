@@ -3,32 +3,31 @@ import { Card, Title, TextInput, Button, Grid, Text, Flex, Dialog, DialogPanel }
 import { MagnifyingGlassIcon, TrashIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import NotyfService from "services/NotyfService";
 import Loading from "components/helper/Loading";
-
 import User from "interfaces/User";
 import { userService } from "services/UserService";
 import { adminService } from "services/AdminService";
 
+// Props type for navigation callback
 type AdminManagementProps = {
   onNavigate?: (route: string) => void;
 };
 
 const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
-  // State for search functionality
+  // State for user search
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  
-  // State for admins list
+
+  // State for admin list and loading
   const [admins, setAdmins] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // State for confirmation dialog
+
+  // State for remove admin confirmation dialog
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
-  
-  // Load existing admins
+
+  // Load admins on mount and check for admin permission
   useEffect(() => {
-    // Check if user is admin before loading
     if (!userService.isadmin()) {
       NotyfService.showError("Sie haben keine Berechtigung, diese Seite zu sehen");
       if (onNavigate) {
@@ -36,7 +35,7 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
       }
       return;
     }
-    
+
     const loadData = async () => {
       try {
         const adminsList = await adminService.getAdmins();
@@ -53,14 +52,14 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
         }
       }
     };
-    
+
     loadData();
   }, [onNavigate]);
-  
-  // Search for users
+
+  // Search users by query
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
-    
+
     setIsSearching(true);
     try {
       const results = await adminService.searchUsers(searchQuery);
@@ -75,19 +74,14 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
       setIsSearching(false);
     }
   };
-  
-  // Add user to admins
+
+  // Add user as admin and update state
   const addUserAsAdmin = async (user: User) => {
     try {
       await adminService.addAdmin(user.id);
-      
-      // Add user to admins list with isadmin set to true
       const updatedUser = { ...user, isadmin: true };
       setAdmins(prev => [...prev, updatedUser]);
-      
-      // Remove user from search results
       setSearchResults(prev => prev.filter(u => u.id !== user.id));
-      
       NotyfService.showSuccess(`${user.username} wurde erfolgreich als Administrator hinzugefügt`);
     } catch (error) {
       let errorMessage = "Fehler beim Hinzufügen des Administrators";
@@ -97,23 +91,20 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
       NotyfService.showError(errorMessage);
     }
   };
-  
-  // Confirm removing admin
+
+  // Open confirmation dialog for removing admin
   const confirmRemoveAdmin = (userId: number) => {
     setSelectedUserId(userId);
     setIsRemoveModalOpen(true);
   };
-  
-  // Remove admin
+
+  // Remove admin and update state
   const handleRemoveAdmin = async () => {
     if (selectedUserId === null) return;
-    
+
     try {
       await adminService.deleteAdmin(selectedUserId);
-      
-      // Remove user from admins list
       setAdmins(prev => prev.filter(admin => admin.id !== selectedUserId));
-      
       NotyfService.showSuccess("Administrator erfolgreich entfernt");
       setIsRemoveModalOpen(false);
       setSelectedUserId(null);
@@ -125,20 +116,21 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
       NotyfService.showError(errorMessage);
     }
   };
-  
+
+  // Show loading spinner while fetching admins
   if (isLoading) return <Loading />;
-  
+
   return (
     <div className="space-y-8">
+      {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Administratoren verwalten</h1>
         <Text>Suchen Sie nach Benutzern und weisen Sie Administratorrechte zu oder entfernen Sie diese.</Text>
       </div>
-      
-      {/* Search for users and add as admin */}
+
+      {/* User search and add admin section */}
       <Card>
         <Title className="mb-4">Benutzer suchen und als Administrator hinzufügen</Title>
-        
         <div className="flex items-center space-x-2 mb-4">
           <TextInput
             placeholder="Nach Benutzern suchen"
@@ -160,30 +152,24 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
             Suchen
           </Button>
         </div>
-        
-        {/* Search results */}
+
+        {/* Display search results */}
         {searchResults.length > 0 && (
           <div className="mb-6">
             <Text className="font-medium mb-2">Suchergebnisse</Text>
             <Grid numItemsLg={3} numItemsMd={2} numItemsSm={1} className="gap-3">
               {searchResults.map(user => (
-                <Card
-                  key={user.id}
-                  className="!p-3"
-                >
+                <Card key={user.id} className="!p-3">
                   <Flex alignItems="center" justifyContent="between">
                     <div className="flex items-center space-x-3 min-w-0">
-          
-                      {/* Text content aligned left */}
                       <div>
-                      <Text className="font-medium">{user.username}</Text>
-                      <Text className="text-xs text-gray-400">
-                        ID: {user.id}
-                      </Text>
+                        <Text className="font-medium">{user.username}</Text>
+                        <Text className="text-xs text-gray-400">
+                          ID: {user.id}
+                        </Text>
+                      </div>
                     </div>
-                    </div>
-          
-                    {/* Right: Add Button */}
+                    {/* Button to add user as admin */}
                     <Button
                       icon={UserPlusIcon}
                       variant="light"
@@ -197,16 +183,16 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
             </Grid>
           </div>
         )}
-        
+
+        {/* Message if no users found */}
         {searchResults.length === 0 && searchQuery && !isSearching && (
           <Text className="text-gray-500 italic mb-4">Keine Benutzer gefunden. Senden Sie die Suchanfrage ab oder versuchen Sie eine andere Suchanfrage.</Text>
         )}
       </Card>
-      
-      {/* Existing admins */}
+
+      {/* List of current admins */}
       <Card>
         <Title className="mb-4">Aktuelle Administratoren</Title>
-        
         {admins.length === 0 ? (
           <Text className="text-gray-500 italic">Keine Administratoren vorhanden.</Text>
         ) : (
@@ -214,9 +200,7 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
             {admins.map(admin => (
               <Card key={admin.id} className="p-4">
                 <div className="flex justify-between items-center">
-                  {/* Left content block */}
                   <div className="flex items-center space-x-3">
-                    
                     <div>
                       <Text className="font-medium">{admin.username}</Text>
                       <Text className="text-xs text-gray-400">
@@ -224,8 +208,7 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
                       </Text>
                     </div>
                   </div>
-                  
-                  {/* Right: Remove button */}
+                  {/* Button to remove admin, hidden for self */}
                   {userService.getUserID() !== admin.id && (
                     <div>
                       <Button
@@ -244,8 +227,8 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
           </div>
         )}
       </Card>
-      
-      {/* Remove admin confirmation modal */}
+
+      {/* Confirmation dialog for removing admin */}
       <Dialog open={isRemoveModalOpen} onClose={() => setIsRemoveModalOpen(false)}>
         <DialogPanel className="max-w-sm bg-white rounded-xl shadow-md p-6">
           <Title>Administrator-Status entfernen</Title>

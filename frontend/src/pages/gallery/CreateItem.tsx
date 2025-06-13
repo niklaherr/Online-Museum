@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import { Button, Card, TextInput, Textarea, Title, Text, Dialog, DialogPanel, Flex, Badge } from "@tremor/react";
-import { SparklesIcon, ArrowLeftIcon, PhotoIcon, TagIcon, DocumentTextIcon, EyeIcon, LockClosedIcon, CheckCircleIcon, XCircleIcon, CloudArrowUpIcon, PlusIcon } from "@heroicons/react/24/outline";
-import {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent} from "@radix-ui/react-tooltip";
+import {
+  Button, Card, TextInput, Textarea, Title, Text, Dialog, DialogPanel, Flex, Badge
+} from "@tremor/react";
+import {
+  SparklesIcon, ArrowLeftIcon, PhotoIcon, TagIcon, DocumentTextIcon, EyeIcon,
+  LockClosedIcon, CheckCircleIcon, XCircleIcon, CloudArrowUpIcon, PlusIcon
+} from "@heroicons/react/24/outline";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip";
 import { itemService } from "../../services/ItemService";
 import { itemAssistantService } from "../../services/ItemAssistantService";
 import NotyfService from "services/NotyfService";
@@ -11,6 +16,7 @@ type CreateItemProps = {
 };
 
 export const CreateItem = ({ onNavigate }: CreateItemProps) => {
+  // State variables for form fields and UI state
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
@@ -22,6 +28,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
   const [isPrivate, setIsPrivate] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
+  // Handle image file selection and preview
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -35,6 +42,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
     }
   };
 
+  // Handle item creation (form submission)
   const handleCreate = async () => {
     if (!title.trim()) {
       NotyfService.showError("Bitte gib einen Titel ein.");
@@ -64,6 +72,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
     }
   };
 
+  // Generate description using AI assistant
   const handleGenerateDescription = async () => {
     if (!title.trim()) {
       NotyfService.showError("Bitte gib zuerst einen Titel ein.");
@@ -89,11 +98,13 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
     }
   };
 
+  // Accept the generated description and close dialog
   const handleAcceptDescription = () => {
     setDescription(generatedDescription);
     setIsDialogOpen(false);
   };
 
+  // Check if form can be submitted
   const canCreate = title.trim().length > 0;
 
   return (
@@ -110,15 +121,14 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
         </Button>
       </div>
 
-      {/* Hero Header */}
+      {/* Hero Header with gradient and icon */}
       <div className="relative bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 rounded-2xl overflow-hidden shadow-2xl">
-        {/* Background Pattern */}
+        {/* Decorative background pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-8 right-8 w-24 h-24 bg-white rounded-full"></div>
           <div className="absolute bottom-4 left-8 w-16 h-16 bg-white rounded-full"></div>
           <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-white rounded-full"></div>
         </div>
-        
         <div className="relative p-8 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -151,6 +161,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
               </div>
 
               <div className="space-y-4">
+                {/* Title input */}
                 <div>
                   <Text className="font-medium mb-2 text-gray-700">Titel *</Text>
                   <TextInput
@@ -164,6 +175,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                   </Text>
                 </div>
 
+                {/* Category input */}
                 <div>
                   <Text className="font-medium mb-2 text-gray-700">Kategorie *</Text>
                   <TextInput
@@ -180,7 +192,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
             </div>
           </Card>
 
-          {/* Description Card */}
+          {/* Description Card with AI generation */}
           <Card>
             <div className="p-6 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
@@ -191,64 +203,65 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                     Empfohlen
                   </Badge>
                 </div>
+                {/* AI description button with tooltip if fields missing */}
                 <TooltipProvider>
-  <div className="sm:ml-auto">
-    {!title || !category ? (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span>
-            <Button
-              icon={SparklesIcon}
-              size="xs"
-              color="blue"
-              onClick={handleGenerateDescription}
-              loading={isGenerating}
-              disabled={!title || !category}
-              className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
-            >
-              KI-Beschreibung
-            </Button>
-          </span>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-xs p-4 bg-white border border-gray-200 shadow-lg rounded-lg">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 mt-0.5">
-              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="text-sm">
-              <p className="font-medium text-gray-800 mb-1">Fehlende Informationen</p>
-              <p className="text-gray-600 leading-relaxed">
-                {!title && !category 
-                  ? "Bitte fülle Titel und Kategorie aus, um eine KI-Beschreibung zu generieren."
-                  : !title 
-                  ? "Bitte fülle den Titel aus, um eine KI-Beschreibung zu generieren."
-                  : "Bitte fülle die Kategorie aus, um eine KI-Beschreibung zu generieren."
-                }
-              </p>
-            </div>
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    ) : (
-      <Button
-        icon={SparklesIcon}
-        size="xs"
-        color="blue"
-        onClick={handleGenerateDescription}
-        loading={isGenerating}
-        disabled={!title || !category}
-        className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
-      >
-        KI-Beschreibung
-      </Button>
-    )}
-  </div>
-</TooltipProvider>
+                  <div className="sm:ml-auto">
+                    {!title || !category ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>
+                            <Button
+                              icon={SparklesIcon}
+                              size="xs"
+                              color="blue"
+                              onClick={handleGenerateDescription}
+                              loading={isGenerating}
+                              disabled={!title || !category}
+                              className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
+                            >
+                              KI-Beschreibung
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs p-4 bg-white border border-gray-200 shadow-lg rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 mt-0.5">
+                              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <div className="text-sm">
+                              <p className="font-medium text-gray-800 mb-1">Fehlende Informationen</p>
+                              <p className="text-gray-600 leading-relaxed">
+                                {!title && !category 
+                                  ? "Bitte fülle Titel und Kategorie aus, um eine KI-Beschreibung zu generieren."
+                                  : !title 
+                                  ? "Bitte fülle den Titel aus, um eine KI-Beschreibung zu generieren."
+                                  : "Bitte fülle die Kategorie aus, um eine KI-Beschreibung zu generieren."
+                                }
+                              </p>
+                            </div>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <Button
+                        icon={SparklesIcon}
+                        size="xs"
+                        color="blue"
+                        onClick={handleGenerateDescription}
+                        loading={isGenerating}
+                        disabled={!title || !category}
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
+                      >
+                        KI-Beschreibung
+                      </Button>
+                    )}
+                  </div>
+                </TooltipProvider>
               </div>
 
-              
+              {/* Description textarea */}
               <Textarea
                 placeholder="Erzählen Sie die Geschichte hinter diesem Item..."
                 value={description}
@@ -256,7 +269,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                 rows={6}
                 className="w-full"
               />
-              
               <Text className="text-xs text-gray-500">
                 Eine detaillierte Beschreibung macht Ihr Item interessanter und persönlicher.
               </Text>
@@ -275,6 +287,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                 <Title className="text-xl">Sichtbarkeitseinstellungen</Title>
               </div>
 
+              {/* Privacy toggle */}
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className={`p-2 rounded-lg ${isPrivate ? 'bg-red-100' : 'bg-green-100'}`}>
@@ -296,7 +309,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                     </Text>
                   </div>
                 </div>
-                
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -327,6 +339,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                 <Title className="text-xl">Bild hochladen</Title>
               </div>
 
+              {/* Image upload input and preview */}
               <div className="space-y-4">
                 <div className="relative">
                   <input
@@ -380,13 +393,12 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
             </div>
           </Card>
 
-          {/* Progress Card */}
+          {/* Progress Card showing form completion status */}
           <Card>
             <div className="p-6 space-y-4">
               <Title className="text-lg flex items-center">
                 Status
               </Title>
-              
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Titel eingegeben</Text>
@@ -396,7 +408,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                     <XCircleIcon className="w-5 h-5 text-red-500" />
                   )}
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Kategorie festgelegt</Text>
                   {category.trim() ? (
@@ -405,7 +416,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                     <XCircleIcon className="w-5 h-5 text-gray-400" />
                   )}
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Beschreibung verfasst</Text>
                   {description.trim() ? (
@@ -414,7 +424,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                     <XCircleIcon className="w-5 h-5 text-gray-400" />
                   )}
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Bild hochgeladen</Text>
                   {imageFile ? (
@@ -427,7 +436,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
             </div>
           </Card>
 
-          {/* Action Buttons */}
+          {/* Action Buttons for create and cancel */}
           <div className="space-y-3">
             <Button 
               color="emerald" 
@@ -439,7 +448,6 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
             >
               {isCreating ? "Item wird erstellt..." : "Item erstellen"}
             </Button>
-            
             <Button
               variant="light"
               onClick={() => onNavigate("/items")}
@@ -465,11 +473,11 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
                 <Text className="text-gray-600">Basierend auf Titel und Kategorie</Text>
               </div>
             </div>
-
+            {/* Generated description preview */}
             <div className="p-6 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-xl border border-blue-200">
               <Text className="leading-relaxed text-gray-800">{generatedDescription}</Text>
             </div>
-
+            {/* Dialog action buttons */}
             <Flex justifyContent="end" className="space-x-3">
               <Button
                 color="gray"

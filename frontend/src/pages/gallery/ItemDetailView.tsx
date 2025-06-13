@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, Button, Dialog, DialogPanel, Title, Flex, Card, Badge } from "@tremor/react";
-import { 
-  UserIcon, 
-  PencilIcon, 
-  TrashIcon, 
-  CalendarIcon,
-  TagIcon,
-  LockClosedIcon,
-  EyeIcon,
-  ArrowLeftIcon
-} from "@heroicons/react/24/outline";
+import { UserIcon, PencilIcon, TrashIcon, CalendarIcon, TagIcon, LockClosedIcon, EyeIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { useParams } from "react-router-dom";
 import { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
@@ -23,11 +14,13 @@ type ItemDetailViewProps = {
 };
 
 const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
+  // Get item ID from route params and set up state
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
   const [item, setItem] = useState<GalleryItem | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  // Fetch item data on mount or when ID changes
   useEffect(() => {
     const loadItem = async () => {
       try {
@@ -46,12 +39,13 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
     loadItem();
   }, [id]);
 
+  // Handle item deletion with confirmation
   const handleDeleteItem = async () => {
     if (item) {
       try {
         await itemService.deleteItem(item.id);
         NotyfService.showSuccess("Item successfully deleted!");
-        onNavigate("/items"); // Redirect to the list of items after deletion
+        onNavigate("/items"); // Redirect after deletion
       } catch (error) {
         let errorMessage = "Fehler beim Löschen des Items";
         if (error instanceof Error) {
@@ -59,20 +53,21 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
         }
         NotyfService.showError(errorMessage);
       } finally {
-        setIsDeleteModalOpen(false); // Close the confirmation dialog
+        setIsDeleteModalOpen(false); // Always close modal
       }
     }
   };
 
-  if (isLoading) return <Loading />
-
+  // Show loading or no results if needed
+  if (isLoading) return <Loading />;
   if (!item) return <NoResults />;
 
+  // Check if current user is the owner
   const isOwner = item.user_id === userService.getUserID();
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Back Button */}
+      {/* Back navigation button */}
       <div className="flex items-center mb-6">
         <Button
           variant="light"
@@ -84,10 +79,10 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
         </Button>
       </div>
 
-      {/* Main Content Card */}
+      {/* Main item details card */}
       <Card className="overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
-          {/* Image Section */}
+          {/* Image section */}
           <div className="space-y-4">
             <div className="aspect-square w-full overflow-hidden rounded-xl bg-gray-100 border-2 border-gray-200">
               {item.image ? (
@@ -107,7 +102,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
             </div>
           </div>
 
-          {/* Content Section */}
+          {/* Item content and meta info */}
           <div className="space-y-6">
             {/* Header with badges */}
             <div className="space-y-4">
@@ -117,7 +112,6 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
                     {item.category}
                   </Badge>
                 )}
-                
                 {item.isprivate ? (
                   <Badge color="red" icon={LockClosedIcon}>
                     Privat
@@ -127,14 +121,12 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
                     Öffentlich
                   </Badge>
                 )}
-
                 {isOwner && (
                   <Badge color="gray">
                     Eigenes Item
                   </Badge>
                 )}
               </div>
-
               <div>
                 <Title className="text-3xl text-gray-900 mb-2 leading-tight">
                   {item.title}
@@ -142,7 +134,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
               </div>
             </div>
 
-            {/* Meta Information */}
+            {/* Meta information: date and user */}
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
               <div className="flex items-center text-gray-600">
                 <CalendarIcon className="w-5 h-5 mr-3 text-blue-500" />
@@ -157,7 +149,6 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
                   })}
                 </Text>
               </div>
-
               <div className="flex items-center text-gray-600">
                 <UserIcon className="w-5 h-5 mr-3 text-blue-500" />
                 <Text className="font-medium">Erstellt von:</Text>
@@ -165,7 +156,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
               </div>
             </div>
 
-            {/* Description */}
+            {/* Item description */}
             {item.description && (
               <div className="space-y-2">
                 <Title className="text-lg text-gray-800">Beschreibung</Title>
@@ -177,7 +168,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
               </div>
             )}
 
-            {/* Action Buttons */}
+            {/* Edit and delete buttons for owner */}
             {isOwner && (
               <div className="pt-6 border-t border-gray-200">
                 <div className="flex flex-wrap gap-3">
@@ -189,7 +180,6 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
                   >
                     Bearbeiten
                   </Button>
-                  
                   <Button
                     variant="light"
                     color="red"
@@ -206,7 +196,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
         </div>
       </Card>
 
-      {/* Additional Information Card below item Infos */}
+      {/* Additional item details card */}
       <Card>
         <div className="p-6">
           <Title className="text-lg mb-4">Item-Details</Title>
@@ -215,12 +205,10 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
               <Text className="font-medium text-blue-800">Item-ID</Text>
               <Text className="text-blue-600">{item.id}</Text>
             </div>
-            
             <div className="bg-green-50 rounded-lg p-3">
               <Text className="font-medium text-green-800">Benutzer-ID</Text>
               <Text className="text-green-600">{item.user_id}</Text>
             </div>
-            
             <div className="bg-purple-50 rounded-lg p-3">
               <Text className="font-medium text-purple-800">Sichtbarkeit</Text>
               <Text className="text-purple-600">
@@ -231,22 +219,19 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
         </div>
       </Card>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete confirmation dialog */}
       <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
         <DialogPanel className="max-w-md bg-white rounded-xl shadow-xl p-6">
           <div className="text-center">
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
               <TrashIcon className="h-6 w-6 text-red-600" />
             </div>
-            
             <Title className="text-lg font-semibold text-gray-900 mb-2">
               Item wirklich löschen?
             </Title>
-            
             <Text className="text-gray-500 mb-6">
               Diese Aktion kann nicht rückgängig gemacht werden. Das Item "{item.title}" wird permanent gelöscht.
             </Text>
-            
             <Flex justifyContent="end" className="space-x-3">
               <Button 
                 variant="secondary" 

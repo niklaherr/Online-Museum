@@ -1,25 +1,15 @@
+import { useState, useEffect } from 'react';
+import { Badge, Card, Title, Text, Button } from '@tremor/react';
+import { SparklesIcon, MagnifyingGlassIcon, XMarkIcon, PlusIcon, CalendarIcon, LockClosedIcon, EyeIcon, RectangleStackIcon, UserGroupIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import ItemList from 'interfaces/ItemList';
 import Editorial from 'interfaces/Editorial';
 import NoResults from 'components/helper/NoResults';
-import { useState, useEffect } from 'react';
+import Loading from 'components/helper/Loading';
 import { itemService } from 'services/ItemService';
 import { editorialService } from 'services/EditorialService';
 import NotyfService from 'services/NotyfService';
-import Loading from 'components/helper/Loading';
-import { Badge, Card, Title, Text, Button } from '@tremor/react';
-import { 
-  SparklesIcon, 
-  MagnifyingGlassIcon,
-  XMarkIcon,
-  PlusIcon,
-  CalendarIcon,
-  LockClosedIcon,
-  EyeIcon,
-  RectangleStackIcon,
-  UserGroupIcon,
-  GlobeAltIcon,
-} from '@heroicons/react/24/outline';
 
+// Card component for displaying either an ItemList or Editorial
 type ItemListCardProps = {
   list: ItemList | Editorial;
   onView: (id: number, type: 'item-list' | 'editorial') => void;
@@ -28,13 +18,13 @@ type ItemListCardProps = {
 const ItemListCard = ({ list, onView }: ItemListCardProps) => {
   const isEditorial = !('isprivate' in list);
   const hasMainImage = 'main_image' in list && list.main_image;
-  
+
   return (
     <Card
       className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden bg-white border-0 shadow-lg"
       onClick={() => onView(list.id, isEditorial ? 'editorial' : 'item-list')}
     >
-      {/* Header Image/Icon Area */}
+      {/* Image or icon area with status badge */}
       <div className="relative h-48 w-full overflow-hidden rounded-xl">
         {hasMainImage ? (
           <img
@@ -44,14 +34,13 @@ const ItemListCard = ({ list, onView }: ItemListCardProps) => {
           />
         ) : (
           <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center h-full">
-            {/* Background Pattern */}
+            {/* Decorative background pattern */}
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-4 right-4 w-16 h-16 bg-blue-300 rounded-full"></div>
               <div className="absolute bottom-4 left-4 w-12 h-12 bg-purple-300 rounded-full"></div>
               <div className="absolute top-1/2 left-1/2 w-20 h-20 bg-indigo-200 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
             </div>
-
-            {/* Center Icon */}
+            {/* Central icon */}
             <div className="relative z-10 p-4 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
               {isEditorial ? (
                 <SparklesIcon className="w-12 h-12 text-blue-600" />
@@ -62,21 +51,21 @@ const ItemListCard = ({ list, onView }: ItemListCardProps) => {
           </div>
         )}
 
-        {/* Status Badge */}
+        {/* Status badge (Editorial/Private/Public) */}
         <div className="absolute top-4 right-4">
-          <Badge color={isEditorial ? "indigo" : 
-            ('isprivate' in list && list.isprivate) ? "red" : "green"} 
+          <Badge color={isEditorial ? "indigo" :
+            ('isprivate' in list && list.isprivate) ? "red" : "green"}
             size="sm">
-            {isEditorial ? 'Redaktionell' : 
-             ('isprivate' in list && list.isprivate) ? 'Privat' : 'Öffentlich'}
+            {isEditorial ? 'Redaktionell' :
+              ('isprivate' in list && list.isprivate) ? 'Privat' : 'Öffentlich'}
           </Badge>
         </div>
 
-        {/* Overlay Gradient */}
+        {/* Gradient overlay at the bottom */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/20 to-transparent h-16"></div>
       </div>
 
-      {/* Content */}
+      {/* Card content: title, description, metadata */}
       <div className="p-6 space-y-4">
         {/* Title */}
         <div>
@@ -84,21 +73,18 @@ const ItemListCard = ({ list, onView }: ItemListCardProps) => {
             {list.title}
           </Title>
         </div>
-
-        {/* Description */}
+        {/* Description if available */}
         {list.description && (
           <Text className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
             {list.description}
           </Text>
         )}
-
-        {/* Meta Information */}
+        {/* Metadata: date and status */}
         <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
           <div className="flex items-center">
             <CalendarIcon className="w-4 h-4 mr-1" />
             <span>{new Date(list.entered_on).toLocaleDateString('de-DE')}</span>
           </div>
-          
           {isEditorial ? (
             <div className="flex items-center text-indigo-600">
               <SparklesIcon className="w-4 h-4 mr-1" />
@@ -125,82 +111,80 @@ const ItemListCard = ({ list, onView }: ItemListCardProps) => {
   );
 };
 
+// Props for the main ItemListView component
 type ItemListViewProps = {
   onViewSpace: (id: number, type?: string) => void;
   onNavigate: (route: string) => void;
 };
 
+// Main component for displaying all list sections and search
 const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
+  // State for lists, loading, and search
   const [itemLists, setItemLists] = useState<ItemList[]>([]);
   const [editorialLists, setEditorialLists] = useState<Editorial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [userItemLists, setUserItemLists] = useState<ItemList[]>([]);
 
+  // Load lists on mount
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load regular item lists
         const fetchedItemLists = await itemService.fetchPublicLists();
         setItemLists(fetchedItemLists);
-        
-        // Filter for user's own item lists
+
         const userlists = await itemService.fetchUserLists();
         setUserItemLists(userlists);
 
         const fetchedEditorials = await editorialService.fetchEditorialLists();
         setEditorialLists(fetchedEditorials);
         setIsLoading(false)
-        
       } catch (error) {
         let errorMessage = "Fehler beim Laden der Listen";
-        if(error instanceof Error) {
+        if (error instanceof Error) {
           errorMessage = error.message;
         }
         NotyfService.showError(errorMessage);
       }
     };
-
     loadData();
-    
   }, []);
 
-  // Filtering and searching for item lists
+  // Filter lists by search term
   const filteredItemLists = itemLists.filter(list => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       return (
-        list.title.toLowerCase().includes(term) || 
+        list.title.toLowerCase().includes(term) ||
         (list.description && list.description.toLowerCase().includes(term))
       );
     }
     return true;
   });
 
-  // Filtering and searching for editorial lists
   const filteredEditorials = editorialLists.filter(editorial => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       return (
-        editorial.title.toLowerCase().includes(term) || 
+        editorial.title.toLowerCase().includes(term) ||
         (editorial.description && editorial.description.toLowerCase().includes(term))
       );
     }
     return true;
   });
 
-  // Filtering and searching for user's item lists
   const filteredUserItemLists = userItemLists.filter(list => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       return (
-        list.title.toLowerCase().includes(term) || 
+        list.title.toLowerCase().includes(term) ||
         (list.description && list.description.toLowerCase().includes(term))
       );
     }
     return true;
   });
 
+  // Handle navigation when a card is clicked
   const handleViewSpace = (id: number, type: 'item-list' | 'editorial') => {
     if (type === 'editorial') {
       onNavigate(`/editorial/${id}`);
@@ -209,6 +193,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
     }
   };
 
+  // Clear the search field
   const clearSearch = () => {
     setSearchTerm('');
   };
@@ -219,7 +204,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
 
   return (
     <div className="space-y-8">
-      {/* Hero Header */}
+      {/* Header with title, description, and create button */}
       <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl overflow-hidden shadow-2xl">
         <div className="relative p-8 text-white">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -252,7 +237,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
         </div>
       </div>
 
-      {/* Simple Search Section - Same as Gallery */}
+      {/* Search input */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="relative flex-1 max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -276,7 +261,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
         </div>
       </div>
 
-      {/* No Results */}
+      {/* No results message if search yields nothing */}
       {searchTerm && filteredEditorials.length === 0 && filteredItemLists.length === 0 && filteredUserItemLists.length === 0 && (
         <div className="text-center py-8">
           <MagnifyingGlassIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -293,10 +278,10 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
         </div>
       )}
 
-      {/* No Results when no search and no items */}
+      {/* No results message if there are no lists at all */}
       {!searchTerm && totalLists === 0 && <NoResults />}
 
-      {/* Editorial Lists Section */}
+      {/* Editorial lists section */}
       {filteredEditorials.length > 0 && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
@@ -326,7 +311,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
         </div>
       )}
 
-      {/* Public Lists Section */}
+      {/* Public lists section */}
       {filteredItemLists.length > 0 && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
@@ -356,7 +341,7 @@ const ItemListView = ({ onViewSpace, onNavigate }: ItemListViewProps) => {
         </div>
       )}
       
-      {/* User's Lists Section */}
+      {/* User's own lists section */}
       {filteredUserItemLists.length > 0 && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">

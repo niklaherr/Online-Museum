@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
-import { Card, Title, TextInput, Textarea, Button, Text, Dialog, DialogPanel, Flex, Badge } from "@tremor/react";
-import { SparklesIcon, ArrowLeftIcon, RectangleStackIcon, DocumentTextIcon, EyeIcon, LockClosedIcon, CheckCircleIcon, XCircleIcon, CalendarIcon, TagIcon, XMarkIcon, PhotoIcon, CloudArrowUpIcon } from "@heroicons/react/24/outline";
-import {TooltipProvider, Tooltip, TooltipTrigger, TooltipContent} from "@radix-ui/react-tooltip";
+import {
+  Card, Title, TextInput, Textarea, Button, Text, Dialog, DialogPanel, Flex, Badge
+} from "@tremor/react";
+import {
+  SparklesIcon, ArrowLeftIcon, RectangleStackIcon, DocumentTextIcon, EyeIcon,
+  LockClosedIcon, CheckCircleIcon, XCircleIcon, CalendarIcon, TagIcon, XMarkIcon,
+  PhotoIcon, CloudArrowUpIcon
+} from "@heroicons/react/24/outline";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip";
 import Item, { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
 import { itemAssistantService } from "services/ItemAssistantService";
@@ -12,6 +18,7 @@ type CreateItemListProps = {
 };
 
 export default function CreateItemList({ onNavigate }: CreateItemListProps) {
+  // State variables for form fields and UI state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [userItems, setUserItems] = useState<Item[]>([]);
@@ -25,6 +32,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
   const [isCreateConfirmOpen, setIsCreateConfirmOpen] = useState(false);
   const [generatedDescription, setGeneratedDescription] = useState("");
 
+  // Fetch user's own items on mount
   useEffect(() => {
     const fetchUserItems = async () => {
       try {
@@ -37,6 +45,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     fetchUserItems();
   }, []);
 
+  // Handle main image file selection and preview
   const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -50,11 +59,12 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     }
   };
 
-  // Remove item from selection
+  // Remove an item from the selected items list
   const removeItem = (itemId: number) => {
     setSelectedItems(prev => prev.filter(item => item.id !== itemId));
   };
 
+  // Toggle selection of an item
   const toggleItemSelection = (itemId: number) => {
     const item = userItems.find(i => i.id === itemId);
     if (!item) return;
@@ -72,6 +82,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     }
   };
 
+  // Submit the form to create a new item list
   const handleSubmit = async () => {
     if (!title.trim()) {
       NotyfService.showError("Listentitel ist erforderlich.");
@@ -104,6 +115,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     }
   };
 
+  // Generate a description using AI based on title and selected items
   const handleGenerateDescription = async () => {
     if (!title.trim()) {
       NotyfService.showError("Bitte gib zuerst einen Titel ein.");
@@ -118,7 +130,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     setIsGenerating(true);
 
     try {
-     let promptText = `Erstelle eine Beschreibung für eine redaktionelle Sammlung mit dem Titel "${title}". `;
+      let promptText = `Erstelle eine Beschreibung für eine redaktionelle Sammlung mit dem Titel "${title}". `;
       promptText += "Die Sammlung enthält folgende Elemente:\n";
 
       selectedItems.forEach((item, index) => {
@@ -130,7 +142,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
 
       promptText += `\nBitte erstelle basierend auf dem Titel "${title}" und diesen ${selectedItems.length} Inhalten eine, `;
       promptText += "zusammenfassende Beschreibung, die die thematische Verbindung dieser redaktionellen Sammlung in 2-3 Sätzen hervorhebt.";
-      
+
       const generatedText = await itemAssistantService.generateDescription(
         title,
         promptText
@@ -146,16 +158,18 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
     }
   };
 
+  // Accept the generated description and set it as the description
   const handleAcceptDescription = () => {
     setDescription(generatedDescription);
     setIsDialogOpen(false);
   };
 
+  // Check if form has required changes to enable submit
   const hasChanges = title.trim() && selectedItems.length > 0;
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Back Button */}
+      {/* Back navigation button */}
       <div className="flex items-center mb-6">
         <Button
           variant="light"
@@ -167,15 +181,15 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
         </Button>
       </div>
 
-      {/* Hero Header */}
+      {/* Hero header with gradient background */}
       <div className="relative bg-gradient-to-r from-green-600 via-blue-600 to-indigo-600 rounded-2xl overflow-hidden shadow-2xl">
-        {/* Background Pattern */}
+        {/* Decorative background pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-8 right-8 w-24 h-24 bg-white rounded-full"></div>
           <div className="absolute bottom-4 left-8 w-16 h-16 bg-white rounded-full"></div>
           <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-white rounded-full"></div>
         </div>
-        
+
         <div className="relative p-8 text-white">
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
@@ -192,9 +206,9 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Form Section */}
+        {/* Main form section */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Basic Information Card */}
+          {/* Card: Basic information (title, description, AI description) */}
           <Card>
             <div className="p-6 space-y-6">
               <div className="flex items-center space-x-3 mb-4">
@@ -203,6 +217,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
               </div>
 
               <div className="space-y-4">
+                {/* Title input */}
                 <div>
                   <Text className="font-medium mb-2 text-gray-700">Listentitel *</Text>
                   <TextInput
@@ -213,63 +228,64 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                   />
                 </div>
 
+                {/* Description input and AI description button/tooltip */}
                 <div>
                   <TooltipProvider>
-  <div className="flex items-center justify-between mb-2">
-    <Text className="font-medium text-gray-700">Beschreibung</Text>
-    {selectedItems.length === 0 || !title.trim() ? (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span>
-            <Button
-              icon={SparklesIcon}
-              size="xs"
-              color="blue"
-              onClick={handleGenerateDescription}
-              loading={isGenerating}
-              disabled={selectedItems.length === 0 || !title.trim()}
-              className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
-            >
-              KI-Beschreibung
-            </Button>
-          </span>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-xs p-4 bg-white border border-gray-200 shadow-lg rounded-lg">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 mt-0.5">
-              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="text-sm">
-              <p className="font-medium text-gray-800 mb-1">Fehlende Informationen</p>
-              <p className="text-gray-600 leading-relaxed">
-                {selectedItems.length === 0 && !title.trim()
-                  ? "Bitte fülle den Titel aus und wähle mindestens ein Item aus, um eine KI-Beschreibung zu generieren."
-                  : selectedItems.length === 0
-                  ? "Bitte wähle mindestens ein Item aus, um eine KI-Beschreibung zu generieren."
-                  : "Bitte fülle den Titel aus, um eine KI-Beschreibung zu generieren."
-                }
-              </p>
-            </div>
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    ) : (
-      <Button
-        icon={SparklesIcon}
-        size="xs"
-        color="blue"
-        onClick={handleGenerateDescription}
-        loading={isGenerating}
-        disabled={selectedItems.length === 0 || !title.trim()}
-        className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
-      >
-        KI-Beschreibung
-      </Button>
-    )}
-  </div>
-</TooltipProvider>
+                    <div className="flex items-center justify-between mb-2">
+                      <Text className="font-medium text-gray-700">Beschreibung</Text>
+                      {selectedItems.length === 0 || !title.trim() ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span>
+                              <Button
+                                icon={SparklesIcon}
+                                size="xs"
+                                color="blue"
+                                onClick={handleGenerateDescription}
+                                loading={isGenerating}
+                                disabled={selectedItems.length === 0 || !title.trim()}
+                                className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
+                              >
+                                KI-Beschreibung
+                              </Button>
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs p-4 bg-white border border-gray-200 shadow-lg rounded-lg">
+                            <div className="flex items-start gap-3">
+                              <div className="flex-shrink-0 mt-0.5">
+                                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                              <div className="text-sm">
+                                <p className="font-medium text-gray-800 mb-1">Fehlende Informationen</p>
+                                <p className="text-gray-600 leading-relaxed">
+                                  {selectedItems.length === 0 && !title.trim()
+                                    ? "Bitte fülle den Titel aus und wähle mindestens ein Item aus, um eine KI-Beschreibung zu generieren."
+                                    : selectedItems.length === 0
+                                      ? "Bitte wähle mindestens ein Item aus, um eine KI-Beschreibung zu generieren."
+                                      : "Bitte fülle den Titel aus, um eine KI-Beschreibung zu generieren."
+                                  }
+                                </p>
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <Button
+                          icon={SparklesIcon}
+                          size="xs"
+                          color="blue"
+                          onClick={handleGenerateDescription}
+                          loading={isGenerating}
+                          disabled={selectedItems.length === 0 || !title.trim()}
+                          className="bg-gradient-to-r from-blue-500 to-purple-500 border-0 text-white"
+                        >
+                          KI-Beschreibung
+                        </Button>
+                      )}
+                    </div>
+                  </TooltipProvider>
                   <Textarea
                     placeholder="Beschreibung (optional)"
                     value={description}
@@ -282,7 +298,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
             </div>
           </Card>
 
-          {/* Main Image Upload Card */}
+          {/* Card: Main image upload and preview */}
           <Card>
             <div className="p-6 space-y-4">
               <div className="flex items-center space-x-3">
@@ -291,6 +307,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
               </div>
 
               <div className="space-y-4">
+                {/* File input for banner image */}
                 <div className="relative">
                   <input
                     type="file"
@@ -321,7 +338,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                   </label>
                 </div>
 
-                {/* Image Preview */}
+                {/* Banner image preview */}
                 {mainImagePreview && (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -331,30 +348,25 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                       </Badge>
                     </div>
                     
-                    {/* Live Banner Preview - matches ItemListDetailView exactly */}
+                    {/* Live banner preview */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <Text className="text-xs text-gray-500">So wird es als Banner dargestellt:</Text>
                       </div>
-                      
-                      {/* Fixed Height Banner - matches ItemListDetailView exactly */}
                       <div className="relative h-64 w-full overflow-hidden rounded-lg border-2 border-blue-200 shadow-lg">
                         <img
                           src={mainImagePreview}
                           alt="Banner Vorschau"
                           className="w-full h-full object-cover"
                         />
-                        {/* Dark overlay like in real banner */}
                         <div className="absolute inset-0 bg-black/40"></div>
-                        
-                        {/* Banner indicator */}
                         <div className="absolute bottom-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
                           Live Banner
                         </div>
                       </div>
                     </div>
 
-                    {/* Info Box */}
+                    {/* Info box about banner */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <Text className="text-xs text-blue-800 font-medium mb-1">ℹ️ Banner-Info</Text>
                       <Text className="text-xs text-blue-700 leading-relaxed">
@@ -367,7 +379,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
             </div>
           </Card>
 
-          {/* Privacy Settings Card */}
+          {/* Card: Privacy settings */}
           <Card>
             <div className="p-6">
               <div className="flex items-center space-x-3 mb-4">
@@ -379,6 +391,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                 <Title className="text-xl">Sichtbarkeitseinstellungen</Title>
               </div>
 
+              {/* Toggle for private/public list */}
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className={`p-2 rounded-lg ${isPrivate ? 'bg-red-100' : 'bg-green-100'}`}>
@@ -420,7 +433,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
             </div>
           </Card>
 
-          {/* Own Items Selection Card */}
+          {/* Card: Select own items for the list */}
           <Card>
             <div className="p-6 space-y-4">
               <div className="flex items-center space-x-3">
@@ -431,6 +444,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                 </div>
               </div>
 
+              {/* Show message if no items exist, else show selectable list */}
               {userItems.length === 0 ? (
                 <div className="text-center py-8">
                   <RectangleStackIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -458,8 +472,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                           onChange={() => toggleItemSelection(item.id)}
                           className="rounded text-blue-500 focus:ring-blue-500"
                         />
-                        
-                        {/* Item Image */}
+                        {/* Item image */}
                         <div className="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
                           {item.image && (
                             <img
@@ -469,8 +482,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                             />
                           )}
                         </div>
-                        
-                        {/* Item Details */}
+                        {/* Item details */}
                         <label htmlFor={`item-${item.id}`} className="flex-1 cursor-pointer">
                           <Text className="font-medium">{item.title}</Text>
                           <div className="flex items-center space-x-2 text-xs text-gray-500">
@@ -485,8 +497,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                             <span>{new Date(item.entered_on).toLocaleDateString()}</span>
                           </div>
                         </label>
-                        
-                        {/* Privacy Badge */}
+                        {/* Privacy badge */}
                         <div className="flex-shrink-0">
                           {item.isprivate ? (
                             <Badge color="red" icon={LockClosedIcon} size="xs">
@@ -507,13 +518,12 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
           </Card>
         </div>
 
-        {/* Status/Preview Section */}
+        {/* Status and preview section */}
         <div className="space-y-6">
-          {/* Status Card */}
+          {/* Card: Status checklist */}
           <Card>
             <div className="p-6 space-y-4">
               <Title className="text-lg">Status</Title>
-              
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Titel ausgefüllt</Text>
@@ -523,7 +533,6 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                     <XCircleIcon className="w-5 h-5 text-red-500" />
                   )}
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Items ausgewählt</Text>
                   {selectedItems.length > 0 ? (
@@ -532,7 +541,6 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                     <XCircleIcon className="w-5 h-5 text-red-500" />
                   )}
                 </div>
-                
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Beschreibung vorhanden</Text>
                   {description.trim() ? (
@@ -541,7 +549,6 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
                     <XCircleIcon className="w-5 h-5 text-gray-400" />
                   )}
                 </div>
-
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Banner-Bild hochgeladen</Text>
                   {mainImageFile ? (
@@ -554,11 +561,10 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
             </div>
           </Card>
 
-          {/* Selected Items Preview */}
+          {/* Card: Preview of selected items */}
           <Card>
             <div className="p-6 space-y-4">
               <Title className="text-lg">Ausgewählte Items ({selectedItems.length})</Title>
-              
               {selectedItems.length === 0 ? (
                 <Text className="text-gray-500 italic text-center py-4">
                   Keine Items ausgewählt
@@ -598,7 +604,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
             </div>
           </Card>
 
-          {/* Action Buttons */}
+          {/* Action buttons: create and cancel */}
           <div className="space-y-3">
             <Button 
               color="blue" 
@@ -609,7 +615,6 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
             >
               Liste erstellen
             </Button>
-            
             <Button
               variant="light"
               onClick={() => onNavigate("/item-list")}
@@ -621,7 +626,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
         </div>
       </div>
 
-      {/* AI Description Dialog */}
+      {/* Dialog: Show AI-generated description */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} static={true}>
         <DialogPanel className="max-w-2xl">
           <div className="p-6 space-y-6">
@@ -629,11 +634,9 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
               <SparklesIcon className="w-8 h-8 text-blue-600" />
               <Title className="text-xl">KI-generierte Beschreibung</Title>
             </div>
-
             <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
               <Text className="leading-relaxed">{generatedDescription}</Text>
             </div>
-
             <Flex justifyContent="end" className="space-x-3">
               <Button
                 color="gray"
@@ -656,22 +659,19 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
         </DialogPanel>
       </Dialog>
 
-      {/* Create Confirmation Dialog */}
+      {/* Dialog: Confirm creation of the list */}
       <Dialog open={isCreateConfirmOpen} onClose={() => setIsCreateConfirmOpen(false)}>
         <DialogPanel className="max-w-md bg-white rounded-xl shadow-xl p-6">
           <div className="text-center space-y-4">
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
               <CheckCircleIcon className="h-6 w-6 text-green-600" />
             </div>
-            
             <Title className="text-lg font-semibold text-gray-900">
               Liste erstellen?
             </Title>
-            
             <Text className="text-gray-500">
               Bist du sicher, dass du diese neue Liste mit {selectedItems.length} eigenen Items erstellen möchtest?
             </Text>
-            
             <Flex justifyContent="end" className="space-x-3 pt-4">
               <Button variant="secondary" onClick={() => setIsCreateConfirmOpen(false)}>
                 Abbrechen

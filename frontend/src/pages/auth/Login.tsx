@@ -5,12 +5,15 @@ type LoginPageProps = {
   onNavigate: (route: string) => void;
 };
 
+// Login page component for user authentication
 const LoginPage = ({ onNavigate }: LoginPageProps) => {
+  // State for form fields, loading, and error message
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Handles form submission and login logic
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setError('');
@@ -37,6 +40,7 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
   return (
     <div className="flex items-center justify-center min-h-full p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+        {/* Header with title and subtitle */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Anmelden</h1>
           <p className="mt-2 text-gray-600">
@@ -44,13 +48,16 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
           </p>
         </div>
 
+        {/* Error message display */}
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
           </div>
         )}
 
+        {/* Login form */}
         <form className="space-y-6" onSubmit={handleSubmit}>
+          {/* Username input */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Benutzername
@@ -64,6 +71,7 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
             />
           </div>
 
+          {/* Password input */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Passwort
@@ -77,8 +85,8 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
             />
           </div>
 
+          {/* Forgot password link */}
           <div className="flex items-center justify-between">
-
             <div className="text-sm">
               <button 
                 type="button"
@@ -90,6 +98,7 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
             </div>
           </div>
 
+          {/* Submit button */}
           <div>
             <button
               type="submit"
@@ -101,6 +110,7 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
           </div>
         </form>
 
+        {/* Divider */}
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -114,6 +124,7 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
           </div>
         </div>
 
+        {/* Registration link */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Noch kein Konto?{' '}
