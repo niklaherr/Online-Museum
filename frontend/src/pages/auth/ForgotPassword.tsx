@@ -6,6 +6,7 @@ type ForgotPasswordProps = {
 };
 
 const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
+  // State variables for each step and form field
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState('');
   const [securityAnswer, setSecurityAnswer] = useState('');
@@ -16,7 +17,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
   const [userSecurityQuestion, setUserSecurityQuestion] = useState('');
   const [resetToken, setResetToken] = useState('');
 
-  // Step 1: Find user and get their security question
+  // Step 1: Fetch the user's security question by username
   const findUser = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (!username) {
@@ -26,13 +27,10 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
 
     setIsLoading(true);
     try {
-      // Call the backend to get the user's security question
       const response = await fetch(`${process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:3001'}/security-question/${username}`);
-      
       if (!response.ok) {
         throw new Error('Benutzername nicht gefunden');
       }
-      
       const data = await response.json();
       setUserSecurityQuestion(data.securityQuestion);
       setStep(2);
@@ -45,7 +43,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
     }
   };
 
-  // Step 2: Verify security question answer
+  // Step 2: Verify the answer to the security question
   const verifySecurityQuestion = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (!securityAnswer) {
@@ -55,7 +53,6 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
 
     setIsLoading(true);
     try {
-      // Call the backend to verify the security answer
       const response = await fetch(`${process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:3001'}/verify-security-question`, {
         method: 'POST',
         headers: {
@@ -63,11 +60,9 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
         },
         body: JSON.stringify({ username, securityAnswer }),
       });
-      
       if (!response.ok) {
         throw new Error('Die Antwort auf die Sicherheitsfrage ist falsch');
       }
-      
       const data = await response.json();
       setResetToken(data.resetToken);
       setStep(3);
@@ -80,19 +75,17 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
     }
   };
 
-  // Step 3: Reset password
+  // Step 3: Reset the user's password
   const resetPassword = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     if (!newPassword || !confirmPassword) {
       setError('Bitte füllen Sie alle Felder aus');
       return;
     }
-
     if (newPassword !== confirmPassword) {
       setError('Die Passwörter stimmen nicht überein');
       return;
     }
-
     if (newPassword.length < 6) {
       setError('Das Passwort muss mindestens 6 Zeichen lang sein');
       return;
@@ -100,7 +93,6 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
 
     setIsLoading(true);
     try {
-      // Call the backend to reset the password
       const response = await fetch(`${process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:3001'}/reset-password`, {
         method: 'POST',
         headers: {
@@ -108,11 +100,9 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
         },
         body: JSON.stringify({ resetToken, newPassword }),
       });
-      
       if (!response.ok) {
         throw new Error('Fehler beim Zurücksetzen des Passworts');
       }
-      
       NotyfService.showSuccess('Ihr Passwort wurde erfolgreich zurückgesetzt');
       onNavigate('/login');
     } catch (err) {
@@ -126,6 +116,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
   return (
     <div className="flex items-center justify-center min-h-full p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+        {/* Header and step description */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Passwort zurücksetzen</h1>
           <p className="mt-2 text-gray-600">
@@ -135,13 +126,14 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
           </p>
         </div>
 
+        {/* Error message display */}
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
           </div>
         )}
 
-        {/* Step 1: Username input */}
+        {/* Step 1: Username input form */}
         {step === 1 && (
           <form className="space-y-6" onSubmit={findUser}>
             <div>
@@ -157,7 +149,6 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
                 required
               />
             </div>
-
             <div>
               <button
                 type="submit"
@@ -170,7 +161,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
           </form>
         )}
 
-        {/* Step 2: Security question */}
+        {/* Step 2: Security question and answer form */}
         {step === 2 && (
           <form className="space-y-6" onSubmit={verifySecurityQuestion}>
             <div>
@@ -181,7 +172,6 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
                 {userSecurityQuestion}
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Antwort
@@ -195,7 +185,6 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
                 required
               />
             </div>
-
             <div>
               <button
                 type="submit"
@@ -208,7 +197,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
           </form>
         )}
 
-        {/* Step 3: New password */}
+        {/* Step 3: New password form */}
         {step === 3 && (
           <form className="space-y-6" onSubmit={resetPassword}>
             <div>
@@ -224,7 +213,6 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
                 required
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Passwort bestätigen
@@ -238,7 +226,6 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
                 required
               />
             </div>
-
             <div>
               <button
                 type="submit"
@@ -251,6 +238,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
           </form>
         )}
 
+        {/* Link to return to login */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Zurück zur{' '}

@@ -1,12 +1,7 @@
 import { Link } from 'react-router-dom';
 import { userService } from 'services/UserService';
 import { Flex } from '@tremor/react';
-import {
-  Bars3Icon,
-  UserCircleIcon,
-  ChevronDownIcon,
-  SparklesIcon,
-} from '@heroicons/react/24/outline';
+import { Bars3Icon, UserCircleIcon, ChevronDownIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
 type HeaderProps = {
@@ -15,6 +10,7 @@ type HeaderProps = {
   sidebarOpen: boolean;
 };
 
+// Header component for the main navigation bar
 const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
   const isLoggedIn = userService.isLoggedIn();
   const userName = userService.getUserName();
@@ -25,8 +21,9 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
     <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30 h-[75px]">
       <div className="px-4 py-3">
         <Flex justifyContent="between" alignItems="center">
-          {/* Left Side */}
+          {/* Left Side: Logo and sidebar toggle */}
           <Flex alignItems="center" className="gap-2 sm:gap-4">
+            {/* Sidebar toggle button for logged-in users (mobile only) */}
             {isLoggedIn && (
               <button
                 onClick={() => toggleSidebar(!sidebarOpen)}
@@ -37,29 +34,31 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
               </button>
             )}
 
+            {/* Logo for guests */}
             {!isLoggedIn && (
               <Link to="/" className="flex items-center space-x-2 sm:space-x-4">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-md group-hover:shadow-lg transition-all duration-200 group-hover:scale-105">
-                <SparklesIcon className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="lg:text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Online-Museum
+                <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-md group-hover:shadow-lg transition-all duration-200 group-hover:scale-105">
+                  <SparklesIcon className="w-6 h-6 text-white" />
                 </div>
-              </div>
-            </Link>
+                <div>
+                  <div className="lg:text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    Online-Museum
+                  </div>
+                </div>
+              </Link>
             )}
           </Flex>
 
-          {/* Right Side */}
+          {/* Right Side: User menu or login/register */}
           <div className="flex items-center space-x-2 sm:space-x-4">
             {isLoggedIn ? (
+              // User menu for logged-in users
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center space-x-2 sm:space-x-3 p-2 hover:bg-gray-100 rounded-xl transition-all duration-200 group"
                 >
-                  {/* Avatar */}
+                  {/* User avatar with admin badge */}
                   <div className="relative">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm shadow-md">
                       {userName?.charAt(0).toUpperCase()}
@@ -69,7 +68,7 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
                     )}
                   </div>
 
-                  {/* User Info */}
+                  {/* User info (name and role) */}
                   <div className="hidden md:block text-left">
                     <div className="text-sm font-medium text-gray-900">{userName}</div>
                     {isadmin && (
@@ -77,6 +76,7 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
                     )}
                   </div>
 
+                  {/* Dropdown arrow */}
                   <ChevronDownIcon
                     className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
                       showUserMenu ? 'rotate-180' : ''
@@ -84,13 +84,16 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
                   />
                 </button>
 
+                {/* Dropdown menu */}
                 {showUserMenu && (
                   <>
+                    {/* Overlay to close menu on outside click */}
                     <div
                       className="fixed inset-0 z-10"
                       onClick={() => setShowUserMenu(false)}
                     />
                     <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20">
+                      {/* User info in dropdown */}
                       <div className="px-4 py-3 border-b border-gray-100">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold">
@@ -105,6 +108,7 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
                         </div>
                       </div>
 
+                      {/* Dropdown actions */}
                       <div className="py-2">
                         <Link
                           to="/profile"
@@ -143,6 +147,7 @@ const Header = ({ onNavigate, toggleSidebar, sidebarOpen }: HeaderProps) => {
                 )}
               </div>
             ) : (
+              // Login and register buttons for guests
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <Link
                   to="/login"
