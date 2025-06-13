@@ -2,20 +2,23 @@ import User from "interfaces/User";
 import NotyfService from "./NotyfService";
 import { userService } from "./UserService";
 
+// Service class for admin-related API calls
 class AdminService {
     private baseUrl: string;
 
     constructor() {
+        // Set base URL from environment or fallback to localhost
         this.baseUrl = process.env.REACT_APP_BACKEND_API_URL || "http://localhost:3001";
     }
 
+    // Assign admin rights to a user
     async addAdmin(userId: number): Promise<boolean> {
         try {
             const response = await fetch(`${this.baseUrl}/admin/${userId}`, {
                 method: "PUT",
                 headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${userService.getToken()}`
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${userService.getToken()}`
                 },
                 body: JSON.stringify({ isadmin: true }),
             });
@@ -28,13 +31,14 @@ class AdminService {
         }
     }
 
+    // Remove admin rights from a user
     async deleteAdmin(userId: number): Promise<boolean> {
         try {
             const response = await fetch(`${this.baseUrl}/admin/${userId}`, {
                 method: "PUT",
                 headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${userService.getToken()}`
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${userService.getToken()}`
                 },
                 body: JSON.stringify({ isadmin: false }),
             });
@@ -48,12 +52,13 @@ class AdminService {
         }
     }
 
+    // Search for users by query string
     async searchUsers(query: string): Promise<User[]> {
         try {
             const response = await fetch(`${this.baseUrl}/admin/search?q=${encodeURIComponent(query)}`, {
                 headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${userService.getToken()}`
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${userService.getToken()}`
                 },
             });
 
@@ -68,12 +73,13 @@ class AdminService {
         }
     }
 
+    // Fetch all admin users
     async getAdmins(): Promise<User[]> {
         try {
             const response = await fetch(`${this.baseUrl}/admin`, {
                 headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${userService.getToken()}`
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${userService.getToken()}`
                 },
             });
 
@@ -89,4 +95,5 @@ class AdminService {
     }
 }
 
+// Export a singleton instance of AdminService
 export const adminService = new AdminService();

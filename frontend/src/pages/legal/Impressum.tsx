@@ -7,7 +7,7 @@ const Impressum = () => {
         <Title className="text-2xl mb-6">Impressum</Title>
         <div className="space-y-6">
 
-          {/* Provider */}
+          {/* Provider information section */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">1. Anbieterinformationen</h2>
             <Text className="mb-2 font-medium">Universitätsprojekt - Online Museum</Text>
@@ -18,14 +18,14 @@ const Impressum = () => {
             <Text>Deutschland</Text>
           </div>
 
-          {/* Contact */}
+          {/* Contact details section */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">2. Kontakt</h2>
             <Text className="mb-2">E-Mail: niklas.herrmann@std.dhsh.de</Text>
             <Text>Website: www.museum-frontend-production.up.railway.app</Text>
           </div>
 
-          {/* Project team */}
+          {/* Project team members section */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">3. Projektverantwortliche</h2>
             <Text className="mb-2">Niklas Herrmann (Projektleitung/Entwicklung)</Text>
@@ -36,7 +36,7 @@ const Impressum = () => {
             </Text>
           </div>
 
-          {/* Academic context */}
+          {/* Academic context of the project */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">4. Akademischer Kontext</h2>
             <Text className="mb-2">Betreuende Hochschule: DHSH</Text>
@@ -46,7 +46,7 @@ const Impressum = () => {
             <Text>Betreuende Dozent:in: Prof. Dr. Sven Niemand</Text>
           </div>
 
-          {/* Project purpose */}
+          {/* Purpose of the application */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">5. Zweck der Anwendung</h2>
             <Text className="mb-2">
@@ -62,7 +62,7 @@ const Impressum = () => {
             </Text>
           </div>
 
-          {/* Disclaimer for university project */}
+          {/* Disclaimer for liability */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">6. Haftungsausschluss</h2>
             <Text className="mb-2">
@@ -79,7 +79,7 @@ const Impressum = () => {
             </Text>
           </div>
 
-          {/* Data protection reference */}
+          {/* Data protection notice */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">7. Datenschutz</h2>
             <Text>
@@ -89,7 +89,7 @@ const Impressum = () => {
             </Text>
           </div>
 
-          {/* Hosting information */}
+          {/* Hosting provider information */}
           <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">8. Hosting</h2>
             <Text className="mb-2">Diese Anwendung wird gehostet über:</Text>
@@ -101,6 +101,7 @@ const Impressum = () => {
             </Text>
           </div>
 
+          {/* Footer with current date and last update */}
           <Text className="text-sm text-gray-500 mt-6">
             Stand: {new Date().toLocaleDateString('de-DE')} | 
             Letzte Aktualisierung: {new Date().toLocaleDateString('de-DE')}

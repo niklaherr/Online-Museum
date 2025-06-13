@@ -1,17 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Text, Title, Badge } from "@tremor/react";
 import { 
-  LockClosedIcon, 
-  UserIcon, 
-  MagnifyingGlassIcon,
-  XMarkIcon,
-  PlusIcon,
-  TagIcon,
-  CalendarIcon,
-  EyeIcon,
-  PhotoIcon,
-  SparklesIcon,
-  RectangleGroupIcon
+  LockClosedIcon, UserIcon, MagnifyingGlassIcon, XMarkIcon, PlusIcon,
+  TagIcon, CalendarIcon, PhotoIcon, SparklesIcon
 } from "@heroicons/react/24/outline";
 import { GalleryItem } from "../../interfaces/Item";
 import { itemService } from "../../services/ItemService";
@@ -24,10 +15,9 @@ type GalleryProps = {
   onNavigate: (route: string) => void;
 };
 
-// Group Items in Categories
+// Groups gallery items by their category
 const groupItemsByCategory = (items: GalleryItem[]) => {
   const groupedItems: { [key: string]: GalleryItem[] } = {};
-  
   items.forEach((item) => {
     const category = item.category && item.category.trim() !== "" ? item.category : "Unkategorisiert";
     if (!groupedItems[category]) {
@@ -35,18 +25,17 @@ const groupItemsByCategory = (items: GalleryItem[]) => {
     }
     groupedItems[category].push(item);
   });
-  
   return groupedItems;
 };
 
-// Modern Item Card Component
+// Renders a single gallery item as a card
 const ItemCard = ({ item, onClick }: { item: GalleryItem; onClick: () => void }) => {
   return (
     <Card
       className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
       onClick={onClick}
     >
-      {/* Image */}
+      {/* Item image or placeholder */}
       <div className="aspect-square w-full overflow-hidden bg-gray-100 mb-4">
         {item.image ? (
           <img
@@ -61,9 +50,9 @@ const ItemCard = ({ item, onClick }: { item: GalleryItem; onClick: () => void })
         )}
       </div>
 
-      {/* Content */}
+      {/* Card content: category, privacy, title, date, author */}
       <div className="p-4 space-y-3">
-        {/* Category & Privacy Badge */}
+        {/* Category badge and privacy icon */}
         <div className="flex justify-between items-start">
           {item.category && (
             <Badge color="blue" icon={TagIcon} size="xs" className="max-w-[120px] truncate">
@@ -72,7 +61,6 @@ const ItemCard = ({ item, onClick }: { item: GalleryItem; onClick: () => void })
                 : item.category}
             </Badge>
           )}
-          
           {item.isprivate && (
             <div className="p-1 bg-red-100 rounded">
               <LockClosedIcon className="w-4 h-4 text-red-500" />
@@ -80,18 +68,18 @@ const ItemCard = ({ item, onClick }: { item: GalleryItem; onClick: () => void })
           )}
         </div>
 
-        {/* Title */}
+        {/* Item title */}
         <Title className="text-lg line-clamp-2 group-hover:text-blue-600 transition-colors">
           {item.title}
         </Title>
 
-        {/* Date */}
+        {/* Date of entry */}
         <Text className="text-xs text-gray-500 flex items-center">
           <CalendarIcon className="w-4 h-4 mr-1" />
           {new Date(item.entered_on).toLocaleDateString('de-DE')}
         </Text>
 
-        {/* Author */}
+        {/* Author info */}
         <div className="flex items-center pt-2 border-t border-gray-100">
           <UserIcon className="w-4 h-4 text-gray-400 mr-2" />
           <Text className="text-sm text-gray-600 font-medium">
@@ -103,7 +91,7 @@ const ItemCard = ({ item, onClick }: { item: GalleryItem; onClick: () => void })
   );
 };
 
-// Category Section Component
+// Renders a section for a category with its items
 const CategorySection = ({ 
   category, 
   items, 
@@ -115,7 +103,7 @@ const CategorySection = ({
 }) => {
   return (
     <div className="space-y-6">
-      {/* Category Header */}
+      {/* Category header with icon and item count */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-blue-100 rounded-lg">
@@ -133,7 +121,7 @@ const CategorySection = ({
         </Badge>
       </div>
 
-      {/* Items Grid */}
+      {/* Grid of item cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {items.map((item) => (
           <ItemCard
@@ -147,6 +135,7 @@ const CategorySection = ({
   );
 };
 
+// Main gallery component
 const Gallery = ({ onNavigate }: GalleryProps) => {
   const [museumItems, setMuseumItems] = useState<GalleryItem[]>([]);
   const [userItems, setUserItems] = useState<GalleryItem[]>([]);
@@ -155,6 +144,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
   const [searchParams] = useSearchParams();
   const categoryFilter = searchParams.get("category");
 
+  // Loads public and user-owned items from the API
   const loadItems = async () => {
     try {
       const items = await itemService.fetchItemsNotOwnedByUser();
@@ -175,23 +165,21 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     loadItems();
   }, []);
 
-  // Filter Items based on search query and category filter
+  // Filters public items by search query and category
   const filteredItems = museumItems.filter((item) => {
     const query = searchQuery.toLowerCase();
     const matchesSearch = 
       item.title.toLowerCase().includes(query) ||
       item.username.toLowerCase().includes(query) ||
       (item.category && item.category.toLowerCase().includes(query));
-    
     if (categoryFilter) {
       const itemCategory = item.category || "Unkategorisiert";
       return matchesSearch && itemCategory === categoryFilter;
     }
-    
     return matchesSearch;
   });
 
-  // Filter User Items based on search query
+  // Filters user-owned items by search query
   const filteredUserItems = userItems.filter((item) => {
     const query = searchQuery.toLowerCase();
     return (
@@ -200,13 +188,14 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
     );
   });
 
-  // Group the filtered items by category
+  // Groups filtered public items by category
   const groupedItems = groupItemsByCategory(filteredItems);
   const categories = Object.keys(groupedItems).sort();
 
   const totalPublicItems = filteredItems.length;
   const totalUserItems = filteredUserItems.length;
 
+  // Clears the search input
   const clearSearch = () => {
     setSearchQuery('');
   };
@@ -215,7 +204,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
 
   return (
     <div className="space-y-8">
-      {/* Hero Header */}
+      {/* Hero header with stats and create button */}
       <div className="relative bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-2xl overflow-hidden shadow-2xl">
         <div className="relative p-8 text-white">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -240,7 +229,6 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
                 </div>
               </div>
             </div>
-            
             <Button
               icon={PlusIcon}
               onClick={() => onNavigate('/items/create')}
@@ -253,7 +241,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
         </div>
       </div>
 
-      {/* Simple Search Section - Same as ItemList */}
+      {/* Search input field */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="relative flex-1 max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -277,7 +265,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
         </div>
       </div>
 
-      {/* No Results */}
+      {/* No results message for search */}
       {searchQuery && categories.length === 0 && filteredUserItems.length === 0 && (
         <div className="text-center py-8">
           <MagnifyingGlassIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -294,7 +282,7 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
         </div>
       )}
 
-      {/* Public Items by Category */}
+      {/* Render public items grouped by category */}
       {categories.length > 0 && (
         <div className="space-y-12">
           {categories.map((category) => (
@@ -308,34 +296,33 @@ const Gallery = ({ onNavigate }: GalleryProps) => {
         </div>
       )}
 
-{/* User's Items Section */}
-{filteredUserItems.length > 0 && (
-  <div className="space-y-12">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-green-100 rounded-lg">
-          <SparklesIcon className="w-6 h-6 text-green-600" />
+      {/* Render user's own items if available */}
+      {filteredUserItems.length > 0 && (
+        <div className="space-y-12">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <SparklesIcon className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <Title className="text-2xl text-gray-900">Meine Items</Title>
+                <Text className="text-gray-600">Ihre persönlichen Kunstwerke und Sammlungen</Text>
+              </div>
+            </div>
+            <Badge color="green" size="lg">
+              {filteredUserItems.length}
+            </Badge>
+          </div>
+          {/* User items are shown together, not grouped by category */}
+          <CategorySection
+            category="Alle meine Items"
+            items={filteredUserItems}
+            onNavigate={onNavigate}
+          />
         </div>
-        <div>
-          <Title className="text-2xl text-gray-900">Meine Items</Title>
-          <Text className="text-gray-600">Ihre persönlichen Kunstwerke und Sammlungen</Text>
-        </div>
-      </div>
-      <Badge color="green" size="lg">
-        {filteredUserItems.length}
-      </Badge>
-    </div>
+      )}
 
-    {/* Display all user items together without category grouping */}
-    <CategorySection
-      category="Alle meine Items"
-      items={filteredUserItems}
-      onNavigate={onNavigate}
-    />
-  </div>
-)}
-
-      {/* No Results when no search and no items */}
+      {/* Show generic no results if nothing to display */}
       {!searchQuery && categories.length === 0 && filteredUserItems.length === 0 && (
         <NoResults />
       )}

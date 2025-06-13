@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Credentials, userService } from 'services/UserService';
 import NotyfService from 'services/NotyfService';
 
+// Props for RegisterPage, expects a navigation callback
 type RegisterPageProps = {
   onNavigate: (route: string) => void;
 };
 
-// Sicherheitsfragen-Optionen
+// Security questions options for the dropdown
 const securityQuestions = [
   "Familienname der Mutter",
   "Name des ersten Haustieres",
@@ -14,6 +15,7 @@ const securityQuestions = [
 ];
 
 const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
+  // State variables for form fields and UI state
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,25 +24,30 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Handles form submission and validation
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setError('');
     
+    // Basic validation for required fields
     if (!username || !password || !securityQuestion || !securityAnswer) {
       setError('Bitte füllen Sie alle Pflichtfelder aus');
       return;
     }
 
+    // Password length validation
     if (password.length < 6) {
       setError('Das Passwort muss mindestens 6 Zeichen lang sein.');
       return;
     }
     
+    // Password match validation
     if (password !== confirmPassword) {
       setError('Die Passwörter stimmen nicht überein');
       return;
     }
 
+    // Security answer validation
     if (securityAnswer.trim() === '') {
       setError('Bitte geben Sie eine Antwort auf die Sicherheitsfrage ein');
       return;
@@ -48,6 +55,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
     
     setIsLoading(true);
     try {
+      // Prepare credentials and call signup service
       const credentials: Credentials = {
         username: username,
         password: password,
@@ -66,9 +74,11 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
     }
   };
 
+  // Render registration form UI
   return (
     <div className="flex items-center justify-center min-h-full p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Registrieren</h1>
           <p className="mt-2 text-gray-600">
@@ -76,13 +86,16 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
           </p>
         </div>
 
+        {/* Error message display */}
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
           </div>
         )}
 
+        {/* Registration form */}
         <form className="space-y-6" onSubmit={handleSubmit}>
+          {/* Username input */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Benutzername <span className="text-red-500">*</span>
@@ -97,6 +110,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
             />
           </div>
 
+          {/* Password input */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Passwort <span className="text-red-500">*</span>
@@ -111,6 +125,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
             />
           </div>
 
+          {/* Confirm password input */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Passwort bestätigen <span className="text-red-500">*</span>
@@ -125,6 +140,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
             />
           </div>
 
+          {/* Security question dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Sicherheitsfrage <span className="text-red-500">*</span>
@@ -143,6 +159,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
             </select>
           </div>
 
+          {/* Security answer input */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Antwort auf Sicherheitsfrage <span className="text-red-500">*</span>
@@ -160,6 +177,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
             </p>
           </div>
 
+          {/* Submit button */}
           <div>
             <button
               type="submit"
@@ -171,6 +189,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
           </div>
         </form>
 
+        {/* Link to login page */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Bereits ein Konto?{' '}

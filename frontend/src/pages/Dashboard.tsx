@@ -1,25 +1,6 @@
 import { useEffect, useState } from 'react';
-
-import {
-  Card,
-  Title,
-  Text,
-  Metric,
-  Flex,
-  Badge,
-  BarChart,
-  Grid
-} from '@tremor/react';
-import { 
-  SparklesIcon, 
-  ClockIcon,
-  ArrowRightIcon,
-  ChartBarIcon,
-  DocumentTextIcon,
-  PhotoIcon,
-  RectangleStackIcon,
-  ArrowTrendingUpIcon
-} from '@heroicons/react/24/outline';
+import { Card, Title, Text, Metric, Flex, Badge, BarChart, Grid } from '@tremor/react';
+import { SparklesIcon, ClockIcon, ArrowRightIcon, ChartBarIcon, DocumentTextIcon, PhotoIcon, RectangleStackIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import { userService } from 'services/UserService';
 import Activity from 'interfaces/Activity';
 import Editorial from 'interfaces/Editorial';
@@ -33,8 +14,9 @@ type ActivityItemProps = {
   activity: Activity
 }
 
-// Modern Activity Card Component
+// Renders a single activity card with icon, badge, and message
 const ActivityItem = ({ activity } : ActivityItemProps) => {
+  // Formats the time difference as a human-readable string
   const formatTime = (timeString: string) => {
     const now = new Date();
     const time = new Date(timeString);
@@ -52,6 +34,7 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
     }
   };
   
+  // Returns badge color based on activity type
   const getBadgeColor = () => {
     switch(activity.type) {
       case 'CREATE': return 'emerald';
@@ -61,6 +44,7 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
     }
   };
 
+  // Returns icon component based on activity type
   const getIcon = () => {
     switch(activity.type) {
       case 'CREATE': return <SparklesIcon className="w-4 h-4" />;
@@ -70,6 +54,7 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
     }
   };
 
+  // Returns a descriptive message for the activity
   const getMessage = () => {
     const baseMessage = activity.category === 'ITEM' ? 'Es wurde ein Item' : 
                        activity.category === 'ITEM_LIST' ? 'Es wurde eine Liste' : 'Es wurde Element';
@@ -86,8 +71,8 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
     }
   };
 
+  // Returns the activity type as a label
   const getType = () => {
-    
     switch (activity.type) {
       case 'CREATE':
         return `ERSTELLEN`;
@@ -100,8 +85,6 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
     }
   };
 
-  
-  
   return (
     <Card className="group hover:shadow-md transition-all duration-200 border-l-4 border-l-blue-500">
       <Flex className="py-3" justifyContent="between" alignItems="center">
@@ -133,13 +116,14 @@ const ActivityItem = ({ activity } : ActivityItemProps) => {
   );
 };
 
-// Editorial list component for dashboard
+// Renders a single editorial list card for the dashboard
 type EditorialItemProps = {
   editorial: Editorial;
   onNavigate: (route: string) => void;
 }
 
 const EditorialItem = ({ editorial, onNavigate }: EditorialItemProps) => {
+  // Formats a date string to German locale
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('de-DE', {
       day: '2-digit',
@@ -190,7 +174,7 @@ const EditorialItem = ({ editorial, onNavigate }: EditorialItemProps) => {
   );
 };
 
-// Modern Stats Card Component
+// Displays a single statistics card with icon, value, and optional trend
 const StatsCard = ({ 
   title, 
   value, 
@@ -206,7 +190,7 @@ const StatsCard = ({
 }) => {
   return (
     <Card className="relative overflow-hidden hover:shadow-lg transition-all duration-300 group">
-      {/* Background gradient */}
+      {/* Background gradient for visual effect */}
       <div className={`absolute inset-0 bg-gradient-to-br from-${color}-50 to-${color}-100 opacity-50`}></div>
       
       <div className="relative p-6">
@@ -235,19 +219,20 @@ const StatsCard = ({
   );
 };
 
-// Maincomponent for the Dashboard
+// Main dashboard component, fetches and displays all dashboard data
 const Dashboard = () => {
-  
+  // State for activities, editorial lists, item counts, and loading
   const [activities, setActivities] = useState<Activity[]>([]);
   const [editorialLists, setEditorialLists] = useState<Editorial[]>([]);
   const [itemListDateCount, setItemListDateCount] = useState<DateCount[]>([]);
   const [itemDataCount, setItemDataCount] = useState<DateCount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Loads dashboard data on mount
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load activities, item list counts and item data counts
+        // Load activities, item list counts and item data counts in parallel
         const [activitiesData, itemListData, itemData] = await Promise.all([
           itemService.fetchActivities(),
           itemService.fetchItemListDataCounting(),
@@ -258,7 +243,7 @@ const Dashboard = () => {
         setItemListDateCount(itemListData);
         setItemDataCount(itemData);
 
-        // Load editorial lists separately when the user is logged in
+        // Load editorial lists if user is logged in
         if (userService.isLoggedIn()) {
           try {
             const editorialData = await editorialService.fetchEditorialLists();
@@ -282,19 +267,20 @@ const Dashboard = () => {
     loadData();
   }, []);
 
+  // Handles navigation to a different route
   const handleNavigate = (route: string) => {
     window.location.href = route;
   };
 
   if (isLoading) return <Loading />
 
-  // Calculate stats
+  // Calculate total items and lists for stats
   const totalItems = itemDataCount.reduce((sum, item) => sum + item.count, 0);
   const totalLists = itemListDateCount.reduce((sum, item) => sum + item.count, 0);
 
   return (
     <div className="space-y-8">
-      {/* Welcome Header */}
+      {/* Welcome header with user greeting */}
       <div className="space-y-2">
         <Title className="text-3xl font-bold text-gray-900">
           Dashboard
@@ -304,7 +290,7 @@ const Dashboard = () => {
         </Text>
       </div>
 
-      {/* Stats Cards */}
+      {/* Statistics cards for lists and items */}
       <Grid numItemsSm={1} numItemsMd={2} className="gap-6">
         <StatsCard
           title="Meine Listen"
@@ -322,7 +308,7 @@ const Dashboard = () => {
         />
       </Grid>
 
-      {/* Redaktionelle Listen Section */}
+      {/* Editorial recommendations section */}
       {editorialLists.length > 0 && (
         <Card className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border-0 shadow-2xl overflow-hidden">
           <div className="relative p-8">
@@ -348,6 +334,7 @@ const Dashboard = () => {
                 </button>
               </div>
               
+              {/* Editorial list cards (max 3) */}
               <Grid numItemsSm={1} numItemsMd={2} numItemsLg={3} className="gap-6">
                 {editorialLists.slice(0, 3).map((editorial) => (
                   <EditorialItem 
@@ -358,6 +345,7 @@ const Dashboard = () => {
                 ))}
               </Grid>
               
+              {/* Show more button if there are more than 3 editorial lists */}
               {editorialLists.length > 3 && (
                 <div className="mt-8 text-center">
                   <button 
@@ -373,7 +361,7 @@ const Dashboard = () => {
         </Card>
       )}
 
-      {/* Charts Section */}
+      {/* Charts section for item lists and items over time */}
       <Grid numItemsSm={1} numItemsMd={2} className="gap-6">
         <Card className="p-6 hover:shadow-lg transition-shadow duration-300">
           <div className="flex items-center mb-4">
@@ -416,7 +404,7 @@ const Dashboard = () => {
         </Card>
       </Grid>
 
-      {/* Activities Section */}
+      {/* Activities section, shows recent user actions */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
@@ -430,6 +418,7 @@ const Dashboard = () => {
           </div>
         </div>
         
+        {/* Show message if no activities, otherwise list them */}
         {activities.length === 0 ? (
           <div className="text-center py-12">
             <ClockIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -447,10 +436,11 @@ const Dashboard = () => {
         )}
       </Card>
 
-      {/* Quick Actions */}
+      {/* Quick actions section for fast navigation */}
       <Card className="p-6 bg-gradient-to-r from-gray-50 to-blue-50">
         <Title className="mb-4">Schnellaktionen</Title>
         <Grid numItemsSm={2} numItemsMd={4} className="gap-4">
+          {/* Button to create a new item */}
           <button 
             className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group border border-gray-200"
             onClick={() => handleNavigate('/items/create')}
@@ -463,6 +453,7 @@ const Dashboard = () => {
             </div>
           </button>
           
+          {/* Button to create a new list */}
           <button 
             className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group border border-gray-200"
             onClick={() => handleNavigate('/item-list/create')}
@@ -475,6 +466,7 @@ const Dashboard = () => {
             </div>
           </button>
           
+          {/* Button to open gallery */}
           <button 
             className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group border border-gray-200"
             onClick={() => handleNavigate('/items')}
@@ -487,6 +479,7 @@ const Dashboard = () => {
             </div>
           </button>
           
+          {/* Button to open lists */}
           <button 
             className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group border border-gray-200"
             onClick={() => handleNavigate('/item-list')}

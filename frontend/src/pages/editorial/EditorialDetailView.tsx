@@ -1,20 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Card,
-  Title,
-  Text,
-  Subtitle,
-  Grid,
-  Badge,
-} from "@tremor/react";
-import {
-  UserIcon,
-  CalendarIcon,
-  EyeIcon,
-  RectangleStackIcon,
-  TagIcon,
-} from "@heroicons/react/24/outline";
+import { Card, Title, Text, Subtitle, Grid, Badge } from "@tremor/react";
+import { UserIcon, CalendarIcon, EyeIcon, RectangleStackIcon, TagIcon } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import Editorial from "interfaces/Editorial";
 import { editorialService } from "services/EditorialService";
@@ -31,6 +18,7 @@ const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [list, setList] = useState<Editorial | null>(null);
 
+  // Fetch editorial details and items on mount or when id changes
   useEffect(() => {
     const loadItemLists = async () => {
       try {
@@ -50,11 +38,12 @@ const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
     loadItemLists();
   }, [id]);
 
+  // Show loading indicator while fetching data
   if (isLoading) return <Loading />;
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header */}
+      {/* Editorial header with title, description, and meta info */}
       <Card className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 opacity-60" />
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full -translate-y-16 translate-x-16" />
@@ -89,7 +78,7 @@ const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
         </div>
       </Card>
 
-      {/* Items */}
+      {/* List of items in the editorial, or empty state if none */}
       {items.length > 0 ? (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -99,6 +88,7 @@ const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
             </Text>
           </div>
 
+          {/* Grid of item cards */}
           <Grid className="gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {items.map((item) => (
               <Card
@@ -106,7 +96,7 @@ const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
                 className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
                 onClick={() => onNavigate(`/items/${item.id}`)}
               >
-                {/* Image */}
+                {/* Item image or placeholder */}
                 <div className="aspect-square w-full overflow-hidden bg-gray-100 mb-4">
                   {item.image ? (
                     <img
@@ -121,7 +111,7 @@ const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
                   )}
                 </div>
 
-                {/* Content */}
+                {/* Item details */}
                 <div className="p-4 space-y-3">
                   <div className="flex justify-between items-start">
                     {item.category && (
@@ -152,6 +142,7 @@ const EditorialDetailView = ({ onNavigate }: EditorialDetailViewProps) => {
           </Grid>
         </div>
       ) : (
+        // Empty state if no items are present
         <Card>
           <div className="text-center py-12">
             <RectangleStackIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />

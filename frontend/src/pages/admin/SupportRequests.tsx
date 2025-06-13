@@ -1,22 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  Title,
-  Text,
-  Badge,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeaderCell,
-  TableBody,
-  TableCell,
-  Button,
-  Select,
-  SelectItem,
-  Divider,
-  Dialog,
-  DialogPanel,
-} from '@tremor/react';
+import { Card, Title, Text, Badge, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Button, Select, SelectItem, Divider, Dialog, DialogPanel } from '@tremor/react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import ContactForm from 'interfaces/ContactForm';
@@ -24,14 +7,10 @@ import { contactFormService } from 'services/ContactFormService';
 import NotyfService from 'services/NotyfService';
 import { userService } from 'services/UserService';
 import Loading from 'components/helper/Loading';
-import {
-  EnvelopeIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-} from '@heroicons/react/24/outline';
+import { EnvelopeIcon, ClockIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 const SupportRequests = () => {
+  // State for contact forms, loading, selected form, modal, and status filter
   const [contactForms, setContactForms] = useState<ContactForm[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedForm, setSelectedForm] = useState<ContactForm | null>(null);
@@ -39,15 +18,15 @@ const SupportRequests = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
-    // Check if user is admin
+    // Check admin rights and load contact forms on mount
     if (!userService.isadmin()) {
       NotyfService.showError('Sie haben keine Berechtigung, auf diese Seite zuzugreifen.');
       return;
     }
-    
     loadContactForms();
   }, []);
 
+  // Fetch all contact forms from the backend
   const loadContactForms = async () => {
     setLoading(true);
     try {
@@ -64,19 +43,16 @@ const SupportRequests = () => {
     }
   };
 
+  // Update the status of a contact form
   const updateStatus = async (formId: number, newStatus: 'new' | 'in_progress' | 'completed') => {
     try {
       const updatedForm = await contactFormService.updateContactFormStatus(formId, newStatus);
-      
-      // Update the form in the list
       setContactForms(prev => 
         prev.map(form => form.id === formId ? updatedForm : form)
       );
-      
       if (selectedForm && selectedForm.id === formId) {
         setSelectedForm(updatedForm);
       }
-      
       NotyfService.showSuccess('Status erfolgreich aktualisiert');
     } catch (error) {
       let errorMessage = 'Fehler beim Aktualisieren des Status';
@@ -87,17 +63,20 @@ const SupportRequests = () => {
     }
   };
 
+  // Handle status change from dropdown
   const handleStatusChange = (formId: number, newStatus: string) => {
     if (newStatus === 'new' || newStatus === 'in_progress' || newStatus === 'completed') {
       updateStatus(formId, newStatus);
     }
   };
 
+  // Open the detail modal for a selected form
   const showDetails = (form: ContactForm) => {
     setSelectedForm(form);
     setIsDetailModalOpen(true);
   };
 
+  // Return a colored badge based on status
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'new':
@@ -111,6 +90,7 @@ const SupportRequests = () => {
     }
   };
 
+  // Format date string to German date/time
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), 'dd.MM.yyyy HH:mm', { locale: de });
@@ -119,7 +99,7 @@ const SupportRequests = () => {
     }
   };
 
-  // Filter the contact forms based on the selected status
+  // Filter contact forms by selected status
   const filteredForms = contactForms.filter(form => {
     if (statusFilter === 'all') return true;
     return form.status === statusFilter;
@@ -129,12 +109,14 @@ const SupportRequests = () => {
 
   return (
     <div className="space-y-8">
+      {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2 ">Support-Anfragen</h1>
         <Text>Verwalten Sie eingehende Kontaktanfragen von Benutzern.</Text>
       </div>
 
       <Card>
+        {/* Filter and table header */}
         <div className="flex justify-between items-center mb-4">
           <Title>Alle Anfragen</Title>
           <div className="w-48">
@@ -147,6 +129,7 @@ const SupportRequests = () => {
           </div>
         </div>
 
+        {/* Show message if no forms, otherwise show table */}
         {filteredForms.length === 0 ? (
           <div className="text-center py-10">
             <EnvelopeIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
@@ -165,6 +148,7 @@ const SupportRequests = () => {
               </TableRow>
             </TableHead>
             <TableBody>
+              {/* Render each contact form row */}
               {filteredForms.map((form) => (
                 <TableRow key={form.id}>
                   <TableCell>{getStatusBadge(form.status)}</TableCell>
@@ -207,20 +191,23 @@ const SupportRequests = () => {
         )}
       </Card>
 
-      {/* Detail Modal */}
+      {/* Detail modal for a selected support request */}
       <Dialog open={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)}>
         <DialogPanel>
           {selectedForm && (
             <div>
+              {/* Modal header with subject and status */}
               <div className="flex justify-between items-start mb-4">
                 <Title>{selectedForm.subject}</Title>
                 {getStatusBadge(selectedForm.status)}
               </div>
               
+              {/* Submission date */}
               <div className="mb-4">
                 <Text className="text-sm text-gray-500">Eingereicht am {formatDate(selectedForm.submitted_on)}</Text>
               </div>
               
+              {/* Name and email */}
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                   <Text className="font-medium">Name</Text>
@@ -239,6 +226,7 @@ const SupportRequests = () => {
               
               <Divider />
               
+              {/* Message content */}
               <div className="my-4">
                 <Text className="font-medium mb-2">Nachricht</Text>
                 <div className="bg-gray-50 p-4 rounded-md whitespace-pre-wrap">
@@ -248,6 +236,7 @@ const SupportRequests = () => {
               
               <Divider />
               
+              {/* Status change and action buttons */}
               <div className="mt-4 flex justify-between items-center">
                 <div>
                   <Text className="font-medium">Status ändern</Text>

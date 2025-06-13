@@ -2,14 +2,16 @@ import { userService } from "./UserService";
 import { GalleryItem } from "../interfaces/Item";
 import Editorial from "interfaces/Editorial";
 
+// Service for handling editorial list API requests
 class EditorialService {
   private baseUrl: string;
 
   constructor() {
+    // Set base URL from environment or fallback to localhost
     this.baseUrl = process.env.REACT_APP_BACKEND_API_URL || "http://localhost:3001";
   }
 
-  // Fetch all editorial lists
+  // Fetch all editorial lists from the backend
   async fetchEditorialLists(): Promise<Editorial[]> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
@@ -38,7 +40,7 @@ class EditorialService {
     }
   }
 
-  // Fetch a specific editorial list by ID
+  // Fetch a specific editorial list by its ID
   async fetchEditorialListById(id: string): Promise<Editorial> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
@@ -66,6 +68,7 @@ class EditorialService {
     }
   }
 
+  // Fetch all items belonging to a specific editorial list
   async fetchItemsByEditorialId(editorialId: number): Promise<GalleryItem[]> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
@@ -79,11 +82,10 @@ class EditorialService {
       });
 
       if (res.status === 401) {
-        userService.logout(); // Perform logout
+        userService.logout(); // Perform logout on unauthorized
         throw new Error("Nicht autorisiert. Sie wurden ausgeloggt.");
       }
     
-
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Fehler beim Laden der Items: ${errorMessage}`);
@@ -97,7 +99,7 @@ class EditorialService {
     }
   }
 
-  // Search for items across all users
+  // Search for items across all users by query string
   async searchItems(query: string): Promise<GalleryItem[]> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
@@ -129,7 +131,7 @@ class EditorialService {
     }
   }
 
-  // Create a new editorial list
+  // Create a new editorial list with given data
   async createEditorialList(data: {
     title: string;
     description?: string;
@@ -168,7 +170,7 @@ class EditorialService {
     }
   }
 
-  // Update an existing editorial list
+  // Update an existing editorial list by ID
   async updateEditorialList(id: number, data: {
     title: string;
     description?: string;
@@ -207,7 +209,7 @@ class EditorialService {
     }
   }
 
-  // Delete an editorial list
+  // Delete an editorial list by ID
   async deleteEditorialList(id: number): Promise<void> {
     const token = userService.getToken();
     if (!token) throw new Error("Nicht eingeloggt.");
@@ -239,4 +241,5 @@ class EditorialService {
   }
 }
 
+// Export a singleton instance of the EditorialService
 export const editorialService = new EditorialService();
