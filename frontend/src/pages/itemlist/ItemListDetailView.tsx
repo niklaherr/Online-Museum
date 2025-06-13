@@ -1,29 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Card,
-  Title,
-  Text,
-  Button,
-  Subtitle,
-  Grid,
-  Dialog,
-  DialogPanel,
-  Flex,
-  Badge
-} from "@tremor/react";
-import {
-  UserIcon,
-  TrashIcon,
-  LockClosedIcon,
-  EyeIcon,
-  CalendarIcon,
-  PencilIcon,
-  ArrowLeftIcon,
-  RectangleStackIcon,
-  TagIcon,
-  PhotoIcon
-} from "@heroicons/react/24/outline";
+import { Card, Title, Text, Button, Subtitle, Grid, Dialog, DialogPanel, Flex, Badge } from "@tremor/react";
+import { UserIcon, TrashIcon, LockClosedIcon, EyeIcon, CalendarIcon, PencilIcon, ArrowLeftIcon, RectangleStackIcon, TagIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import ItemList from "interfaces/ItemList";
 import { itemService } from "services/ItemService";
@@ -36,12 +14,14 @@ type ItemListDetailViewProps = {
 };
 
 const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
+  // Get list id from route params and initialize state
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [list, setList] = useState<ItemList | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  // Fetch item list and its items on mount or when id changes
   useEffect(() => {
     const loadItemLists = async () => {
       try {
@@ -62,6 +42,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
     loadItemLists();
   }, [id]);
 
+  // Handle deletion of the item list
   const handleDeleteItemList = async () => {
     if (list) {
       try {
@@ -81,11 +62,12 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
 
   if (isLoading) return <Loading />;
 
+  // Check if current user is the owner of the list
   const isOwner = list?.user_id === userService.getUserID();
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      {/* Back Button */}
+      {/* Back navigation button */}
       <div className="flex items-center mb-6">
         <Button
           variant="light"
@@ -98,7 +80,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
       </div>
 
       <Card className="overflow-hidden">
-        {/* Header Image */}
+        {/* Header image or placeholder */}
         <div className="relative w-full h-72 bg-gray-100 border-b-2 border-gray-200">
           {list?.main_image ? (
             <img
@@ -116,9 +98,8 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
           )}
         </div>
 
-        {/* Content Section */}
         <div className="p-6 space-y-6">
-          {/* Header with badges */}
+          {/* List title and badges */}
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               <Badge color="blue" icon={RectangleStackIcon}>
@@ -145,7 +126,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
             </div>
           </div>
 
-          {/* Meta Information */}
+          {/* Meta information: creation date */}
           <div className="bg-gray-50 rounded-lg p-4 space-y-3">
             <div className="flex items-center text-gray-600">
               <CalendarIcon className="w-5 h-5 mr-3 text-blue-500" />
@@ -165,7 +146,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
             </div>
           </div>
 
-          {/* Description */}
+          {/* List description */}
           {list?.description && (
             <div className="space-y-2">
               <Title className="text-lg text-gray-800">Beschreibung</Title>
@@ -177,7 +158,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
             </div>
           )}
 
-          {/* Action Buttons */}
+          {/* Edit and delete buttons for owner */}
           {isOwner && (
             <div className="pt-6 border-t border-gray-200">
               <div className="flex flex-wrap gap-3">
@@ -205,7 +186,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
         </div>
       </Card>
 
-      {/* Items Grid */}
+      {/* Grid of items in the list */}
       {items.length > 0 ? (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -223,7 +204,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
                 className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
                 onClick={() => onNavigate(`/items/${item.id}`)}
               >
-                {/* Image */}
+                {/* Item image or placeholder */}
                 <div className="aspect-square w-full overflow-hidden bg-gray-100 mb-4">
                   {item.image ? (
                     <img
@@ -238,9 +219,8 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
                   )}
                 </div>
 
-                {/* Content */}
                 <div className="p-4 space-y-3">
-                  {/* Category & Privacy Badge */}
+                  {/* Item category and privacy badge */}
                   <div className="flex justify-between items-start">
                     {item.category && (
                       <Badge color="blue" icon={TagIcon} size="xs">
@@ -255,18 +235,18 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
                     )}
                   </div>
 
-                  {/* Title */}
+                  {/* Item title */}
                   <Title className="text-lg line-clamp-2 group-hover:text-blue-600 transition-colors">
                     {item.title}
                   </Title>
 
-                  {/* Date */}
+                  {/* Item creation date */}
                   <Text className="text-xs text-gray-500 flex items-center">
                     <CalendarIcon className="w-4 h-4 mr-1" />
                     {new Date(item.entered_on).toLocaleDateString("de-DE")}
                   </Text>
 
-                  {/* Author */}
+                  {/* Item author */}
                   <div className="flex items-center pt-2 border-t border-gray-100">
                     <UserIcon className="w-4 h-4 text-gray-400 mr-2" />
                     <Text className="text-sm text-gray-600 font-medium">
@@ -279,6 +259,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
           </Grid>
         </div>
       ) : (
+        // Empty state if no items in the list
         <Card>
           <div className="text-center py-12">
             <RectangleStackIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -299,7 +280,7 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
         </Card>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete confirmation dialog */}
       <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
         <DialogPanel className="max-w-md bg-white rounded-xl shadow-xl p-6">
           <div className="text-center">

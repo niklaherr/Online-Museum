@@ -6,7 +6,7 @@ type ForgotPasswordProps = {
 };
 
 const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
-  // State variables for each step and form field
+  // State variables for each step and form fields
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState('');
   const [securityAnswer, setSecurityAnswer] = useState('');
@@ -113,6 +113,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
     }
   };
 
+  // Render the UI for each step of the password reset process
   return (
     <div className="flex items-center justify-center min-h-full p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
@@ -126,7 +127,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
           </p>
         </div>
 
-        {/* Error message display */}
+        {/* Display error message if present */}
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
@@ -161,7 +162,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
           </form>
         )}
 
-        {/* Step 2: Security question and answer form */}
+        {/* Step 2: Security question form */}
         {step === 2 && (
           <form className="space-y-6" onSubmit={verifySecurityQuestion}>
             <div>
@@ -238,7 +239,7 @@ const ForgotPassword = ({ onNavigate }: ForgotPasswordProps) => {
           </form>
         )}
 
-        {/* Link to return to login */}
+        {/* Link to navigate back to login */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Zurück zur{' '}

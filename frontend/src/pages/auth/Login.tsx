@@ -7,7 +7,7 @@ type LoginPageProps = {
 
 // Login page component for user authentication
 const LoginPage = ({ onNavigate }: LoginPageProps) => {
-  // State for form fields, loading and error handling
+  // State for form fields, loading, and error message
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +40,7 @@ const LoginPage = ({ onNavigate }: LoginPageProps) => {
   return (
     <div className="flex items-center justify-center min-h-full p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-        {/* Header section */}
+        {/* Header with title and subtitle */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Anmelden</h1>
           <p className="mt-2 text-gray-600">

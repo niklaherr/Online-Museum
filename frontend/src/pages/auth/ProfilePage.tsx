@@ -6,7 +6,7 @@ import NotyfService from 'services/NotyfService';
 import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
-  // State for edit mode, delete modal, loading, and password form data
+  // State for edit mode, delete modal, loading, and password form
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,7 @@ const ProfilePage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle password change form submission with validation and feedback
+  // Handle password change form submission
   const handleSubmit = async () => {
     if (!formData.oldPassword || !formData.newPassword || !formData.reNewPassword) {
       NotyfService.showError("Bitte füllen Sie alle Felder aus.");
@@ -62,7 +62,7 @@ const ProfilePage = () => {
     }
   };
 
-  // Handle user account deletion with feedback and redirect
+  // Handle user account deletion
   const deleteUser = async () => {
     setIsLoading(true);
     try {
@@ -106,12 +106,13 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      {/* Profile header with avatar and welcome message */}
+      {/* Hero header with user avatar and welcome message */}
       <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl overflow-hidden shadow-2xl">
         <div className="absolute inset-0 opacity-10">
         </div>
         <div className="relative p-8 text-white">
           <div className="flex items-center space-x-6">
+            {/* User avatar */}
             <div className="relative">
               <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-2xl border-4 border-white/30">
                 <span className="text-4xl font-bold text-white">
@@ -119,6 +120,7 @@ const ProfilePage = () => {
                 </span>
               </div>
             </div>
+            {/* User info and greeting */}
             <div className="flex-1">
               <div className="flex items-center space-x-3 mb-2">
                 <Title className="text-3xl font-bold text-white">{userName}</Title>
@@ -181,7 +183,7 @@ const ProfilePage = () => {
                     />
                   </div>
                 </div>
-                {/* Password security hint */}
+                {/* Password security info */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-start">
                     <ShieldCheckIcon className="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
@@ -222,7 +224,7 @@ const ProfilePage = () => {
               </div>
             </Card>
           ) : (
-            // Account overview card
+            // Account overview
             <Card className="p-6">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="p-2 bg-gray-100 rounded-lg">
@@ -260,7 +262,6 @@ const ProfilePage = () => {
             </Card>
           )}
         </div>
-
         {/* Actions card: change password and logout */}
         <Card className="lg:col-span-2 p-6">
             <Title className="text-lg mb-4 flex items-center">

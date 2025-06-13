@@ -7,7 +7,7 @@ type RegisterPageProps = {
   onNavigate: (route: string) => void;
 };
 
-// Security question options for registration
+// Security questions options for the dropdown
 const securityQuestions = [
   "Familienname der Mutter",
   "Name des ersten Haustieres",
@@ -15,7 +15,7 @@ const securityQuestions = [
 ];
 
 const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
-  // State hooks for form fields and UI state
+  // State variables for form fields and UI state
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -140,7 +140,7 @@ const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
             />
           </div>
 
-          {/* Security question select */}
+          {/* Security question dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Sicherheitsfrage <span className="text-red-500">*</span>

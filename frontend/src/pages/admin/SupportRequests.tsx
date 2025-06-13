@@ -70,13 +70,13 @@ const SupportRequests = () => {
     }
   };
 
-  // Open the detail modal for a specific form
+  // Open the detail modal for a selected form
   const showDetails = (form: ContactForm) => {
     setSelectedForm(form);
     setIsDetailModalOpen(true);
   };
 
-  // Return a colored badge based on the status
+  // Return a colored badge based on status
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'new':
@@ -117,6 +117,7 @@ const SupportRequests = () => {
 
       {/* Card with filter and table */}
       <Card>
+        {/* Filter and table header */}
         <div className="flex justify-between items-center mb-4">
           <Title>Alle Anfragen</Title>
           <div className="w-48">
@@ -191,20 +192,23 @@ const SupportRequests = () => {
         )}
       </Card>
 
-      {/* Detail modal for a single support request */}
+      {/* Detail modal for a selected support request */}
       <Dialog open={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)}>
         <DialogPanel>
           {selectedForm && (
             <div>
+              {/* Modal header with subject and status */}
               <div className="flex justify-between items-start mb-4">
                 <Title>{selectedForm.subject}</Title>
                 {getStatusBadge(selectedForm.status)}
               </div>
               
+              {/* Submission date */}
               <div className="mb-4">
                 <Text className="text-sm text-gray-500">Eingereicht am {formatDate(selectedForm.submitted_on)}</Text>
               </div>
               
+              {/* Name and email */}
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                   <Text className="font-medium">Name</Text>
@@ -223,6 +227,7 @@ const SupportRequests = () => {
               
               <Divider />
               
+              {/* Message content */}
               <div className="my-4">
                 <Text className="font-medium mb-2">Nachricht</Text>
                 <div className="bg-gray-50 p-4 rounded-md whitespace-pre-wrap">
@@ -232,6 +237,7 @@ const SupportRequests = () => {
               
               <Divider />
               
+              {/* Status change and action buttons */}
               <div className="mt-4 flex justify-between items-center">
                 <div>
                   <Text className="font-medium">Status ändern</Text>
