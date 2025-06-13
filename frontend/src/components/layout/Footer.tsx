@@ -1,14 +1,10 @@
 import { Link } from 'react-router-dom';
-import { 
-  SparklesIcon, 
-  HeartIcon,
-  GlobeAltIcon,
-  ShieldCheckIcon,
-  QuestionMarkCircleIcon
-} from '@heroicons/react/24/outline';
+import { SparklesIcon, HeartIcon, GlobeAltIcon, ShieldCheckIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 
+// Footer component for the application
 const Footer = () => {
 
+  // Footer link sections with titles, icons, and links
   const footerLinks = [
     {
       title: 'Rechtliches',
@@ -39,10 +35,10 @@ const Footer = () => {
 
   return (
     <footer className="bg-white border-t border-gray-100 mt-auto">
-      {/* Main Footer */}
+      {/* Main footer container */}
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand Section */}
+          {/* Brand section with logo and description */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center space-x-3 group mb-4">
               <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-md group-hover:shadow-lg transition-all duration-200 group-hover:scale-105">
@@ -58,11 +54,13 @@ const Footer = () => {
               </div>
             </Link>
             
+            {/* Short description */}
             <p className="text-sm text-gray-600 leading-relaxed mb-4">
               Erstellen Sie persönliche digitale Sammlungen und teilen Sie Ihre Erinnerungen 
               in einer modernen, interaktiven Plattform.
             </p>
             
+            {/* Made with love section */}
             <div className="flex items-center text-sm text-gray-500">
               <span>Made with</span>
               <HeartIcon className="w-4 h-4 mx-1 text-red-500" />
@@ -70,13 +68,15 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Link Sections */}
+          {/* Render footer link sections */}
           {footerLinks.map((section, index) => (
             <div key={index}>
+              {/* Section title with icon */}
               <div className="flex items-center space-x-2 mb-4">
                 <section.icon className="w-5 h-5 text-gray-600" />
                 <h3 className="font-semibold text-gray-900">{section.title}</h3>
               </div>
+              {/* Section links */}
               <ul className="space-y-3">
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>

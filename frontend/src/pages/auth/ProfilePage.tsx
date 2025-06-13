@@ -100,6 +100,7 @@ const ProfilePage = () => {
     );
   }
 
+  // Get user info for display
   const userName = userService.getUserName();
   const isadmin = userService.isadmin();
 

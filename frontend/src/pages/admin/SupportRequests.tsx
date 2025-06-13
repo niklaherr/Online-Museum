@@ -115,6 +115,7 @@ const SupportRequests = () => {
         <Text>Verwalten Sie eingehende Kontaktanfragen von Benutzern.</Text>
       </div>
 
+      {/* Card with filter and table */}
       <Card>
         {/* Filter and table header */}
         <div className="flex justify-between items-center mb-4">

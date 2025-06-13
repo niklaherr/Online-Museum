@@ -1,17 +1,9 @@
 import { Dispatch, SetStateAction } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { userService } from 'services/UserService';
-import {
-  HomeIcon,
-  ClipboardIcon,
-  NewspaperIcon,
-  UserGroupIcon,
-  PhotoIcon,
-  EnvelopeIcon,
-  XMarkIcon,
-  SparklesIcon,
-} from '@heroicons/react/24/outline';
+import { HomeIcon, ClipboardIcon, NewspaperIcon, UserGroupIcon, PhotoIcon, EnvelopeIcon, XMarkIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
+// Sidebar component props
 type SidebarProps = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -20,14 +12,17 @@ type SidebarProps = {
 const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   const location = useLocation();
 
+  // Only render sidebar if user is logged in
   if (!userService.isLoggedIn) return null;
 
+  // Main navigation items
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: HomeIcon, color: 'blue' },
     { path: '/item-list', label: 'Listen', icon: ClipboardIcon, color: 'green' },
     { path: '/items', label: 'Meine Galerie', icon: PhotoIcon, color: 'purple' },
   ];
 
+  // Admin navigation items
   const adminItems = [
     { path: '/editorial', label: 'Redaktion', icon: NewspaperIcon, color: 'indigo' },
     { path: '/admin', label: 'Admin', icon: UserGroupIcon, color: 'red' },
@@ -36,7 +31,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
 
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Mobile overlay for closing sidebar */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
@@ -44,13 +39,13 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar container */}
       <div
         className={`fixed md:relative z-50 h-full w-72 bg-white shadow-2xl transform transition-all duration-300 ease-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           md:translate-x-0 md:block border-r border-gray-100`}
       >
-        {/* Header */}
+        {/* Sidebar header with logo and close button */}
         <div className="relative p-6 h-[75px] w-72 flex items-center px-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white">
           <div className="relative flex justify-between items-center">
             <div className="flex items-center space-x-3">
@@ -62,6 +57,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
               </div>
             </div>
             
+            {/* Close button for mobile */}
             <button
               onClick={() => setIsOpen(false)}
               className="md:hidden p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -71,13 +67,15 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
           </div>
         </div>
 
-        {/* Navigation */}
+        {/* Navigation section */}
         <nav className="flex-1 p-4 space-y-2">
+          {/* Main section */}
           <div className="mb-6">
             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
               Hauptbereich
             </div>
             
+            {/* Render main navigation links */}
             {navItems.map(({ path, label, icon: Icon, color }) => {
               const isActive = location.pathname === path;
               return (
@@ -108,13 +106,14 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             })}
           </div>
 
-          {/* Admin Section */}
+          {/* Admin section, only visible for admins */}
           {userService.isadmin() && (
             <div>
               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
                 Administration
               </div>
               
+              {/* Render admin navigation links */}
               {adminItems.map(({ path, label, icon: Icon, color }) => {
                 const isActive = location.pathname === path;
                 return (

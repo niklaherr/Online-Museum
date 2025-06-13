@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
+// Loading component displays a spinner, then a message if loading takes too long
 const Loading = () => {
   const [timeoutReached, setTimeoutReached] = useState(false);
 
+  // Set a timeout to switch from spinner to message after 1.5 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setTimeoutReached(true);
@@ -13,8 +15,10 @@ const Loading = () => {
 
   return (
     <div className="flex flex-col justify-center items-center p-12 text-center">
+      {/* Show spinner before timeout, otherwise show fallback message */}
       {!timeoutReached ? (
         <div className="text-blue-500">
+          {/* Animated loading spinner */}
           <svg
             className="animate-spin h-10 w-10"
             xmlns="http://www.w3.org/2000/svg"
@@ -40,6 +44,7 @@ const Loading = () => {
         </div>
       ) : (
         <div className="text-gray-500 flex flex-col items-center">
+          {/* Fallback message with icon if loading takes too long */}
           <ExclamationCircleIcon className="w-10 h-10 mb-2 text-gray-400" />
           <p className="text-lg font-semibold">Fehler beim Laden</p>
           <p className="text-sm text-gray-400 mt-1">Versuche, die Seite neu zu laden oder prüfe deine Verbindung.</p>
