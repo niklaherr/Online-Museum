@@ -117,8 +117,8 @@ const TermsOfUse = () => {
           </div>
           {/* Footer: Last updated information */}
           <Text className="text-sm text-gray-500 mt-6">
-            Stand: {new Date().toLocaleDateString('de-DE')} | 
-            Letzte Aktualisierung: {new Date().toLocaleDateString('de-DE')}
+            Stand: 16.06.2025 |
+            Letzte Aktualisierung: 27.05.2025
           </Text>
         </div>
       </Card>
