@@ -268,8 +268,8 @@ const Roadmap = () => {
         {/* Footer with last update info */}
         <div className="text-sm text-gray-500 mt-8">
           <Text className="text-sm text-gray-500 mt-6">
-            Stand: {new Date().toLocaleDateString('de-DE')} | 
-            Letzte Aktualisierung: {new Date().toLocaleDateString('de-DE')}
+            Stand: 16.06.2025 |
+            Letzte Aktualisierung: 27.05.2025
           </Text>
           <p className="mt-1 italic">
             Hinweis: Diese Roadmap stellt unsere aktuellen Pläne dar und kann sich basierend auf Nutzerfeedback, technologischen Entwicklungen und Ressourcenverfügbarkeit ändern.
