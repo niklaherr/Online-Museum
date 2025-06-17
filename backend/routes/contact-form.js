@@ -18,7 +18,7 @@ router.post("/contact-form", async (req, res) => {
                    RETURNING id`;
 
     if (isSQLInjection(query)) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {
@@ -46,7 +46,7 @@ router.get("/contact-form", authenticateJWT, async (req, res) => {
     const query = `SELECT * FROM contact_form ORDER BY submitted_on DESC`;
 
     if (isSQLInjection(query)) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {
@@ -76,7 +76,7 @@ router.put("/contact-form/:id/status", authenticateJWT, async (req, res) => {
     const query = `UPDATE contact_form SET status = $1 WHERE id = $2 RETURNING *`;
 
     if (isSQLInjection(query)) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {

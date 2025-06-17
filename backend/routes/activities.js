@@ -19,7 +19,7 @@ router.get("/activities", authenticateJWT, async (req, res) => {
         LIMIT 5`;
 
         if (isSQLInjection(query)) {
-            res.status(401).send("Access denied");
+            res.status(401).send("Zugriff verweigert");
             return;
         }
 
@@ -28,7 +28,7 @@ router.get("/activities", authenticateJWT, async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching activities");
+        res.status(500).send("Fehler beim Abrufen der Aktivitäten");
     }
 });
 

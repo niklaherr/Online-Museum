@@ -7,7 +7,7 @@ const router = express.Router();
 // Middleware to ensure user is an admin
 function requireAdmin(req, res, next) {
     if (!req.user || req.user.isadmin !== true) {
-        return res.status(403).json({ error: "Admin privileges required." });
+        return res.status(403).json({ error: "Administratorrechte erforderlich." });
     }
     next();
 }
@@ -16,7 +16,7 @@ function requireAdmin(req, res, next) {
 router.get("/admin/search", authenticateJWT, requireAdmin, async (req, res) => {
     const pool = req.app.locals.pool;
     const { q } = req.query;
-    const currentUserId = req.user.id; // Assuming req.user is set by your auth middleware
+    const currentUserId = req.user.id;
 
     const query = `
         SELECT * 
@@ -29,14 +29,14 @@ router.get("/admin/search", authenticateJWT, requireAdmin, async (req, res) => {
     const values = [`%${q}%`, currentUserId];
 
     if (isSQLInjection(query)) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
     try {
         const result = await pool.query(query, values);
         res.json(result.rows);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Error searching users" });
+        res.status(500).json({ error: "Fehler beim Suchen der Benutzer" });
     }
 });
 
@@ -47,25 +47,25 @@ router.put("/admin/:id", authenticateJWT, requireAdmin, async (req, res) => {
     const { isadmin } = req.body;
 
     if (typeof isadmin !== "boolean") {
-        return res.status(400).json({ error: "Invalid 'isadmin' value. Must be true or false." });
+        return res.status(400).json({ error: "Ungültiger Wert für 'isadmin'. Muss true oder false sein." });
     }
 
     const query = 'UPDATE users SET "isadmin" = $1 WHERE id = $2 RETURNING id, username, "isadmin"';
     if (isSQLInjection(query)) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {
         const result = await pool.query(query, [isadmin, id]);
 
         if (result.rowCount === 0) {
-            return res.status(404).json({ error: "User not found" });
+            return res.status(404).json({ error: "Benutzer nicht gefunden" });
         }
 
         res.json(result.rows[0]);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Error updating admin status" });
+        res.status(500).json({ error: "Fehler beim Aktualisieren des Admin-Status" });
     }
 });
 
@@ -75,7 +75,7 @@ router.get("/admin", authenticateJWT, requireAdmin, async (req, res) => {
 
     const query = 'SELECT * FROM users WHERE "isadmin" = true ORDER BY username ASC';
     if (isSQLInjection(query)) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {
@@ -83,8 +83,6 @@ router.get("/admin", authenticateJWT, requireAdmin, async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Error fetching admins" });
+        res.status(500).json({ error: "Fehler beim Abrufen der Administratoren" });
     }
 });
-
-module.exports = router;

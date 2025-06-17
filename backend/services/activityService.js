@@ -3,7 +3,7 @@
 //function used to create activities for a user, e.g when creating an item you will call this function after creating it
 async function createActivity(pool, { category, element_id, type, user_id }) {
     if (!category || !element_id || !type || !user_id) {
-        throw new Error("Missing required fields: category, element_id, type, and user_id");
+        throw new Error("Fehlende Kategorien: category, element_id, type, and user_id");
     }
 
     try {
@@ -15,8 +15,7 @@ async function createActivity(pool, { category, element_id, type, user_id }) {
         );
         return result.rows[0];
     } catch (err) {
-        console.error("Error creating activity:", err);
-        throw new Error("Error creating activity");
+        throw new Error("Fehler beim Erstellen der Aktivität: " + err.message);
     }
 }
 

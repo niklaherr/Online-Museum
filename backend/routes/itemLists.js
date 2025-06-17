@@ -16,10 +16,10 @@ router.get("/item-lists/:id", authenticateJWT, async (req, res) => {
 
     try {
         const query = "SELECT * FROM item_list WHERE id = $1 AND (isPrivate = false OR user_id = $2)";
-        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+        if (isSQLInjection(query)) return res.status(401).send("Zugriff verweigert");
 
         const result = await pool.query(query, [id, userId]);
-        if (result.rows.length === 0) return res.status(404).send("Item list not found");
+        if (result.rows.length === 0) return res.status(404).send("Item-Liste nicht gefunden");
 
         const itemList = result.rows[0];
         res.json({
@@ -28,7 +28,7 @@ router.get("/item-lists/:id", authenticateJWT, async (req, res) => {
         });
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching item list");
+        res.status(500).send("Fehler beim Abrufen der Item-Liste");
     }
 });
 
@@ -53,7 +53,7 @@ router.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) 
             )
             ORDER BY item.entered_on DESC
         `;
-        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+        if (isSQLInjection(query)) return res.status(401).send("Zugriff verweigert");
 
         const result = await pool.query(query, [item_list_id, requestingUserId]);
 
@@ -72,7 +72,7 @@ router.get("/item-lists/:item_list_id/items", authenticateJWT, async (req, res) 
         res.json(items);
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching items");
+        res.status(500).send("Fehler beim Abrufen der Items");
     }
 });
 
@@ -84,19 +84,19 @@ router.post("/item-lists", authenticateJWT, upload.single("main_image"), async (
     const pool = req.app.locals.pool;
 
     if (!title || !item_ids || item_ids.length === 0) {
-        return res.status(400).send("Title and at least one item ID are required.");
+        return res.status(400).send("Titel und mindestens eine Item-ID sind erforderlich.");
     }
 
     let parsedItemIds;
     try {
         parsedItemIds = typeof item_ids === 'string' ? JSON.parse(item_ids) : item_ids;
     } catch (error) {
-        return res.status(400).send("Invalid item_ids format.");
+        return res.status(400).send("Ungültiges Format für item_ids.");
     }
 
     try {
         const insertQuery = "INSERT INTO item_list (title, description, user_id, isprivate, main_image) VALUES ($1, $2, $3, $4, $5) RETURNING id";
-        if (isSQLInjection(insertQuery)) return res.status(401).send("Access denied");
+        if (isSQLInjection(insertQuery)) return res.status(401).send("Zugriff verweigert");
 
         await pool.query('BEGIN');
 
@@ -105,7 +105,7 @@ router.post("/item-lists", authenticateJWT, upload.single("main_image"), async (
 
         for (const itemId of parsedItemIds) {
             const itemQuery = "INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)";
-            if (isSQLInjection(itemQuery)) return res.status(401).send("Access denied");
+            if (isSQLInjection(itemQuery)) return res.status(401).send("Zugriff verweigert");
 
             await pool.query(itemQuery, [newItemListId, itemId]);
         }
@@ -122,7 +122,7 @@ router.post("/item-lists", authenticateJWT, upload.single("main_image"), async (
     } catch (err) {
         await pool.query('ROLLBACK');
         console.error("Error creating item list:", err);
-        res.status(500).send("Error creating item list.");
+        res.status(500).send("Fehler beim Erstellen der Item-Liste.");
     }
 });
 
@@ -134,28 +134,28 @@ router.put("/item-lists/:id", authenticateJWT, upload.single("main_image"), asyn
     const userId = req.user.id;
     const pool = req.app.locals.pool;
 
-    if (!title) return res.status(400).send("Title is required.");
+    if (!title) return res.status(400).send("Titel ist erforderlich.");
 
     let parsedItemIds;
     try {
         parsedItemIds = typeof item_ids === 'string' ? JSON.parse(item_ids) : item_ids;
         if (!Array.isArray(parsedItemIds) || parsedItemIds.length === 0) {
-            return res.status(400).send("At least one item ID is required.");
+            return res.status(400).send("Mindestens eine Item-ID ist erforderlich.");
         }
     } catch (error) {
-        return res.status(400).send("Invalid item_ids format.");
+        return res.status(400).send("Ungültiges Format für item_ids.");
     }
 
     try {
         await pool.query('BEGIN');
 
         const checkQuery = "SELECT * FROM item_list WHERE id = $1 AND user_id = $2";
-        if (isSQLInjection(checkQuery)) return res.status(401).send("Access denied");
+        if (isSQLInjection(checkQuery)) return res.status(401).send("Zugriff verweigert");
 
         const existingList = await pool.query(checkQuery, [itemListId, userId]);
         if (existingList.rowCount === 0) {
             await pool.query('ROLLBACK');
-            return res.status(404).send("Item list not found or not authorized.");
+            return res.status(404).send("Item-Liste nicht gefunden oder nicht berechtigt.");
         }
 
         let updateQuery = "UPDATE item_list SET title = $1, description = $2, isprivate = $3";
@@ -169,16 +169,16 @@ router.put("/item-lists/:id", authenticateJWT, upload.single("main_image"), asyn
             updateValues.push(itemListId);
         }
 
-        if (isSQLInjection(updateQuery)) return res.status(401).send("Access denied");
+        if (isSQLInjection(updateQuery)) return res.status(401).send("Zugriff verweigert");
 
         await pool.query(updateQuery, updateValues);
 
         const deleteQuery = "DELETE FROM item_itemlist WHERE item_list_id = $1";
-        if (isSQLInjection(deleteQuery)) return res.status(401).send("Access denied");
+        if (isSQLInjection(deleteQuery)) return res.status(401).send("Zugriff verweigert");
         await pool.query(deleteQuery, [itemListId]);
 
         const insertItemQuery = "INSERT INTO item_itemlist (item_list_id, item_id) VALUES ($1, $2)";
-        if (isSQLInjection(insertItemQuery)) return res.status(401).send("Access denied");
+        if (isSQLInjection(insertItemQuery)) return res.status(401).send("Zugriff verweigert");
         for (const itemId of parsedItemIds) {
             await pool.query(insertItemQuery, [itemListId, itemId]);
         }
@@ -196,7 +196,7 @@ router.put("/item-lists/:id", authenticateJWT, upload.single("main_image"), asyn
     } catch (err) {
         await pool.query('ROLLBACK');
         console.error("Error updating item list:", err);
-        res.status(500).send("Error updating item list.");
+        res.status(500).send("Fehler beim Aktualisieren der Item-Liste.");
     }
 });
 
@@ -210,16 +210,16 @@ router.delete("/item-lists/:id", authenticateJWT, async (req, res) => {
         await pool.query('BEGIN');
 
         const checkQuery = "SELECT * FROM item_list WHERE id = $1 AND user_id = $2";
-        if (isSQLInjection(checkQuery)) return res.status(401).send("Access denied");
+        if (isSQLInjection(checkQuery)) return res.status(401).send("Zugriff verweigert");
         const itemListResult = await pool.query(checkQuery, [itemListId, userId]);
 
         if (itemListResult.rows.length === 0) {
             await pool.query('ROLLBACK');
-            return res.status(404).send("Item list not found or does not belong to you.");
+            return res.status(404).send("Item-Liste nicht gefunden oder gehört nicht Ihnen.");
         }
 
         const deleteQuery = "DELETE FROM item_list WHERE id = $1";
-        if (isSQLInjection(deleteQuery)) return res.status(401).send("Access denied");
+        if (isSQLInjection(deleteQuery)) return res.status(401).send("Zugriff verweigert");
         await pool.query(deleteQuery, [itemListId]);
 
         await createActivity(pool, {
@@ -230,11 +230,11 @@ router.delete("/item-lists/:id", authenticateJWT, async (req, res) => {
         });
 
         await pool.query('COMMIT');
-        res.status(200).send("Item list deleted successfully.");
+        res.status(200).send("Item-Liste erfolgreich gelöscht.");
     } catch (err) {
         await pool.query('ROLLBACK');
         console.error("Error deleting item list:", err);
-        res.status(500).send("Error deleting item list.");
+        res.status(500).send("Fehler beim Löschen der Item-Liste.");
     }
 });
 
@@ -298,7 +298,7 @@ router.get("/item-lists", authenticateJWT, async (req, res) => {
             ${whereClause}
             ORDER BY il.entered_on DESC;
         `;
-        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+        if (isSQLInjection(query)) return res.status(401).send("Zugriff verweigert");
 
         const result = await pool.query(query, values);
 
@@ -316,8 +316,9 @@ router.get("/item-lists", authenticateJWT, async (req, res) => {
         res.json(itemLists);
     } catch (err) {
         console.error("Error filtering item lists:", err);
-        res.status(500).send("Error filtering item lists");
+        res.status(500).send("Fehler beim Filtern der Item-Listen");
     }
 });
 
 module.exports = router;
+

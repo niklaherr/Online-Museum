@@ -21,7 +21,7 @@ router.get("/items/no-auth", async (req, res) => {
             ORDER BY item.entered_on DESC
             LIMIT 5;
         `;
-        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+        if (isSQLInjection(query)) return res.status(401).send("Zugriff verweigert");
         const result = await pool.query(query);
 
         const items = result.rows.map(item => ({
@@ -39,7 +39,7 @@ router.get("/items/no-auth", async (req, res) => {
         res.json(items);
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching items");
+        res.status(500).send("Fehler beim Abrufen der Items");
     }
 });
 
@@ -122,7 +122,7 @@ router.get("/items", authenticateJWT, async (req, res) => {
             ORDER BY i.entered_on DESC;
         `;
 
-        if (isSQLInjection(sqlQuery)) return res.status(401).send("Access denied");
+        if (isSQLInjection(sqlQuery)) return res.status(401).send("Zugriff verweigert");
 
         const result = await pool.query(sqlQuery, values);
 
@@ -141,7 +141,7 @@ router.get("/items", authenticateJWT, async (req, res) => {
         res.json(items);
     } catch (err) {
         console.error("Error filtering items:", err);
-        res.status(500).send("Error filtering items");
+        res.status(500).send("Fehler beim Filtern der Items");
     }
 });
 
@@ -159,10 +159,10 @@ router.get("/items/:id", authenticateJWT, async (req, res) => {
             WHERE item.id = $1
             AND (item.isPrivate = false OR item.user_id = $2)
         `;
-        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+        if (isSQLInjection(query)) return res.status(401).send("Zugriff verweigert");
         const result = await pool.query(query, [id, userId]);
 
-        if (result.rows.length === 0) return res.status(404).send("Item not found");
+        if (result.rows.length === 0) return res.status(404).send("Item nicht gefunden");
 
         const item = result.rows[0];
         res.json({
@@ -178,7 +178,7 @@ router.get("/items/:id", authenticateJWT, async (req, res) => {
         });
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching item or user data");
+        res.status(500).send("Fehler beim Abrufen des Items oder der Benutzerdaten");
     }
 });
 
@@ -188,14 +188,14 @@ router.post("/items", authenticateJWT, upload.single("image"), async (req, res) 
     const image = req.file ? req.file.buffer : null;
     const pool = req.app.locals.pool;
 
-    if (!title) return res.status(400).send("Missing required fields: title");
+    if (!title) return res.status(400).send("Fehlende erforderliche Felder: Titel");
 
     try {
 
         const query = `INSERT INTO item (user_id, title, image, description, category, isprivate)
              VALUES ($1, $2, $3, $4, $5, $6)
              RETURNING *`;
-        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+        if (isSQLInjection(query)) return res.status(401).send("Zugriff verweigert");
         const result = await pool.query(
             query,
             [req.user.id, title, image, description || null, category || null, isprivate]
@@ -214,7 +214,7 @@ router.post("/items", authenticateJWT, upload.single("image"), async (req, res) 
         res.status(201).json(result.rows[0]);
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error creating item");
+        res.status(500).send("Fehler beim Erstellen des Items");
     }
 });
 
@@ -225,7 +225,7 @@ router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, re
     const image = req.file ? req.file.buffer : null;
     const pool = req.app.locals.pool;
 
-    if (!title) return res.status(400).send("Missing required field: title");
+    if (!title) return res.status(400).send("Fehlendes erforderliches Feld: Titel");
 
     try {
         const fields = ["title", "description", "category"];
@@ -242,12 +242,12 @@ router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, re
         query += ` WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1} RETURNING *`;
         values.push(id, req.user.id);
 
-        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+        if (isSQLInjection(query)) return res.status(401).send("Zugriff verweigert");
 
         const result = await pool.query(query, values);
 
         if (result.rows.length === 0)
-            return res.status(404).send("Item not found or not authorized");
+            return res.status(404).send("Item nicht gefunden oder nicht autorisiert");
 
         // Remove from editorial list if now private
         if (isprivate === 'true' || isprivate === true) {
@@ -264,7 +264,7 @@ router.put("/items/:id", authenticateJWT, upload.single("image"), async (req, re
         res.json(result.rows[0]);
     } catch (err) {
         console.error("Error updating item:", err);
-        res.status(500).send("Error updating item");
+        res.status(500).send("Fehler beim Aktualisieren des Items");
     }
 });
 
@@ -277,18 +277,18 @@ router.delete("/items/:id", authenticateJWT, async (req, res) => {
     try {
         // Ensure the item exists and belongs to the current user
         const query = "SELECT * FROM item WHERE id = $1 AND user_id = $2"
-        if (isSQLInjection(query)) return res.status(401).send("Access denied");
+        if (isSQLInjection(query)) return res.status(401).send("Zugriff verweigert");
         const itemResult = await pool.query(
             query,
             [itemID, userId]
         );
 
         if (itemResult.rows.length === 0) {
-            return res.status(404).send("Item not found or does not belong to you.");
+            return res.status(404).send("Item nicht gefunden oder gehört nicht Ihnen.");
         }
 
         const deleteQuery = "DELETE FROM item WHERE id = $1"
-        if (isSQLInjection(deleteQuery)) return res.status(401).send("Access denied");
+        if (isSQLInjection(deleteQuery)) return res.status(401).send("Zugriff verweigert");
         // Delete the item (cascading will handle associations)
         await pool.query(deleteQuery, [itemID]);
 
@@ -299,10 +299,10 @@ router.delete("/items/:id", authenticateJWT, async (req, res) => {
             user_id: userId
         });
 
-        res.status(200).send("Item deleted successfully.");
+        res.status(200).send("Item erfolgreich gelöscht.");
     } catch (err) {
         console.error("Error deleting item:", err);
-        res.status(500).send("Error deleting item.");
+        res.status(500).send("Fehler beim Löschen des Items.");
     }
 });
 
@@ -331,7 +331,7 @@ router.get("/items-search", authenticateJWT, async (req, res) => {
         ORDER BY i.entered_on DESC
         `;
 
-        if (isSQLInjection(sqlQuery)) return res.status(401).send("Access denied");
+        if (isSQLInjection(sqlQuery)) return res.status(401).send("Zugriff verweigert");
         
         const searchPattern = `%${query}%`;
         const result = await pool.query(sqlQuery, [searchPattern]);

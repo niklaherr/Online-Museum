@@ -18,7 +18,7 @@ router.post("/register", async (req, res) => {
         const query = "INSERT INTO users (username, password, security_question, security_answer) VALUES ($1, $2, $3, $4) RETURNING id, username"
 
         if (isSQLInjection(query)) {
-            return res.status(401).send("Access denied");
+            return res.status(401).send("Zugriff verweigert");
         }
 
         const result = await pool.query(
@@ -31,7 +31,7 @@ router.post("/register", async (req, res) => {
         res.status(201).json({ token, id: user.id, username: user.username, isadmin: false });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Registration failed" });
+        res.status(500).json({ error: "Registrierung fehlgeschlagen" });
     }
 });
 
@@ -43,23 +43,23 @@ router.post("/login", async (req, res) => {
     try {
         const query = "SELECT * FROM users WHERE username = $1"
         if (isSQLInjection(query)) {
-            return res.status(401).send("Access denied");
+            return res.status(401).send("Zugriff verweigert");
         }
 
         const result = await pool.query(query, [username]);
         const user = result.rows[0];
 
-        if (!user) return res.status(401).json({ error: "Invalid credentials" });
+        if (!user) return res.status(401).json({ error: "Ungültige Anmeldedaten" });
 
         const match = await bcrypt.compare(password, user.password);
-        if (!match) return res.status(401).json({ error: "Invalid credentials" });
+        if (!match) return res.status(401).json({ error: "Ungültige Anmeldedaten" });
 
         const token = jwt.sign({ id: user.id, username: user.username, isadmin: user.isadmin }, JWT_SECRET, { expiresIn: "1h" });
 
         res.json({ token, id: user.id, username: user.username, isadmin: user.isadmin });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Login failed" });
+        res.status(500).json({ error: "Anmeldung fehlgeschlagen" });
     }
 });
 
@@ -73,7 +73,7 @@ router.post("/verify-security-question", async (req, res) => {
         // Find the user
         const query = "SELECT * FROM users WHERE username = $1"
         if (isSQLInjection(query)) {
-            return res.status(401).send("Access denied");
+            return res.status(401).send("Zugriff verweigert");
         }
         const result = await pool.query(
             query,
@@ -81,7 +81,7 @@ router.post("/verify-security-question", async (req, res) => {
         );
         
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: "User not found" });
+            return res.status(404).json({ error: "Benutzer nicht gefunden" });
         }
         
         const user = result.rows[0];
@@ -99,16 +99,16 @@ router.post("/verify-security-question", async (req, res) => {
             
             return res.json({ 
                 success: true, 
-                message: "Security answer verified",
+                message: "Sicherheitsantwort verifiziert",
                 resetToken: resetToken,
                 userId: user.id
             });
         } else {
-            return res.status(401).json({ error: "Invalid security answer" });
+            return res.status(401).json({ error: "Ungültige Sicherheitsantwort" });
         }
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Error verifying security question" });
+        res.status(500).json({ error: "Fehler bei der Überprüfung der Sicherheitsfrage" });
     }
 });
 
@@ -120,7 +120,7 @@ router.get("/security-question/:username", async (req, res) => {
     try {
         const query = "SELECT security_question FROM users WHERE username = $1"
         if (isSQLInjection(query)) {
-            return res.status(401).send("Access denied");
+            return res.status(401).send("Zugriff verweigert");
         }
         const result = await pool.query(
             query,
@@ -128,13 +128,13 @@ router.get("/security-question/:username", async (req, res) => {
         );
         
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: "User not found" });
+            return res.status(404).json({ error: "Benutzer nicht gefunden" });
         }
         
         res.json({ securityQuestion: result.rows[0].security_question });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Error retrieving security question" });
+        res.status(500).json({ error: "Fehler beim Abrufen der Sicherheitsfrage" });
     }
 });
 
@@ -149,7 +149,7 @@ router.post("/reset-password", async (req, res) => {
         
         // Check if token was issued for password reset
         if (decoded.purpose !== 'password-reset') {
-            return res.status(401).json({ error: "Invalid token purpose" });
+            return res.status(401).json({ error: "Ungültiger Token-Zweck" });
         }
         
         // Hash the new password
@@ -158,20 +158,20 @@ router.post("/reset-password", async (req, res) => {
         // Update the user's password
         const query = "UPDATE users SET password = $1 WHERE id = $2"
         if (isSQLInjection(query)) {
-            return res.status(401).send("Access denied");
+            return res.status(401).send("Zugriff verweigert");
         }
         await pool.query(
             query,
             [hashedPassword, decoded.id]
         );
         
-        res.json({ success: true, message: "Password reset successful" });
+        res.json({ success: true, message: "Passwort erfolgreich zurückgesetzt" });
     } catch (err) {
         console.error(err);
         if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
-            return res.status(401).json({ error: "Invalid or expired token" });
+            return res.status(401).json({ error: "Ungültiger oder abgelaufener Token" });
         }
-        res.status(500).json({ error: "Error resetting password" });
+        res.status(500).json({ error: "Fehler beim Zurücksetzen des Passworts" });
     }
 });
 
@@ -196,7 +196,7 @@ router.put("/reset-password-with-old-password", authenticateJWT, async (req, res
     try {
         const query = "SELECT * FROM users WHERE id = $1"
         if (isSQLInjection(query)) {
-            return res.status(401).send("Access denied");
+            return res.status(401).send("Zugriff verweigert");
         }
         const result = await pool.query(query, [req.user.id]);
         const user = result.rows[0];
@@ -208,7 +208,7 @@ router.put("/reset-password-with-old-password", authenticateJWT, async (req, res
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
         const updateQuery= "UPDATE users SET password = $1 WHERE id = $2"
         if (isSQLInjection(updateQuery)) {
-            return res.status(401).send("Access denied");
+            return res.status(401).send("Zugriff verweigert");
         }
         await pool.query(updateQuery, [hashedNewPassword, user.id]);
 
