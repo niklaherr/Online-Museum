@@ -142,7 +142,7 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
 
       promptText += `\nBitte erstelle basierend auf dem Titel "${title}" und diesen ${selectedItems.length} Inhalten eine, `;
       promptText += "zusammenfassende Beschreibung, die die thematische Verbindung dieser Sammlung in 2-3 Sätzen hervorhebt.";
-
+      
       const generatedText = await itemAssistantService.generateDescription(
         title,
         promptText
