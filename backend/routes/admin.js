@@ -1,6 +1,6 @@
 const express = require("express");
 const { authenticateJWT } = require("../middleware/auth");
-const { isSQLInjection } = require("../services/injectionService"); // <-- make sure this path is correct
+const { isSQLInjection } = require("../services/injectionService");
 
 const router = express.Router();
 
@@ -86,3 +86,5 @@ router.get("/admin", authenticateJWT, requireAdmin, async (req, res) => {
         res.status(500).json({ error: "Fehler beim Abrufen der Administratoren" });
     }
 });
+
+module.exports = router;
