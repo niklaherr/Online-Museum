@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
 const authenticateJWT = (req, res, next) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
-        return res.status(403).json({ error: "Access denied, no token provided." });
+        return res.status(403).json({ error: "Zugriff verweigert, kein Token bereitgestellt." });
     }
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
@@ -16,7 +16,7 @@ const authenticateJWT = (req, res, next) => {
         next(); // Continue to the next middleware/route
     } catch (err) {
         console.error(err);
-        return res.status(401).json({ error: "Invalid or expired token." });
+        return res.status(401).json({ error: "Ungültiges oder abgelaufenes Token." });
     }
 };
 

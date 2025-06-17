@@ -44,7 +44,7 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
     if (item) {
       try {
         await itemService.deleteItem(item.id);
-        NotyfService.showSuccess("Item successfully deleted!");
+        NotyfService.showSuccess("Item erfolgreich gelöscht");
         onNavigate("/items"); // Redirect after deletion
       } catch (error) {
         let errorMessage = "Fehler beim Löschen des Items";

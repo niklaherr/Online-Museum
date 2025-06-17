@@ -23,10 +23,9 @@ class AdminService {
                 body: JSON.stringify({ isadmin: true }),
             });
 
-            if (!response.ok) throw new Error("Failed to assign admin");
+            if (!response.ok) throw new Error("Admin konnte nicht hinzugefügt werden");
             return true;
         } catch (error) {
-            console.error("addAdmin error:", error);
             throw new Error("Problem beim Hinzufügen des Admins");
         }
     }
@@ -43,10 +42,9 @@ class AdminService {
                 body: JSON.stringify({ isadmin: false }),
             });
 
-            if (!response.ok) throw new Error("Failed to remove admin");
+            if (!response.ok) throw new Error("Admin konnte nicht entfernt werden");
             return true;
         } catch (error) {
-            console.error("deleteAdmin error:", error);
             NotyfService.showError("Fehler beim Entfernen des Admins");
             return false;
         }
@@ -62,12 +60,11 @@ class AdminService {
                 },
             });
 
-            if (!response.ok) throw new Error("Search failed");
+            if (!response.ok) throw new Error("Suche fehlgeschlagen");
 
             const users: User[] = await response.json();
             return users;
         } catch (error) {
-            console.error("searchUsers error:", error);
             NotyfService.showError("Fehler bei der Benutzersuche");
             return [];
         }
@@ -83,7 +80,7 @@ class AdminService {
                 },
             });
 
-            if (!response.ok) throw new Error("Failed to fetch admins");
+            if (!response.ok) throw new Error("Administratoren konnten nicht abgerufen werden");
 
             const admins: User[] = await response.json();
             return admins;

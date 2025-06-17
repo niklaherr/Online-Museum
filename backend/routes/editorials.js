@@ -12,7 +12,7 @@ router.get("/editorial-lists", authenticateJWT, async (req, res) => {
     const query = "SELECT * FROM editorial ORDER BY id DESC";
 
     if (isSQLInjection(query)) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {
@@ -40,7 +40,7 @@ router.get("/editorial-lists/:id", authenticateJWT, async (req, res) => {
     `;
 
     if (isSQLInjection(editorialQuery) || isSQLInjection(itemsQuery)) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {
@@ -100,7 +100,7 @@ router.post("/editorial-lists", authenticateJWT, async (req, res) => {
         isSQLInjection(begin) || 
         isSQLInjection(commit)
     ) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {
@@ -166,7 +166,7 @@ router.put("/editorial-lists/:id", authenticateJWT, async (req, res) => {
         isSQLInjection(begin) || 
         isSQLInjection(commit)
     ) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {
@@ -229,7 +229,7 @@ router.delete("/editorial-lists/:id", authenticateJWT, async (req, res) => {
         isSQLInjection(begin) || 
         isSQLInjection(commit)
     ) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {
@@ -277,7 +277,7 @@ router.get("/editorial-lists/:editorial_id/items", authenticateJWT, async (req, 
     `;
 
     if (isSQLInjection(query)) {
-        return res.status(401).send("Access denied");
+        return res.status(401).send("Zugriff verweigert");
     }
 
     try {
@@ -298,8 +298,9 @@ router.get("/editorial-lists/:editorial_id/items", authenticateJWT, async (req, 
         res.json(items);
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching items");
+        res.status(500).send("Fehler beim Laden der Items");
     }
 });
 
 module.exports = router;
+
