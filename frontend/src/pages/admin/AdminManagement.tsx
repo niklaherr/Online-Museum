@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Card, Title, TextInput, Button, Grid, Text, Flex, Dialog, DialogPanel } from "@tremor/react";
+import { Card, Title, TextInput, Button, Grid, Text, Flex } from "@tremor/react";
 import { MagnifyingGlassIcon, TrashIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import NotyfService from "services/NotyfService";
 import Loading from "components/helper/Loading";
 import User from "interfaces/User";
 import { userService } from "services/UserService";
 import { adminService } from "services/AdminService";
+import AlertDialog from "components/helper/AlertDialog";
 
 // Props type for navigation callback
 type AdminManagementProps = {
@@ -229,22 +230,17 @@ const AdminManagement = ({ onNavigate }: AdminManagementProps) => {
       </Card>
 
       {/* Confirmation dialog for removing admin */}
-      <Dialog open={isRemoveModalOpen} onClose={() => setIsRemoveModalOpen(false)}>
-        <DialogPanel className="max-w-sm bg-white rounded-xl shadow-md p-6">
-          <Title>Administrator-Status entfernen</Title>
-          <Text className="my-4">
-            Möchten Sie diesen Benutzer wirklich als Administrator entfernen? Der Benutzer verliert damit alle Administratorrechte.
-          </Text>
-          <Flex justifyContent="end" className="space-x-2">
-            <Button variant="secondary" onClick={() => setIsRemoveModalOpen(false)}>
-              Abbrechen
-            </Button>
-            <Button color="red" onClick={handleRemoveAdmin}>
-              Entfernen
-            </Button>
-          </Flex>
-        </DialogPanel>
-      </Dialog>
+      <AlertDialog
+        open={isRemoveModalOpen}
+        type={"delete"}
+        title="Administrator-Status entfernen"
+        description="Möchten Sie diesen Benutzer wirklich als Administrator entfernen? Der Benutzer verliert damit alle Administratorrechte."
+        onClose={() => setIsRemoveModalOpen(false)}
+        onConfirm={() => {
+          setIsRemoveModalOpen(false);
+          handleRemoveAdmin();
+        }}
+      />
     </div>
   );
 };

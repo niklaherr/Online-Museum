@@ -90,7 +90,7 @@ npm start
 
 **Zugänglichkeit:**
 
-* Frontend: `http://localhost:3000` -> `http://localhost:80` bei der Nutzung von Docker Compose
+* Frontend: `http://localhost:3000` -> `http://localhost:8080` bei der Nutzung von Docker Compose
 * Backend: `http://localhost:3001`
 * DB: `localhost:5432`
 
@@ -132,6 +132,9 @@ Weitere Informationen findest du innerhalb der [Erklärung des Backends](./docum
 Ein Express.js-basiertes Backend.
 
 Weitere Informationen findest du innerhalb der [Erklärung des Backends](./documentation/backend.md).
+
+## 🚀 Deployment über Railway (Docker + öffentliche URLs)
+Diese Anwendung wird über [Railway](https://railway.com/) gehostet. Jede Komponente läuft in einem eigenen Docker-Container und wird als separater Railway-Service bereitgestellt. Die Kommunikation zwischen den Services erfolgt über die von Railway automatisch generierten öffentlichen URLs. Der genaue Aufbau wird im Verteilungsdiagramm dargestellt.
 
 
 ## 🆘 Support

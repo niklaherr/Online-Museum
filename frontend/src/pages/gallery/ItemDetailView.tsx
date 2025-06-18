@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, Button, Dialog, DialogPanel, Title, Flex, Card, Badge } from "@tremor/react";
+import { Text, Button, Title, Card, Badge } from "@tremor/react";
 import { UserIcon, PencilIcon, TrashIcon, CalendarIcon, TagIcon, LockClosedIcon, EyeIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { useParams } from "react-router-dom";
 import { GalleryItem } from "interfaces/Item";
@@ -8,6 +8,7 @@ import NotyfService from "services/NotyfService";
 import { userService } from "services/UserService";
 import NoResults from "components/helper/NoResults";
 import Loading from "components/helper/Loading";
+import AlertDialog from "components/helper/AlertDialog";
 
 type ItemDetailViewProps = {
   onNavigate: (route: string) => void;
@@ -220,37 +221,17 @@ const ItemDetailView = ({ onNavigate }: ItemDetailViewProps) => {
       </Card>
 
       {/* Delete confirmation dialog */}
-      <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
-        <DialogPanel className="max-w-md bg-white rounded-xl shadow-xl p-6">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-              <TrashIcon className="h-6 w-6 text-red-600" />
-            </div>
-            <Title className="text-lg font-semibold text-gray-900 mb-2">
-              Item wirklich löschen?
-            </Title>
-            <Text className="text-gray-500 mb-6">
-              Diese Aktion kann nicht rückgängig gemacht werden. Das Item "{item.title}" wird permanent gelöscht.
-            </Text>
-            <Flex justifyContent="end" className="space-x-3">
-              <Button 
-                variant="secondary" 
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="px-4"
-              >
-                Abbrechen
-              </Button>
-              <Button 
-                color="red" 
-                onClick={handleDeleteItem}
-                className="px-4"
-              >
-                Ja, löschen
-              </Button>
-            </Flex>
-          </div>
-        </DialogPanel>
-      </Dialog>
+      <AlertDialog
+        open={isDeleteModalOpen}
+        type={"delete"}
+        title="Item löschen"
+        description="Bist du sicher, dass du dieses Item löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden."        
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          setIsDeleteModalOpen(false);
+          handleDeleteItem();
+        }}
+      />
     </div>
   );
 };

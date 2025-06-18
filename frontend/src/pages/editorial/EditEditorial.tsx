@@ -8,6 +8,7 @@ import { GalleryItem } from "interfaces/Item";
 import NotyfService from "services/NotyfService";
 import { editorialService } from "services/EditorialService";
 import { itemAssistantService } from "services/ItemAssistantService";
+import AlertDialog from "components/helper/AlertDialog";
 
 // Props for navigation callback
 type EditEditorialProps = {
@@ -33,6 +34,7 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
   // State for AI description generation dialog
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUpdateConfirmOpen, setIsUpdateConfirmOpen] = useState(false);
   const [generatedDescription, setGeneratedDescription] = useState("");
 
   // Load editorial list details and items on mount
@@ -372,7 +374,7 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
         <div className="border-t pt-4">
           <Button
             color="blue"
-            onClick={handleUpdateList}
+            onClick={() => setIsUpdateConfirmOpen(true)}
             disabled={!title.trim() || selectedItems.length === 0}
           >
             Redaktionelle Liste bearbeiten
@@ -403,6 +405,19 @@ function EditEditorial({ onNavigate }: EditEditorialProps) {
           </div>
         </DialogPanel>
       </Dialog>
+
+      {/* Dialog for editing item */}
+      <AlertDialog
+        open={isUpdateConfirmOpen}
+        type={"update"}
+        title="Änderungen speichern?"
+        description="Bist du sicher, dass du die Änderungen an diesem Liste speichern möchtest?"
+        onClose={() => setIsUpdateConfirmOpen(false)}
+        onConfirm={() => {
+          setIsUpdateConfirmOpen(false);
+          handleUpdateList();
+        }}
+      />
     </div>
   );
 };

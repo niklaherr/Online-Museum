@@ -10,7 +10,7 @@ Das Online Museum Frontend ist eine moderne React-Webanwendung, die als digitale
 src/
 ├── components/           # Wiederverwendbare Komponenten
 │   ├── easter-eggs/     # Snake Game Easter Egg
-│   ├── helper/          # Utility-Komponenten (Loading, NoResults)
+│   ├── helper/          # Utility-Komponenten (Loading, NoResults, AlertDialog)
 │   └── layout/          # Layout-Komponenten (Header, Footer, Sidebar)
 ├── interfaces/          # TypeScript Interface-Definitionen
 ├── pages/              # Hauptseiten der Anwendung
@@ -35,7 +35,6 @@ Das Herzstück der Anwendung ermöglicht den Upload von Bildern mit Titel, Kateg
 
 - Datenschutz-Einstellungen für private/öffentliche Items
 - Vollständige CRUD-Operationen für eigene Items
-- Bildformat-Unterstützung: PNG, JPG, GIF bis 10MB
 
 ### 3. Listen-System
 Das innovative Listen-System organisiert Items in thematischen Sammlungen, die als digitale Erinnerungsräume fungieren. Benutzer können Banner-Bilder für ihre Listen hochladen und Beschreibungen mit KI-Unterstützung erstellen lassen. Die Sichtbarkeits-Kontrolle ermöglicht private oder öffentliche Listen, wobei die KI-Beschreibungen basierend auf den enthaltenen Items generiert werden.
@@ -71,11 +70,11 @@ Der **EditorialService** stellt Admin-spezifische Funktionen bereit, einschließ
 
 ## 🔒 Sicherheitsfeatures
 
-Das Sicherheitskonzept basiert auf JWT-basierter Authentifizierung mit Role-based Access Control (RBAC) für verschiedene Benutzerrollen. Input-Validierung erfolgt sowohl auf Frontend- als auch Backend-Ebene, während React's eingebauter XSS-Schutz zusätzliche Sicherheit bietet. Sichere Datei-Uploads mit Typ- und Größenvalidierung verhindern schädliche Uploads, und das Session-Management mit automatischem Logout sorgt für sichere Benutzersitzungen.
+Das Sicherheitskonzept basiert auf JWT-basierter Authentifizierung mit Role-based Access Control (RBAC) für verschiedene Benutzerrollen. Input-Validierung erfolgt sowohl auf Frontend- als auch Backend-Ebene, während React's eingebauter XSS-Schutz zusätzliche Sicherheit bietet. Das Session-Management mit automatischem Logout sorgt für sichere Benutzersitzungen.
 
 ## 📱 Responsive Design
 
-Die Anwendung ist vollständig responsive gestaltet und folgt einem Mobile-First-Ansatz für optimale Smartphone-Nutzung. Tablet-Support bietet angepasste Layouts für mittlere Bildschirme, während Desktop-Versionen vollständige Feature-Unterstützung gewährleisten.
+Die Anwendung ist vollständig responsiv gestaltet und folgt einem Mobile-First-Ansatz für optimale Smartphone-Nutzung. Tablet-Support bietet angepasste Layouts für mittlere Bildschirme, während Desktop-Versionen vollständige Feature-Unterstützung gewährleisten.
 
 ## 🎮 Easter Eggs
 
@@ -95,6 +94,5 @@ Die Entwicklung folgt bewährten Praktiken mit komponenten-basierter, modularer 
 - **Single Responsibility**: Eine Aufgabe pro Komponente
 - **Props Interface**: Typisierte Komponenten-Props
 - **Error Boundaries**: Fehler-Isolation für robuste Anwendungen
-- **Accessibility**: WCAG-konforme Entwicklung für barrierefreie Nutzung
 
 Das Online Museum Frontend bietet eine umfassende, moderne Lösung für eine digitale Kulturplattform mit professionellem UI/UX Design, robuster Architektur und erweiterbaren Features.

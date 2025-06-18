@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Title, Text, Button, Subtitle, Grid, Dialog, DialogPanel, Flex, Badge } from "@tremor/react";
+import { Card, Title, Text, Button, Grid, Badge } from "@tremor/react";
 import { UserIcon, TrashIcon, LockClosedIcon, EyeIcon, CalendarIcon, PencilIcon, ArrowLeftIcon, RectangleStackIcon, TagIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import ItemList from "interfaces/ItemList";
@@ -8,6 +8,7 @@ import { itemService } from "services/ItemService";
 import NotyfService from "services/NotyfService";
 import { userService } from "services/UserService";
 import Loading from "components/helper/Loading";
+import AlertDialog from "components/helper/AlertDialog";
 
 type ItemListDetailViewProps = {
   onNavigate: (route: string) => void;
@@ -281,40 +282,18 @@ const ItemListDetailView = ({ onNavigate }: ItemListDetailViewProps) => {
       )}
 
       {/* Delete confirmation dialog */}
-      <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
-        <DialogPanel className="max-w-md bg-white rounded-xl shadow-xl p-6">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-              <TrashIcon className="h-6 w-6 text-red-600" />
-            </div>
 
-            <Title className="text-lg font-semibold text-gray-900 mb-2">
-              Liste wirklich löschen?
-            </Title>
-
-            <Text className="text-gray-500 mb-6">
-              Diese Aktion kann nicht rückgängig gemacht werden. Die Liste "{list?.title}" wird permanent gelöscht.
-            </Text>
-
-            <Flex justifyContent="end" className="space-x-3">
-              <Button
-                variant="secondary"
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="px-4"
-              >
-                Abbrechen
-              </Button>
-              <Button
-                color="red"
-                onClick={handleDeleteItemList}
-                className="px-4"
-              >
-                Ja, löschen
-              </Button>
-            </Flex>
-          </div>
-        </DialogPanel>
-      </Dialog>
+      <AlertDialog
+        open={isDeleteModalOpen}
+        type={"delete"}
+        title="Item-Liste löschen"
+        description="Möchten Sie diese Item-Liste wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          setIsDeleteModalOpen(false);
+          handleDeleteItemList();
+        }}
+      />
     </div>
   );
 };

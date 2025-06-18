@@ -12,6 +12,7 @@ import Item, { GalleryItem } from "interfaces/Item";
 import { itemService } from "services/ItemService";
 import { itemAssistantService } from "services/ItemAssistantService";
 import NotyfService from "services/NotyfService";
+import AlertDialog from "components/helper/AlertDialog";
 
 type CreateItemListProps = {
   onNavigate: (route: string) => void;
@@ -660,36 +661,17 @@ export default function CreateItemList({ onNavigate }: CreateItemListProps) {
       </Dialog>
 
       {/* Dialog: Confirm creation of the list */}
-      <Dialog open={isCreateConfirmOpen} onClose={() => setIsCreateConfirmOpen(false)}>
-        <DialogPanel className="max-w-md bg-white rounded-xl shadow-xl p-6">
-          <div className="text-center space-y-4">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-              <CheckCircleIcon className="h-6 w-6 text-green-600" />
-            </div>
-            <Title className="text-lg font-semibold text-gray-900">
-              Liste erstellen?
-            </Title>
-            <Text className="text-gray-500">
-              Bist du sicher, dass du diese neue Liste mit {selectedItems.length} eigenen Items erstellen möchtest?
-            </Text>
-            <Flex justifyContent="end" className="space-x-3 pt-4">
-              <Button variant="secondary" onClick={() => setIsCreateConfirmOpen(false)}>
-                Abbrechen
-              </Button>
-              <Button
-                color="blue"
-                onClick={() => {
-                  setIsCreateConfirmOpen(false);
-                  handleSubmit();
-                }}
-                className="bg-gradient-to-r from-green-600 to-blue-600 border-0"
-              >
-                Ja, erstellen
-              </Button>
-            </Flex>
-          </div>
-        </DialogPanel>
-      </Dialog>
+      <AlertDialog
+        open={isCreateConfirmOpen}
+        type={"create"}
+        title="Item-Liste erstellen"
+        description="Bist du sicher, dass du diese neue Liste mit deinen ausgewählten Items erstellen möchtest?"
+        onClose={() => setIsCreateConfirmOpen(false)}
+        onConfirm={() => {
+          setIsCreateConfirmOpen(false);
+          handleSubmit();
+        }}
+      />
     </div>
   );
 }

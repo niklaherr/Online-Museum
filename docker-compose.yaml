@@ -57,7 +57,7 @@ services:
       REACT_APP_BACKEND_API_URL: http://localhost:3001
       REACT_APP_MISTRAL_API_KEY: SpbqZllg57jFyYGIT0PnvGzn8QPAX5Hs
     ports:
-      - "80:80"
+      - "8080:80"
     depends_on:
       backend:
         condition: service_healthy
