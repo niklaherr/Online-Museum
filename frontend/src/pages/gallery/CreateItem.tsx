@@ -10,6 +10,7 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@radix
 import { itemService } from "../../services/ItemService";
 import { itemAssistantService } from "../../services/ItemAssistantService";
 import NotyfService from "services/NotyfService";
+import AlertDialog from "components/helper/AlertDialog";
 
 type CreateItemProps = {
   onNavigate: (route: string) => void;
@@ -27,6 +28,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
   const [generatedDescription, setGeneratedDescription] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [isCreatingConfirmOpen, setIsCreatingConfirmOpen] = useState(false);
 
   // Handle image file selection and preview
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -440,7 +442,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
           <div className="space-y-3">
             <Button 
               color="emerald" 
-              onClick={handleCreate} 
+              onClick={() => setIsCreatingConfirmOpen(true)} 
               size="lg" 
               className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 border-0"
               disabled={!canCreate}
@@ -501,6 +503,19 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
           </div>
         </DialogPanel>
       </Dialog>
+
+      {/* Dialog for editing item */}
+      <AlertDialog
+        open={isCreatingConfirmOpen}
+        type={"create"}
+        title="Item erstellen"
+        description="Bist du sicher, dass du dieses Item erstellen möchtest? Du kannst es später noch bearbeiten."
+        onClose={() => setIsCreatingConfirmOpen(false)}
+        onConfirm={() => {
+          setIsCreatingConfirmOpen(false);
+          handleCreate();
+        }}
+      />
     </div>
   );
 };

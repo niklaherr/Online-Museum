@@ -8,6 +8,7 @@ import { itemAssistantService } from "services/ItemAssistantService";
 import NotyfService from "services/NotyfService";
 import Editorial from "interfaces/Editorial";
 import Loading from "components/helper/Loading";
+import AlertDialog from "components/helper/AlertDialog";
 
 type EditorialManagementProps = {
   onNavigate: (route: string) => void;
@@ -29,6 +30,7 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedListId, setSelectedListId] = useState<number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isCreateModelOpen, setIsCreateModelOpen] = useState(false);
 
   // State for AI description generation dialog
   const [isGenerating, setIsGenerating] = useState(false);
@@ -394,7 +396,7 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
         <div className="border-t pt-4">
           <Button
             color="blue"
-            onClick={handleCreateList}
+            onClick={() => setIsCreateModelOpen(true)}
             disabled={!title.trim() || selectedItems.length === 0}
           >
             Redaktionelle Liste erstellen
@@ -483,23 +485,31 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
         </DialogPanel>
       </Dialog>
 
+      {/* Create confirmation dialog */}
+      <AlertDialog
+        open={isCreateModelOpen}
+        type={"create"}
+        title="Redaktionelle Liste erstellen?"
+        description="Bist du sicher, dass du diese redaktionelle Liste erstellen möchtest? Du kannst die Liste später bearbeiten."
+        onClose={() => setIsCreateModelOpen(false)}
+        onConfirm={() => {
+          setIsCreateModelOpen(false);
+          handleCreateList();
+        }}
+      />
+
       {/* Delete confirmation dialog */}
-      <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
-        <DialogPanel className="max-w-sm bg-white rounded-xl shadow-md p-6">
-          <Title>Liste löschen bestätigen</Title>
-          <Text className="my-4">
-            Möchten Sie diese redaktionelle Liste wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
-          </Text>
-          <Flex justifyContent="end" className="space-x-2">
-            <Button variant="secondary" onClick={() => setIsDeleteModalOpen(false)}>
-              Abbrechen
-            </Button>
-            <Button color="red" onClick={handleDeleteList}>
-              Löschen
-            </Button>
-          </Flex>
-        </DialogPanel>
-      </Dialog>
+      <AlertDialog
+        open={isDeleteModalOpen}
+        type={"delete"}
+        title="Redaktionelle Liste löschen?"
+        description="Bist du sicher, dass du diese Inhalte löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden."
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          setIsDeleteModalOpen(false);
+          handleDeleteList();
+        }}
+      />
     </div>
   );
 };

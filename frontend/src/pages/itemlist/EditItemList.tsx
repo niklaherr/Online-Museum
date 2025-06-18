@@ -13,6 +13,7 @@ import { itemService } from "services/ItemService";
 import { itemAssistantService } from "services/ItemAssistantService";
 import NotyfService from "services/NotyfService";
 import Loading from "components/helper/Loading";
+import AlertDialog from "components/helper/AlertDialog";
 
 type EditItemListProps = {
   onNavigate: (route: string) => void;
@@ -685,39 +686,17 @@ export default function EditItemList({ onNavigate }: EditItemListProps) {
       </Dialog>
 
       {/* Dialog: Confirm update/save */}
-      <Dialog open={isUpdateConfirmOpen} onClose={() => setIsUpdateConfirmOpen(false)}>
-        <DialogPanel className="max-w-md bg-white rounded-xl shadow-xl p-6">
-          <div className="text-center space-y-4">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
-              <CheckCircleIcon className="h-6 w-6 text-blue-600" />
-            </div>
-            
-            <Title className="text-lg font-semibold text-gray-900">
-              Änderungen speichern?
-            </Title>
-            
-            <Text className="text-gray-500">
-              Bist du sicher, dass du die Änderungen an dieser Liste mit {selectedItems.length} eigenen Items speichern möchtest?
-            </Text>
-            
-            <Flex justifyContent="end" className="space-x-3 pt-4">
-              <Button variant="secondary" onClick={() => setIsUpdateConfirmOpen(false)}>
-                Abbrechen
-              </Button>
-              <Button
-                color="blue"
-                onClick={() => {
-                  setIsUpdateConfirmOpen(false);
-                  handleUpdate();
-                }}
-                className="bg-gradient-to-r from-green-600 to-blue-600 border-0"
-              >
-                Ja, speichern
-              </Button>
-            </Flex>
-          </div>
-        </DialogPanel>
-      </Dialog>
+      <AlertDialog
+        open={isUpdateConfirmOpen}
+        type={"update"}
+        title="Item-Liste bearbeiten"
+        description="Bist du sicher, dass du die Änderungen an dieser Liste mit {selectedItems.length} eigenen Items speichern möchtest?"
+        onClose={() => setIsUpdateConfirmOpen(false)}
+        onConfirm={() => {
+          setIsUpdateConfirmOpen(false);
+          handleUpdate();
+        }}
+      />
     </div>
   );
 }
