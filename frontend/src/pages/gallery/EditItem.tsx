@@ -178,7 +178,7 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
                   />
                 </div>
                 <div>
-                  <Text className="font-medium mb-2 text-gray-700">Kategorie *</Text>
+                  <Text className="font-medium mb-2 text-gray-700">Kategorie</Text>
                   <TextInput
                     placeholder="z.B. Malerei, Fotografie, Skulptur"
                     value={category}
@@ -396,9 +396,9 @@ export const EditItem = ({ onNavigate }: EditItemProps) => {
                 <div className="flex items-center justify-between">
                   <Text className="text-sm">Kategorie ausgefüllt</Text>
                   {category.trim() ? (
-                    <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                   <CheckCircleIcon className="w-5 h-5 text-green-500" />
                   ) : (
-                    <XCircleIcon className="w-5 h-5 text-red-500" />
+                    <XCircleIcon className="w-5 h-5 text-gray-400" />
                   )}
                 </div>
                 <div className="flex items-center justify-between">
