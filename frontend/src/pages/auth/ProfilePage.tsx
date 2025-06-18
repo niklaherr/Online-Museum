@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { Card, Title, Text, Flex, Button, TextInput, Dialog, DialogPanel, Badge } from '@tremor/react';
+import { Card, Title, Text, Flex, Button, TextInput, Badge } from '@tremor/react';
 import { KeyIcon, ShieldCheckIcon, TrashIcon, ArrowRightOnRectangleIcon, UserIcon, CogIcon, ExclamationTriangleIcon, ArrowRightCircleIcon } from '@heroicons/react/24/outline';
 import { ResetPasswordWithOldPasswordCredentials, userService } from 'services/UserService';
 import NotyfService from 'services/NotyfService';
 import { useNavigate } from 'react-router-dom';
+import AlertDialog from 'components/helper/AlertDialog';
 
 const ProfilePage = () => {
   // State for edit mode, delete modal, loading, and password form
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isChangePasswordModelOpen, setIsChangePasswordModelOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -213,7 +215,7 @@ const ProfilePage = () => {
                   </Button>
                   <Button 
                     color="blue" 
-                    onClick={handleSubmit}
+                    onClick={() => setIsChangePasswordModelOpen(true)}
                     loading={isLoading}
                     disabled={isLoading}
                     className="bg-gradient-to-r from-blue-600 to-indigo-600 border-0"
@@ -312,48 +314,33 @@ const ProfilePage = () => {
             </div>
           </Card>
       </div>
+
+      {/* Change Password confirmation modal */}
+      <AlertDialog
+        open={isChangePasswordModelOpen}
+        type={"info"}
+        title="Passwort ändern"
+        description="Sind Sie sicher, dass Sie Ihr Passwort ändern möchten? Diese Aktion wird Ihr aktuelles Passwort durch ein neues ersetzen."
+        onClose={() => setIsChangePasswordModelOpen(false)}
+        onConfirm={() => {
+          setIsChangePasswordModelOpen(false);
+          handleSubmit();
+        }}
+      />
+
+
       {/* Delete confirmation modal */}
-      <Dialog open={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
-        <DialogPanel className="max-w-md bg-white rounded-xl shadow-xl p-6">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-              <TrashIcon className="h-6 w-6 text-red-600" />
-            </div>
-            <Title className="text-lg font-semibold text-gray-900 mb-2">
-              Konto wirklich löschen?
-            </Title>
-            <Text className="text-gray-500 mb-6">
-              Diese Aktion kann nicht rückgängig gemacht werden. Alle Ihre Daten, 
-              Items und Listen werden permanent gelöscht.
-            </Text>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6">
-              <Text className="text-red-800 text-sm font-medium">
-                ⚠️ Warnung: Diese Aktion ist unwiderruflich!
-              </Text>
-            </div>
-            <Flex justifyContent="end" className="space-x-3">
-              <Button 
-                variant="secondary" 
-                onClick={() => setIsDeleteModalOpen(false)}
-                disabled={isLoading}
-              >
-                Abbrechen
-              </Button>
-              <Button 
-                color="red" 
-                onClick={() => { 
-                  deleteUser(); 
-                  setIsDeleteModalOpen(false); 
-                }}
-                loading={isLoading}
-                disabled={isLoading}
-              >
-                Ja, löschen
-              </Button>
-            </Flex>
-          </div>
-        </DialogPanel>
-      </Dialog>
+      <AlertDialog
+        open={isDeleteModalOpen}
+        type={"delete"}
+        title="Konto wirllich löschen?"
+        description="Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden. Alle Ihre Daten, Items und Listen werden permanent gelöscht."
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          setIsDeleteModalOpen(false);
+          deleteUser();
+        }}
+      />
     </div>
   );
 };
