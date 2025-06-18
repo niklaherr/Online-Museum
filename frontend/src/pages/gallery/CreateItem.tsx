@@ -177,7 +177,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
 
                 {/* Category input */}
                 <div>
-                  <Text className="font-medium mb-2 text-gray-700">Kategorie *</Text>
+                  <Text className="font-medium mb-2 text-gray-700">Kategorie</Text>
                   <TextInput
                     placeholder="z.B. Malerei, Fotografie, Skulptur, Vintage"
                     value={category}
