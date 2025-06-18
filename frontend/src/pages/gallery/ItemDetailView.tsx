@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, Button, Dialog, DialogPanel, Title, Flex, Card, Badge } from "@tremor/react";
+import { Text, Button, Title, Card, Badge } from "@tremor/react";
 import { UserIcon, PencilIcon, TrashIcon, CalendarIcon, TagIcon, LockClosedIcon, EyeIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { useParams } from "react-router-dom";
 import { GalleryItem } from "interfaces/Item";

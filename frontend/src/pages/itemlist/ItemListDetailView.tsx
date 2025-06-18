@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Title, Text, Button, Subtitle, Grid, Dialog, DialogPanel, Flex, Badge } from "@tremor/react";
+import { Card, Title, Text, Button, Grid, Badge } from "@tremor/react";
 import { UserIcon, TrashIcon, LockClosedIcon, EyeIcon, CalendarIcon, PencilIcon, ArrowLeftIcon, RectangleStackIcon, TagIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import { GalleryItem } from "interfaces/Item";
 import ItemList from "interfaces/ItemList";
