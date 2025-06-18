@@ -35,7 +35,6 @@ Das Herzstück der Anwendung ermöglicht den Upload von Bildern mit Titel, Kateg
 
 - Datenschutz-Einstellungen für private/öffentliche Items
 - Vollständige CRUD-Operationen für eigene Items
-- Bildformat-Unterstützung: PNG, JPG, GIF bis 10MB
 
 ### 3. Listen-System
 Das innovative Listen-System organisiert Items in thematischen Sammlungen, die als digitale Erinnerungsräume fungieren. Benutzer können Banner-Bilder für ihre Listen hochladen und Beschreibungen mit KI-Unterstützung erstellen lassen. Die Sichtbarkeits-Kontrolle ermöglicht private oder öffentliche Listen, wobei die KI-Beschreibungen basierend auf den enthaltenen Items generiert werden.

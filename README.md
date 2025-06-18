@@ -90,7 +90,7 @@ npm start
 
 **Zugänglichkeit:**
 
-* Frontend: `http://localhost:3000` -> `http://localhost:80` bei der Nutzung von Docker Compose
+* Frontend: `http://localhost:3000` -> `http://localhost:8080` bei der Nutzung von Docker Compose
 * Backend: `http://localhost:3001`
 * DB: `localhost:5432`
 
