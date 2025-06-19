@@ -136,7 +136,7 @@ Weitere Informationen findest du innerhalb der [Erklärung des Backends](./docum
 ## 📚 Präsentationsfolien
 
 Folien der Präsentation über Arbeitsweise, Architektur, Herausforderungen und Lessons Learned.
-Weitere Informationen findest du innerhalb der [Präsentationsfolien](./documentation/Effiziente-Entwicklung-mit-React-and-Scrum (1).pdf).
+Weitere Informationen findest du innerhalb der [Präsentationsfolien](./documentation/presentation.pdf).
 
 ## 🚀 Deployment über Railway (Docker + öffentliche URLs)
 Diese Anwendung wird über [Railway](https://railway.com/) gehostet. Jede Komponente läuft in einem eigenen Docker-Container und wird als separater Railway-Service bereitgestellt. Die Kommunikation zwischen den Services erfolgt über die von Railway automatisch generierten öffentlichen URLs. Der genaue Aufbau wird im Verteilungsdiagramm dargestellt.
