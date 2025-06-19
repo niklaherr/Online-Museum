@@ -124,7 +124,7 @@ Weitere Informationen findest du ![bei anderen Diagrammen](./documentation/diagr
 ## 📚 Dokumentation - Frontend
 
 Ein React basiertes Frontend.
-Weitere Informationen findest du innerhalb der [Erklärung des Backends](./documentation/frontend.md).
+Weitere Informationen findest du innerhalb der [Erklärung des Frontends](./documentation/frontend.md).
 
 
 ## 📚 API-Dokumentation - Backend
