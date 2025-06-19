@@ -12,6 +12,8 @@ Ein Kontaktformular-System erleichtert die Kommunikation zwischen Benutzern und 
 
 ## 👥 Benutzertypen und Berechtigungen
 
+Folgende Anwendungsfälle sind im Frontend vorhanden und sind je nach Rolle erlaubt oder nicht. Diese wird hier aufgeführt, da das Backend ebenfalls für die Absicherung der Anwendungsfälle verantwortlich ist.
+
 ### Berechtigungsübersicht
 
 | Funktion | Anonyme Benutzer | Registrierte Benutzer | Administratoren |
