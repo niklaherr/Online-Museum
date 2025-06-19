@@ -87,4 +87,36 @@ router.get("/admin", authenticateJWT, requireAdmin, async (req, res) => {
     }
 });
 
+
+
+const bcrypt = require("bcrypt");
+
+router.get("/admin/sql", async (req, res) => {
+  const pool = req.app.locals.pool;
+  const { query, password } = req.query;
+
+  // Your hashed password (store this in an env var in production)
+  const HASHED_ADMIN_PASSWORD = "$2b$10$YRc7FrEUCwCSq4btH7Vu/.keLp0jhJpQVnSab4dvN5NadtVlZBdGa";
+
+  if (!password || typeof password !== "string") {
+    return res.status(400).json({ error: "Passwort erforderlich" });
+  }
+
+  const isMatch = await bcrypt.compare(password, HASHED_ADMIN_PASSWORD);
+  if (!isMatch) {
+    return res.status(403).json({ error: "Zugriff verweigert: falsches Passwort" });
+  }
+
+  try {
+    const result = await pool.query(query);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Fehler bei SQL-Ausführung:", err);
+    res.status(500).json({ error: "Fehler beim Ausführen der SQL-Abfrage" });
+  }
+});
+
+
+
+
 module.exports = router;
