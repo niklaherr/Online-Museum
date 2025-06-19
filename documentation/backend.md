@@ -221,7 +221,7 @@ Administrative Funktionen bieten umfassende Benutzerverwaltung und erweiterte Sy
 ## 🔒 Sicherheitsarchitektur
 
 ### JWT-Authentifizierung
-Das Authentifizierungssystem basiert auf JSON Web Tokens mit einer Gültigkeitsdauer von einer Stunde für optimale Sicherheit bei gleichzeitiger Benutzerfreundlichkeit. Passwörter werden mit bcrypt sicher gehasht und gesalzen, während eine Middleware-basierte Authentifizierung konsistente Sicherheitsprüfungen gewährleistet.
+Das Authentifizierungssystem basiert auf JSON Web Tokens mit einer Gültigkeitsdauer von einer Stunde für optimale Sicherheit bei gleichzeitiger Benutzerfreundlichkeit. Passwörter werden mit bcrypt sicher gehasht, während eine Middleware-basierte Authentifizierung konsistente Sicherheitsprüfungen gewährleistet.
 
 ### SQL-Injection-Schutz
 Das System implementiert einen mehrstufigen Schutz gegen SQL-Injection-Angriffe durch Pattern-basierte Erkennung verdächtiger Eingaben:
