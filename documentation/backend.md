@@ -273,6 +273,6 @@ Der SQL-Injection-Schutz basiert auf Pattern-Erkennung und könnte fortgeschritt
 ### Geplante Verbesserungen
 Die Migration zu Cloud Storage (AWS S3, Azure Blob) würde Skalierbarkeit und Performance verbessern. Caching-Mechanismen für häufig abgerufene Daten könnten die Antwortzeiten erheblich reduzieren. Eine OpenAPI/Swagger-Integration würde die API-Dokumentation automatisieren und verbessern.
 
-Prometheus/Grafana-Integration würde umfassende Monitoring- und Alerting-Funktionen bieten. Die Implementierung von Unit- und Integration-Tests würde Code-Qualität und Zuverlässigkeit sicherstellen. Rate Limiting und erweiterte Sicherheitsfeatures würden die Plattform gegen verschiedene Angriffsvektoren absichern.
+Die Implementierung von Unit- und Integration-Tests würde Code-Qualität und Zuverlässigkeit sicherstellen. Rate Limiting und erweiterte Sicherheitsfeatures würden die Plattform gegen verschiedene Angriffsvektoren absichern.
 
 Das Online Museum Backend bietet eine solide, sicherheitsorientierte Grundlage für die digitale Kulturplattform mit klaren Erweiterungsmöglichkeiten für zukünftige Anforderungen.
