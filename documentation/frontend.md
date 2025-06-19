@@ -46,7 +46,7 @@ Administratoren können kuratierte Sammlungen erstellen, die verschiedene Items 
 Die Galerie präsentiert Items in einer kategorisierten Ansicht mit responsivem Grid-Layout, das sich automatisch an verschiedene Bildschirmgrößen anpasst. Eine Volltextsuche durchsucht Titel, Kategorien und Benutzernamen, während Item-Details umfassende Metadaten anzeigen.
 
 ### 6. Dashboard & Analytics
-Das personalisierte Dashboard bietet eine zentrale Übersicht mit Statistiken und interaktiven Diagrammen für Item- und Listen-Entwicklung. Ein chronologischer Aktivitäts-Feed dokumentiert alle Benutzeraktionen, während Schnellaktionen direkten Zugang zu häufig genutzten Funktionen bieten.
+Das personalisierte Dashboard bietet eine zentrale Übersicht mit Statistiken und interaktiven Diagrammen für Item- und Listen-Entwicklung. Ein chronologischer Aktivitäts-Feed dokumentiert neuste Benutzeraktionen, während Schnellaktionen direkten Zugang zu häufig genutzten Funktionen bieten.
 
 ### 7. Admin-Funktionen
 Das umfassende Admin-Panel ermöglicht Benutzerverwaltung mit Such- und Verwaltungsfunktionen, Rechtevergabe für Admin-Status, ein Support-System für Kontaktanfragen und Redaktions-Tools für kuratierte Inhalte.
