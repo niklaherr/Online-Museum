@@ -89,7 +89,7 @@ export const CreateItem = ({ onNavigate }: CreateItemProps) => {
     setIsGenerating(true);
 
     try {
-      const generatedText = await itemAssistantService.generateDescription(title, category);
+      const generatedText = await itemAssistantService.generateItemDescription(title, category);
       setGeneratedDescription(generatedText);
       setIsDialogOpen(true);
       NotyfService.showSuccess("Beschreibung erfolgreich generiert.");
