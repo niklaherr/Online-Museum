@@ -209,7 +209,6 @@ const EditorialManagement = ({ onNavigate }: EditorialManagementProps) => {
           <TooltipProvider>
             <div>
               <div className="flex justify-between items-center mb-2">
-                <Text>Beschreibung</Text>
                 {selectedItems.length === 0 || !title.trim() ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
