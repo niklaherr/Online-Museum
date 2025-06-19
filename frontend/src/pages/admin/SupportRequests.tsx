@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Title, Text, Badge, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Button, Select, SelectItem, Divider, Dialog, DialogPanel } from '@tremor/react';
+import { Card, Title, Text, Badge, Table, TableHead, TableRow, TableHeaderCell, TableBody, TableCell, Button, Select, SelectItem, Divider, Dialog, DialogPanel, Flex, Grid } from '@tremor/react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import ContactForm from 'interfaces/ContactForm';
@@ -198,35 +198,35 @@ const SupportRequests = () => {
           {selectedForm && (
             <div>
               {/* Modal header with subject and status */}
-              <div className="flex justify-between items-start mb-4">
+              <Flex justifyContent="between" alignItems="start" className="mb-4">
                 <Title>{selectedForm.subject}</Title>
                 {getStatusBadge(selectedForm.status)}
-              </div>
-              
+              </Flex>
+
               {/* Submission date */}
-              <div className="mb-4">
-                <Text className="text-sm text-gray-500">Eingereicht am {formatDate(selectedForm.submitted_on)}</Text>
-              </div>
-              
+              <Text className="text-sm text-gray-500 mb-4">
+                Eingereicht am {formatDate(selectedForm.submitted_on)}
+              </Text>
+
               {/* Name and email */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <Grid numItemsSm={2} numItems={1} className="gap-4 mb-4">
                 <div>
                   <Text className="font-medium">Name</Text>
                   <Text>{selectedForm.name}</Text>
                 </div>
                 <div>
                   <Text className="font-medium">E-Mail</Text>
-                  <a 
-                    href={`mailto:${selectedForm.email}`} 
+                  <a
+                    href={`mailto:${selectedForm.email}`}
                     className="text-blue-600 hover:underline"
                   >
                     {selectedForm.email}
                   </a>
                 </div>
-              </div>
-              
+              </Grid>
+
               <Divider />
-              
+
               {/* Message content */}
               <div className="my-4">
                 <Text className="font-medium mb-2">Nachricht</Text>
@@ -234,43 +234,48 @@ const SupportRequests = () => {
                   {selectedForm.message}
                 </div>
               </div>
-              
+
               <Divider />
-              
+
               {/* Status change and action buttons */}
-              <div className="mt-4 flex justify-between items-center">
-                <div>
+              <div className="flex justify-end w-full">
+                <div className="w-full sm:w-auto">
                   <Text className="font-medium">Status ändern</Text>
-                  <Select 
-                    value={selectedForm.status} 
+                  <Select
+                    value={selectedForm.status}
                     onValueChange={(value) => handleStatusChange(selectedForm.id, value)}
-                    className="w-40 mt-1"
+                    className="mt-1 w-full sm:w-40"
                   >
                     <SelectItem value="new">Neu</SelectItem>
                     <SelectItem value="in_progress">In Bearbeitung</SelectItem>
                     <SelectItem value="completed">Abgeschlossen</SelectItem>
                   </Select>
                 </div>
-                
-                <div className="space-x-2">
-                  <Button 
-                    onClick={() => setIsDetailModalOpen(false)}
-                  >
-                    Schließen
-                  </Button>
-                  <Button 
-                    variant="secondary" 
-                    color="blue"
-                    onClick={() => window.open(`mailto:${selectedForm.email}?subject=Re: ${selectedForm.subject}`)}
-                  >
-                    Antworten
-                  </Button>
-                </div>
               </div>
+
+              <Flex flexDirection="col" className="gap-2 sm:flex-row sm:gap-2 sm:justify-end mt-4">
+                <Button 
+                  variant="secondary"
+                  onClick={() => setIsDetailModalOpen(false)} className="w-full sm:w-auto"
+                >
+                  Schließen
+                </Button>
+                <Button
+                  variant="primary"
+                  color="blue"
+                  onClick={() =>
+                    window.open(`mailto:${selectedForm.email}?subject=Re: ${selectedForm.subject}`)
+                  }
+                  className="w-full sm:w-auto"
+                >
+                  Antworten
+                </Button>
+              </Flex>
             </div>
           )}
         </DialogPanel>
       </Dialog>
+
     </div>
   );
 };
